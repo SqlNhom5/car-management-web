@@ -1,9 +1,11 @@
 package com.vehicle.marketplace.service;
 
 
+import com.vehicle.marketplace.Entity.RoleEntity;
 import com.vehicle.marketplace.Entity.UserEntity;
 import com.vehicle.marketplace.Enum.ErrorCode;
 import com.vehicle.marketplace.Enum.Role;
+import com.vehicle.marketplace.constant.PredefinedRole;
 import com.vehicle.marketplace.exception.AppException;
 import com.vehicle.marketplace.mapper.UserMapper;
 import com.vehicle.marketplace.model.request.UserCreationRequest;
@@ -18,8 +20,11 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
 import org.springframework.context.annotation.Bean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.crossstore.ChangeSetPersister;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -36,16 +41,23 @@ public class UserService {
 //    PasswordEncoder passwordEncoder;
 
 
-    public UserResponse createUser(UserCreationRequest userCreationRequest) {
-        if (userRepository.existsByUsername(userCreationRequest.getUsername())) {
-            throw new AppException(ErrorCode.USER_EXISTS);
+    public UserResponse createUser(UserCreationRequest request) {
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new AppException(ErrorCode.USER_EXISTED);
         }
-        UserEntity user = userMapper.toUser(userCreationRequest);
+        UserEntity user = userMapper.toUser(request);
         // mã hoá
-
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Role.USER.name());
-        return userMapper.toUserResponse(userRepository.save(user));
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        HashSet<RoleEntity> roles = new HashSet<>();
+        roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
+        user.setRoles(roles);
+        try {
+            user = userRepository.save(user);
+        } catch (DataIntegrityViolationException exception) {
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
+        return userMapper.toUserResponse(user);
     }
 
     public List<UserResponse> getUsers(){
@@ -64,6 +76,8 @@ public class UserService {
     public UserResponse updateUser(Long id, UserUpdateRequest request) {
         UserEntity user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         userMapper.updateUser(user, request);
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         var roles = roleRepository.findAllById(request.getRoles());
         user.setRoles(new HashSet<>(roles));
         return userMapper.toUserResponse(userRepository.save(user));

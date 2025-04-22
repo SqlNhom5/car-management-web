@@ -11,7 +11,7 @@ public enum ErrorCode {
     // Lỗi không xác định
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized Error.", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_KEY(1001, "Invalid message key.", HttpStatus.BAD_REQUEST),
-    USER_EXISTS(1002, "User already exists.", HttpStatus.BAD_REQUEST),
+    USER_EXISTED(1002, "User already existed.", HttpStatus.BAD_REQUEST),
     USERNAME_INVALID(1003, "Username must be at least {min} characters.", HttpStatus.BAD_REQUEST),
     PASSWORD_INVALID(1004, "Password must be at least {min} characters.", HttpStatus.BAD_REQUEST),
     USER_NOT_EXISTED(1005, "User not exists.", HttpStatus.NOT_FOUND),

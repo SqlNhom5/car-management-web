@@ -1,9 +1,13 @@
 package com.vehicle.marketplace.mapper;
 
+import com.vehicle.marketplace.Entity.RoleEntity;
 import com.vehicle.marketplace.Entity.UserEntity;
 import com.vehicle.marketplace.model.request.UserCreationRequest;
 import com.vehicle.marketplace.model.request.UserUpdateRequest;
+import com.vehicle.marketplace.model.response.RoleResponse;
 import com.vehicle.marketplace.model.response.UserResponse;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +43,7 @@ public class UserMapperImpl implements UserMapper {
 
         UserResponse userResponse = new UserResponse();
 
+        userResponse.setRoles( roleEntitySetToRoleResponseSet( userEntity.getRoles() ) );
         userResponse.setUsername( userEntity.getUsername() );
         userResponse.setFirstName( userEntity.getFirstName() );
         userResponse.setLastName( userEntity.getLastName() );
@@ -56,5 +61,31 @@ public class UserMapperImpl implements UserMapper {
         userEntity.setPassword( request.getPassword() );
         userEntity.setFirstName( request.getFirstName() );
         userEntity.setLastName( request.getLastName() );
+    }
+
+    protected RoleResponse roleEntityToRoleResponse(RoleEntity roleEntity) {
+        if ( roleEntity == null ) {
+            return null;
+        }
+
+        RoleResponse.RoleResponseBuilder roleResponse = RoleResponse.builder();
+
+        roleResponse.name( roleEntity.getName() );
+        roleResponse.description( roleEntity.getDescription() );
+
+        return roleResponse.build();
+    }
+
+    protected Set<RoleResponse> roleEntitySetToRoleResponseSet(Set<RoleEntity> set) {
+        if ( set == null ) {
+            return null;
+        }
+
+        Set<RoleResponse> set1 = new LinkedHashSet<RoleResponse>( Math.max( (int) ( set.size() / .75f ) + 1, 16 ) );
+        for ( RoleEntity roleEntity : set ) {
+            set1.add( roleEntityToRoleResponse( roleEntity ) );
+        }
+
+        return set1;
     }
 }
