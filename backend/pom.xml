@@ -42,6 +42,11 @@
 <!--            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>-->
 <!--        </dependency>-->
         <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>9.30.1</version>
+        </dependency>
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.33</version>
