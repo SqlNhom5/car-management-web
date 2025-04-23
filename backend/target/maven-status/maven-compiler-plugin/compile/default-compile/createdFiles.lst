@@ -1,5 +1,6 @@
 com\vehicle\marketplace\model\request\CarCreationRequest$CarCreationRequestBuilder.class
 com\vehicle\marketplace\mapper\UserMapper.class
+com\vehicle\marketplace\model\request\CarSearchRequest$CarSearchRequestBuilder.class
 com\vehicle\marketplace\model\request\UserUpdateRequest$UserUpdateRequestBuilder.class
 com\vehicle\marketplace\mapper\CarMapper.class
 com\vehicle\marketplace\service\UserService.class
@@ -18,12 +19,15 @@ com\vehicle\marketplace\Entity\CarEntity$CarEntityBuilder.class
 com\vehicle\marketplace\Entity\CarEntity.class
 com\vehicle\marketplace\model\request\UserCreationRequest$UserCreationRequestBuilder.class
 com\vehicle\marketplace\model\request\UserUpdateRequest.class
+com\vehicle\marketplace\repository\custom\CarRepositoryCustom.class
 com\vehicle\marketplace\model\response\CarResponse.class
 com\vehicle\marketplace\model\request\UserCreationRequest.class
 com\vehicle\marketplace\controller\CarController.class
 com\vehicle\marketplace\mapper\UserMapperImpl.class
 com\vehicle\marketplace\exception\GlobalExceptionHandle.class
 com\vehicle\marketplace\model\response\ApiResponse.class
+com\vehicle\marketplace\repository\custom\impl\CarRepositoryImpl.class
 com\vehicle\marketplace\Entity\UserEntity$UserEntityBuilder.class
+com\vehicle\marketplace\model\request\CarSearchRequest.class
 com\vehicle\marketplace\model\response\ApiResponse$ApiResponseBuilder.class
 com\vehicle\marketplace\Enum\ErrorCode.class

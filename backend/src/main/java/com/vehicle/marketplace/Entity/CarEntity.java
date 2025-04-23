@@ -11,19 +11,41 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CarEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long carId;
+    @Column(name = "CarID")
+    Integer carId;
+
+    @Column(name = "CarName")
     String carName;
+
+    @Column(name = "Brand")
     String brand;
+
+    @Column(name = "Model")
     String model;
-    Long manufactureYear;
+
+    @Column(name = "ManufactureYear")
+    Integer manufactureYear;
+
+    @Column(name = "LicensePlate")
     String licensePlate;
-    Long price;
+
+    @Column(name = "Price")
+    Integer price;
+
+    @Column(name = "Status")
     String status;
+
+    @Column(name = "Color")
     String color;
+
+    @Column(name = "Specifications", columnDefinition = "TEXT")
     String specifications;
-    String imageURL;
-    Long warrantyPeriod;
+
+    @Column(name = "ImageURL")
+    String imageUrl;
+
+    @Column(name = "WarrantyPeriod")
+    Integer warrantyPeriod;
 }

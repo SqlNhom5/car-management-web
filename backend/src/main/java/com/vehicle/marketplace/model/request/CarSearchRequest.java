@@ -14,14 +14,11 @@ public class CarSearchRequest {
     String carName;
     String brand;
     String model;
-    Long manufactureYearFrom;
-    Long manufactureYearTo;
-    String licensePlate;
-    Long priceFrom;
-    Long priceTo;
+    Integer manufactureYearFrom;
+    Integer manufactureYearTo;
+    Integer priceFrom;
+    Integer priceTo;
     String status;
     String color;
-    String specifications;
-    String imageURL;
-    Long warrantyPeriod;
+    Integer warrantyPeriod;
 }

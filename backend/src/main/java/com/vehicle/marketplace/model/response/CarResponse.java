@@ -12,12 +12,12 @@ public class CarResponse {
     String carName;
     String brand;
     String model;
-    Long manufactureYear;
+    Integer manufactureYear;
     String licensePlate;
-    Long price;
+    Integer price;
     String status;
     String color;
     String specifications;
-    String imageURL;
-    Long warrantyPeriod;
+    String imageUrl;
+    Integer warrantyPeriod;
 }

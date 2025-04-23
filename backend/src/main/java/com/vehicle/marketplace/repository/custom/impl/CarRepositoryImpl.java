@@ -6,6 +6,7 @@ import com.vehicle.marketplace.repository.custom.CarRepositoryCustom;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,7 +25,7 @@ public class CarRepositoryImpl implements CarRepositoryCustom {
             for(Field item : fields){
                 item.setAccessible(true);
                 String fieldName = item.getName();
-                if(!fieldName.equals("manufactureYear") && !fieldName.equals("price")){
+                if(!fieldName.startsWith("manufactureYear") && !fieldName.startsWith("price")){
                      Object value = item.get(carSearchRequest);
                      if(value != null && !value.equals("")){
                          if(item.getType().getName().equals("java.lang.Long") ||item.getType().getName().equals("java.lang.Integer")
@@ -43,8 +44,8 @@ public class CarRepositoryImpl implements CarRepositoryCustom {
     }
 
     public static void querySpecial(CarSearchRequest carSearchRequest, StringBuilder where){
-        Long priceFrom=carSearchRequest.getPriceFrom();
-        Long priceTo=carSearchRequest.getPriceTo();
+        Integer priceFrom=carSearchRequest.getPriceFrom();
+        Integer priceTo=carSearchRequest.getPriceTo();
         if(priceFrom != null){
             where.append(" and car.price  >= "+priceFrom);
         }
@@ -52,8 +53,8 @@ public class CarRepositoryImpl implements CarRepositoryCustom {
             where.append(" and car.price  <= "+priceFrom);
         }
 
-        Long manufactureYearFrom=carSearchRequest.getManufactureYearFrom();
-        Long manufactureYearTo=carSearchRequest.getManufactureYearTo();
+        Integer manufactureYearFrom=carSearchRequest.getManufactureYearFrom();
+        Integer manufactureYearTo=carSearchRequest.getManufactureYearTo();
         if(manufactureYearFrom != null){
             where.append(" and car.manufacture_year  >= "+manufactureYearFrom);
         }
@@ -68,9 +69,10 @@ public class CarRepositoryImpl implements CarRepositoryCustom {
         StringBuilder where= new StringBuilder(" where 1=1 ");
         queryNomal(carSearchRequest, where);
         querySpecial(carSearchRequest, where);
+        sql.append(where);
         sql.append(" ; ");
-        Query query=entityManager.createQuery(sql.toString(),CarEntity.class);
-        List<CarEntity> ok= query.getResultList();
+        Query query=entityManager.createNativeQuery(sql.toString(),CarEntity.class);
+        List<CarEntity> ok=query.getResultList();
         return null;
     }
 }

@@ -1,5 +1,7 @@
+C:\Users\nguye\OneDrive\Desktop\xe\backend\src\main\java\com\vehicle\marketplace\repository\custom\CarRepositoryCustom.java
 C:\Users\nguye\OneDrive\Desktop\xe\backend\src\main\java\com\vehicle\marketplace\mapper\UserMapper.java
 C:\Users\nguye\OneDrive\Desktop\xe\backend\src\main\java\com\vehicle\marketplace\controller\CarController.java
+C:\Users\nguye\OneDrive\Desktop\xe\backend\src\main\java\com\vehicle\marketplace\model\request\CarSearchRequest.java
 C:\Users\nguye\OneDrive\Desktop\xe\backend\src\main\java\com\vehicle\marketplace\model\request\UserUpdateRequest.java
 C:\Users\nguye\OneDrive\Desktop\xe\backend\src\main\java\com\vehicle\marketplace\exception\GlobalExceptionHandle.java
 C:\Users\nguye\OneDrive\Desktop\xe\backend\src\main\java\com\vehicle\marketplace\model\response\ApiResponse.java
@@ -19,3 +21,4 @@ C:\Users\nguye\OneDrive\Desktop\xe\backend\src\main\java\com\vehicle\marketplace
 C:\Users\nguye\OneDrive\Desktop\xe\backend\src\main\java\com\vehicle\marketplace\CarMarketplaceApplication.java
 C:\Users\nguye\OneDrive\Desktop\xe\backend\src\main\java\com\vehicle\marketplace\model\response\CarResponse.java
 C:\Users\nguye\OneDrive\Desktop\xe\backend\src\main\java\com\vehicle\marketplace\repository\UserRepository.java
+C:\Users\nguye\OneDrive\Desktop\xe\backend\src\main\java\com\vehicle\marketplace\repository\custom\impl\CarRepositoryImpl.java
