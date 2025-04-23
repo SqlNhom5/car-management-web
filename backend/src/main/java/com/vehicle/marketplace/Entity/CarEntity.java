@@ -4,7 +4,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Entity
-@Table(name = "Car")
+@Table(name = "car")
 @Data // Tạo getter, setter, toString, equals, hashCode
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,39 +13,39 @@ import lombok.experimental.FieldDefaults;
 public class CarEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "CarID")
+    @Column(name = "carid")
     Integer carId;
 
-    @Column(name = "CarName")
+    @Column(name = "carname")
     String carName;
 
-    @Column(name = "Brand")
+    @Column(name = "brand")
     String brand;
 
-    @Column(name = "Model")
+    @Column(name = "model")
     String model;
 
-    @Column(name = "ManufactureYear")
+    @Column(name = "manufactureyear")
     Integer manufactureYear;
 
-    @Column(name = "LicensePlate")
+    @Column(name = "licenseplate")
     String licensePlate;
 
-    @Column(name = "Price")
+    @Column(name = "price")
     Integer price;
 
-    @Column(name = "Status")
+    @Column(name = "status")
     String status;
 
-    @Column(name = "Color")
+    @Column(name = "color")
     String color;
 
-    @Column(name = "Specifications", columnDefinition = "TEXT")
+    @Column(name = "specifications", columnDefinition = "TEXT")
     String specifications;
 
-    @Column(name = "ImageURL")
+    @Column(name = "imageurl")
     String imageUrl;
 
-    @Column(name = "WarrantyPeriod")
+    @Column(name = "warrantyperiod")
     Integer warrantyPeriod;
 }

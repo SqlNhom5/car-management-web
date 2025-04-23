@@ -72,7 +72,6 @@ public class CarRepositoryImpl implements CarRepositoryCustom {
         sql.append(where);
         sql.append(" ; ");
         Query query=entityManager.createNativeQuery(sql.toString(),CarEntity.class);
-        List<CarEntity> ok=query.getResultList();
-        return null;
+        return query.getResultList();
     }
 }

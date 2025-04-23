@@ -25,19 +25,14 @@ public class CarMapperImpl implements CarMapper {
         carEntity.carName( carCreationRequest.getCarName() );
         carEntity.brand( carCreationRequest.getBrand() );
         carEntity.model( carCreationRequest.getModel() );
-        if ( carCreationRequest.getManufactureYear() != null ) {
-            carEntity.manufactureYear( carCreationRequest.getManufactureYear().intValue() );
-        }
+        carEntity.manufactureYear( carCreationRequest.getManufactureYear() );
         carEntity.licensePlate( carCreationRequest.getLicensePlate() );
-        if ( carCreationRequest.getPrice() != null ) {
-            carEntity.price( carCreationRequest.getPrice().intValue() );
-        }
+        carEntity.price( carCreationRequest.getPrice() );
         carEntity.status( carCreationRequest.getStatus() );
         carEntity.color( carCreationRequest.getColor() );
         carEntity.specifications( carCreationRequest.getSpecifications() );
-        if ( carCreationRequest.getWarrantyPeriod() != null ) {
-            carEntity.warrantyPeriod( carCreationRequest.getWarrantyPeriod().intValue() );
-        }
+        carEntity.imageUrl( carCreationRequest.getImageUrl() );
+        carEntity.warrantyPeriod( carCreationRequest.getWarrantyPeriod() );
 
         return carEntity.build();
     }
@@ -56,19 +51,14 @@ public class CarMapperImpl implements CarMapper {
         carResponse.setCarName( carEntity.getCarName() );
         carResponse.setBrand( carEntity.getBrand() );
         carResponse.setModel( carEntity.getModel() );
-        if ( carEntity.getManufactureYear() != null ) {
-            carResponse.setManufactureYear( carEntity.getManufactureYear().longValue() );
-        }
+        carResponse.setManufactureYear( carEntity.getManufactureYear() );
         carResponse.setLicensePlate( carEntity.getLicensePlate() );
-        if ( carEntity.getPrice() != null ) {
-            carResponse.setPrice( carEntity.getPrice().longValue() );
-        }
+        carResponse.setPrice( carEntity.getPrice() );
         carResponse.setStatus( carEntity.getStatus() );
         carResponse.setColor( carEntity.getColor() );
         carResponse.setSpecifications( carEntity.getSpecifications() );
-        if ( carEntity.getWarrantyPeriod() != null ) {
-            carResponse.setWarrantyPeriod( carEntity.getWarrantyPeriod().longValue() );
-        }
+        carResponse.setImageUrl( carEntity.getImageUrl() );
+        carResponse.setWarrantyPeriod( carEntity.getWarrantyPeriod() );
 
         return carResponse;
     }
@@ -82,27 +72,13 @@ public class CarMapperImpl implements CarMapper {
         carEntity.setCarName( request.getCarName() );
         carEntity.setBrand( request.getBrand() );
         carEntity.setModel( request.getModel() );
-        if ( request.getManufactureYear() != null ) {
-            carEntity.setManufactureYear( request.getManufactureYear().intValue() );
-        }
-        else {
-            carEntity.setManufactureYear( null );
-        }
+        carEntity.setManufactureYear( request.getManufactureYear() );
         carEntity.setLicensePlate( request.getLicensePlate() );
-        if ( request.getPrice() != null ) {
-            carEntity.setPrice( request.getPrice().intValue() );
-        }
-        else {
-            carEntity.setPrice( null );
-        }
+        carEntity.setPrice( request.getPrice() );
         carEntity.setStatus( request.getStatus() );
         carEntity.setColor( request.getColor() );
         carEntity.setSpecifications( request.getSpecifications() );
-        if ( request.getWarrantyPeriod() != null ) {
-            carEntity.setWarrantyPeriod( request.getWarrantyPeriod().intValue() );
-        }
-        else {
-            carEntity.setWarrantyPeriod( null );
-        }
+        carEntity.setImageUrl( request.getImageUrl() );
+        carEntity.setWarrantyPeriod( request.getWarrantyPeriod() );
     }
 }
