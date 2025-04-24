@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="79336c97-1060-4601-b838-114d3f298af5" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/VehicleMarketplaceApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/VehicleMarketplaceApplication.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/controller/CustomerController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/controller/CustomerController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/controller/VehicleController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/controller/VehicleController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/dto/CustomerDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/dto/CustomerDTO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/Customer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/Customer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/Vehicle.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/Vehicle.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/repository/CustomerRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/repository/CustomerRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/repository/VehicleRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/repository/VehicleRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/service/CustomerService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/service/CustomerService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/service/CustomerServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/service/CustomerServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/service/VehicleService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/service/VehicleService.class" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "vankhanh3704"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/SqlNhom5/CarManagementWeb.git",
+    "accountId": "76cd95ac-33ca-40ee-9230-9e8feef22d2a"
+  }
+}]]></component>
+  <component name="JpbToolWindowState">
+    <option name="isToolWindowVisible" value="false" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 1
+}]]></component>
+  <component name="ProjectId" id="2wDwKZvKGbBIBsXs9SplzEUjRk9" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "Spring Boot.VehicleMarketplaceApplication.executor": "Run",
+    "git-widget-placeholder": "Vu-manageCustomer",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="VehicleMarketplaceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="vehicle-marketplace" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.vehicle.marketplace.VehicleMarketplaceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.24807.4" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.24807.4" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="79336c97-1060-4601-b838-114d3f298af5" name="Changes" comment="" />
+      <created>1745589388132</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1745589388132</updated>
+      <workItem from="1745589389263" duration="394000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
