@@ -1,9 +1,12 @@
 package com.vehicle.marketplace.controller;
 
 
+import com.nimbusds.jose.JOSEException;
 import com.vehicle.marketplace.model.request.AuthenticationRequest;
+import com.vehicle.marketplace.model.request.IntrospectRequest;
 import com.vehicle.marketplace.model.response.ApiResponse;
 import com.vehicle.marketplace.model.response.AuthenticationResponse;
+import com.vehicle.marketplace.model.response.IntrospectResponse;
 import com.vehicle.marketplace.service.AuthenticationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
+
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -20,11 +25,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
     AuthenticationService authenticationService;
 
-    @PostMapping("/log-in")
+
+    // log in : dựa theo token
+    @PostMapping("/token")
     ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request){
         return ApiResponse.<AuthenticationResponse>builder()
                 .result(authenticationService.authenticate(request))
                 .build();
     }
 
+    // xác nhận token còn hiệu lực không
+    @PostMapping("/introspect")
+    ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request) throws ParseException, JOSEException {
+        return ApiResponse.<IntrospectResponse>builder()
+                .result(authenticationService.introspect(request))
+                .build();
+    }
 }

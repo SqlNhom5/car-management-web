@@ -3,12 +3,17 @@ package com.vehicle.marketplace.service;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import com.vehicle.marketplace.Entity.UserEntity;
 import com.vehicle.marketplace.Enum.ErrorCode;
 import com.vehicle.marketplace.exception.AppException;
 import com.vehicle.marketplace.model.request.AuthenticationRequest;
+import com.vehicle.marketplace.model.request.IntrospectRequest;
 import com.vehicle.marketplace.model.response.AuthenticationResponse;
+import com.vehicle.marketplace.model.response.IntrospectResponse;
+import com.vehicle.marketplace.repository.InvalidatedTokenRepository;
 import com.vehicle.marketplace.repository.UserRepository;
 import io.jsonwebtoken.JwsHeader;
 import lombok.AccessLevel;
@@ -21,6 +26,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -32,7 +38,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthenticationService {
     UserRepository userRepository;
-
+    InvalidatedTokenRepository invalidatedTokenRepository;
     @NonFinal
     @Value("${jwt.valid-duration}")
     protected Long VALID_DURATION;
@@ -89,5 +95,38 @@ public class AuthenticationService {
             log.error("Cannot create Token", e);
             throw new RuntimeException(e);
         }
+    }
+
+    // kiểm tra valid của token
+    public IntrospectResponse introspect(IntrospectRequest request) throws ParseException, JOSEException {
+        var token = request.getToken();
+        boolean isValid = true;
+        try{
+            verifyToken(token, false);
+        } catch (AppException e) {
+            isValid = true;
+        }
+        return IntrospectResponse.builder()
+                .valid(isValid)
+                .build();
+    }
+
+    SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
+        JWSVerifier jwsVerifier = new MACVerifier(SIGNER_KEY.getBytes());
+
+        SignedJWT signedJWT = SignedJWT.parse(token);
+
+        // kiểm tra token hết hạn hay chưa
+        Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+        var verifier = signedJWT.verify(jwsVerifier);
+
+        // nếu token hết hạn
+        if (!(verifier && expirationTime.after(new Date()))) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        if(invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())){
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        return signedJWT;
     }
 }
