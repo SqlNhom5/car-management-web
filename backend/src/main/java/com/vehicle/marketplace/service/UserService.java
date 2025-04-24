@@ -38,7 +38,7 @@ public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
     RoleRepository roleRepository;
-//    PasswordEncoder passwordEncoder;
+    PasswordEncoder passwordEncoder;
 
 
     public UserResponse createUser(UserCreationRequest request) {
@@ -47,7 +47,6 @@ public class UserService {
         }
         UserEntity user = userMapper.toUser(request);
         // mã hoá
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         HashSet<RoleEntity> roles = new HashSet<>();
         roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
@@ -76,7 +75,6 @@ public class UserService {
     public UserResponse updateUser(Long id, UserUpdateRequest request) {
         UserEntity user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         userMapper.updateUser(user, request);
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         var roles = roleRepository.findAllById(request.getRoles());
         user.setRoles(new HashSet<>(roles));
