@@ -19,6 +19,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class RoleService {
+
     RoleRepository roleRepository;
     RoleMapper roleMapper;
 

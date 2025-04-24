@@ -33,13 +33,8 @@ public class SecurityConfig {
         );
 
         // xử lý authenticated : sau khi login phải dùng token để truy cập
-        httpSecurity.oauth2ResourceServer(
-                oauth2 -> oauth2
-                        .jwt(jwtConfigurer -> jwtConfigurer
-                                .decoder(customJwtDecoder)
-                        )
-
-        );
+        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder)));
 
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();

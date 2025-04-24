@@ -39,10 +39,10 @@ import java.util.UUID;
 public class AuthenticationService {
     UserRepository userRepository;
     InvalidatedTokenRepository invalidatedTokenRepository;
+
     @NonFinal
     @Value("${jwt.valid-duration}")
     protected Long VALID_DURATION;
-
     @NonFinal
     @Value("${jwt.secret}")
     protected String SIGNER_KEY;
