@@ -2,6 +2,7 @@ package com.vehicle.marketplace.controller;
 
 
 import com.vehicle.marketplace.model.request.UserCreationRequest;
+import com.vehicle.marketplace.model.request.UserSearchRequest;
 import com.vehicle.marketplace.model.request.UserUpdateRequest;
 import com.vehicle.marketplace.model.response.ApiResponse;
 import com.vehicle.marketplace.model.response.UserResponse;
@@ -65,4 +66,6 @@ public class UserController {
                 .result(userService.getMyInfo())
                 .build();
     }
+
+
 }

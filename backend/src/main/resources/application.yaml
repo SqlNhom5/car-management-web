@@ -32,5 +32,5 @@ spring:
 jwt:
   secret: "MAOAaDeZDPe7abJfyyYmg6G4TQXTdQHNrGRFTdOr1whp6zdheS/COfx2GlDSMbXH"
   expiration: 86400000
-  valid-duration: 36000 # in second
+  valid-duration: 3600 # in second
   refresh-duration : 36000

@@ -9,6 +9,7 @@ import com.vehicle.marketplace.constant.PredefinedRole;
 import com.vehicle.marketplace.exception.AppException;
 import com.vehicle.marketplace.mapper.UserMapper;
 import com.vehicle.marketplace.model.request.UserCreationRequest;
+import com.vehicle.marketplace.model.request.UserSearchRequest;
 import com.vehicle.marketplace.model.request.UserUpdateRequest;
 import com.vehicle.marketplace.model.response.ApiResponse;
 import com.vehicle.marketplace.model.response.UserResponse;
@@ -94,4 +95,13 @@ public class UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         return userMapper.toUserResponse(user);
     }
+//
+//    public List<UserResponse> searchUsers(UserSearchRequest request) {
+//        List<UserEntity> userEntities = userRepository.searchUsers(
+//                request.getUsername(),
+//                request.getFirstName(),
+//                request.getLastName(),
+//                request.getEmail()
+//        );
+//    }
 }
