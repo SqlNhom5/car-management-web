@@ -6,11 +6,13 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import com.vehicle.marketplace.Entity.InvalidatedToken;
 import com.vehicle.marketplace.Entity.UserEntity;
 import com.vehicle.marketplace.Enum.ErrorCode;
 import com.vehicle.marketplace.exception.AppException;
 import com.vehicle.marketplace.model.request.AuthenticationRequest;
 import com.vehicle.marketplace.model.request.IntrospectRequest;
+import com.vehicle.marketplace.model.request.LogoutRequest;
 import com.vehicle.marketplace.model.response.AuthenticationResponse;
 import com.vehicle.marketplace.model.response.IntrospectResponse;
 import com.vehicle.marketplace.repository.InvalidatedTokenRepository;
@@ -49,6 +51,10 @@ public class AuthenticationService {
     @Value("${jwt.secret}")
     protected String SIGNER_KEY;
 
+    @NonFinal
+    @Value("${jwt.refresh-duration}")
+    protected Long REFRESH_DURATION;
+
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         var user = userRepository
                 .findByUsername(request.getUsername())
@@ -69,7 +75,6 @@ public class AuthenticationService {
     private String generateToken(UserEntity user) {
         // header
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
-
         // payload
         JWTClaimsSet jwtClaimsSet =
                 new JWTClaimsSet.Builder()
@@ -82,11 +87,8 @@ public class AuthenticationService {
                         .jwtID(UUID.randomUUID().toString())
                         .claim("scope", buildScope(user))
                 .build();
-
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
-
         JWSObject jwsObject = new JWSObject(jwsHeader, payload);
-
         // ki token
         try{
             jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
@@ -106,31 +108,14 @@ public class AuthenticationService {
         try{
             verifyToken(token, false);
         } catch (AppException e) {
-            isValid = true;
+            isValid = false;
         }
         return IntrospectResponse.builder()
                 .valid(isValid)
                 .build();
     }
 
-    SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
-        JWSVerifier jwsVerifier = new MACVerifier(SIGNER_KEY.getBytes());
 
-        SignedJWT signedJWT = SignedJWT.parse(token);
-
-        // kiểm tra token hết hạn hay chưa
-        Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-        var verifier = signedJWT.verify(jwsVerifier);
-
-        // nếu token hết hạn
-        if (!(verifier && expirationTime.after(new Date()))) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
-        }
-        if(invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())){
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
-        }
-        return signedJWT;
-    }
 
     private String buildScope(UserEntity user){
         StringJoiner stringJoiner = new StringJoiner(" ");
@@ -140,4 +125,61 @@ public class AuthenticationService {
         return stringJoiner.toString();
     }
 
+    public void logout(LogoutRequest request) throws ParseException, JOSEException {
+        try {
+            var signToken = verifyToken(request.getToken(), false);
+
+            String jti = signToken.getJWTClaimsSet().getJWTID();
+            Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
+
+            InvalidatedToken invalidatedToken =
+                    InvalidatedToken.builder().id(jti).expiryTime(expiryTime).build();
+
+            invalidatedTokenRepository.save(invalidatedToken);
+        } catch (AppException e) {
+            log.info("Token already expired");
+        }
+    }
+
+    private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
+        JWSVerifier jwsVerifier = new MACVerifier(SIGNER_KEY.getBytes());
+
+        SignedJWT signedJWT = SignedJWT.parse(token);
+
+        // kiểm tra token hết hạn hay chưa
+        Date expirationTime = (isRefresh)
+                ? new Date(
+                signedJWT.getJWTClaimsSet()
+                        .getIssueTime()
+                        .toInstant()
+                        .plusSeconds(REFRESH_DURATION)
+                        .toEpochMilli())
+                : signedJWT.getJWTClaimsSet().getExpirationTime();
+        var verified = signedJWT.verify(jwsVerifier);
+
+        // nếu token hết hạn
+        if (!(verified && expirationTime.after(new Date()))) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        if(invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())){
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        return signedJWT;
+    }
+//    public AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
+//        // kiem tra hieu luc cua token
+//        var signedJWT = verifyToken(request.getToken(), true);
+//        var jti = signedJWT.getJWTClaimsSet().getJWTID();
+//        var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+//        InvalidatedToken invalidatedToken =
+//                InvalidatedToken.builder().id(jti).expiryTime(expiryTime).build();
+//
+//        invalidatedTokenRepository.save(invalidatedToken);
+//
+//        var username = signedJWT.getJWTClaimsSet().getSubject();
+//        var user =
+//                userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+//        var token = generateToken(user);
+//        return AuthenticationResponse.builder().token(token).authenticated(true).build();
+//    }
 }
