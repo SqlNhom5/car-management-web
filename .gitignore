@@ -17,4 +17,8 @@ build/
 
 # OS files
 .DS_Store
+<<<<<<< HEAD
 Thumbs.db
+=======
+Thumbs.db
+>>>>>>> Vu-manageCustomer
