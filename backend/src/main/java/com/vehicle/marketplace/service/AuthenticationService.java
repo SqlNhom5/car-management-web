@@ -13,6 +13,7 @@ import com.vehicle.marketplace.exception.AppException;
 import com.vehicle.marketplace.model.request.AuthenticationRequest;
 import com.vehicle.marketplace.model.request.IntrospectRequest;
 import com.vehicle.marketplace.model.request.LogoutRequest;
+import com.vehicle.marketplace.model.request.RefreshTokenRequest;
 import com.vehicle.marketplace.model.response.AuthenticationResponse;
 import com.vehicle.marketplace.model.response.IntrospectResponse;
 import com.vehicle.marketplace.repository.InvalidatedTokenRepository;
@@ -166,20 +167,21 @@ public class AuthenticationService {
         }
         return signedJWT;
     }
-//    public AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
-//        // kiem tra hieu luc cua token
-//        var signedJWT = verifyToken(request.getToken(), true);
-//        var jti = signedJWT.getJWTClaimsSet().getJWTID();
-//        var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-//        InvalidatedToken invalidatedToken =
-//                InvalidatedToken.builder().id(jti).expiryTime(expiryTime).build();
-//
-//        invalidatedTokenRepository.save(invalidatedToken);
-//
-//        var username = signedJWT.getJWTClaimsSet().getSubject();
-//        var user =
-//                userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
-//        var token = generateToken(user);
-//        return AuthenticationResponse.builder().token(token).authenticated(true).build();
-//    }
+    public AuthenticationResponse refreshToken(RefreshTokenRequest request) throws ParseException, JOSEException {
+        // kiem tra hieu luc cua token
+        var signedJWT = verifyToken(request.getToken(), true);
+        var jti = signedJWT.getJWTClaimsSet().getJWTID();
+        var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+        InvalidatedToken invalidatedToken =
+                InvalidatedToken.builder().id(jti).expiryTime(expiryTime).build();
+
+        invalidatedTokenRepository.save(invalidatedToken);
+
+        var username = signedJWT.getJWTClaimsSet().getSubject();
+        var user =
+                userRepository.findByUsername(username)
+                        .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+        var token = generateToken(user);
+        return AuthenticationResponse.builder().token(token).authenticated(true).build();
+    }
 }

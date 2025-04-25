@@ -5,6 +5,7 @@ import com.nimbusds.jose.JOSEException;
 import com.vehicle.marketplace.model.request.AuthenticationRequest;
 import com.vehicle.marketplace.model.request.IntrospectRequest;
 import com.vehicle.marketplace.model.request.LogoutRequest;
+import com.vehicle.marketplace.model.request.RefreshTokenRequest;
 import com.vehicle.marketplace.model.response.ApiResponse;
 import com.vehicle.marketplace.model.response.AuthenticationResponse;
 import com.vehicle.marketplace.model.response.IntrospectResponse;
@@ -45,5 +46,12 @@ public class AuthenticationController {
         authenticationService.logout(request);
         return ApiResponse.<Void>builder()
                 .build();
+    }
+
+    @PostMapping("/refresh")
+    ApiResponse<AuthenticationResponse> authenticate(@RequestBody RefreshTokenRequest request)
+            throws ParseException, JOSEException {
+        var result = authenticationService.refreshToken(request);
+        return ApiResponse.<AuthenticationResponse>builder().result(result).build();
     }
 }
