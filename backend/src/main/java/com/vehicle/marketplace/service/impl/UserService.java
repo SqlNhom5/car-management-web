@@ -60,22 +60,22 @@ public class UserService implements IUserService {
     }
 
 
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
-    public List<UserResponse> getUsers(){
-        return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    public Page<UserResponse> getUsers(Pageable pageable) {
+        return userRepository.findAll(pageable).map(userMapper::toUserResponse);
     }
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     public UserResponse getUserById(Long id) {
         return userMapper.toUserResponse(userRepository.findById(id)
                 .orElseThrow( () -> new RuntimeException("User not found")));
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteUserById(Long id) {
         userRepository.deleteById(id);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     public UserResponse updateUser(Long id, UserUpdateRequest request) {
         UserEntity user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         userMapper.updateUser(user, request);

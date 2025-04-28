@@ -6,7 +6,6 @@ import com.vehicle.marketplace.model.request.UserUpdateRequest;
 import com.vehicle.marketplace.model.response.ApiResponse;
 import com.vehicle.marketplace.model.response.UserResponse;
 import com.vehicle.marketplace.service.IUserService;
-import com.vehicle.marketplace.service.impl.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -28,9 +27,17 @@ public class UserController {
     IUserService userService;
 
     @GetMapping
-    ApiResponse<List<UserResponse>> getUsers() {
-        return ApiResponse.<List<UserResponse>>
-                builder().result(userService.getUsers())
+    ApiResponse<Page<UserResponse>> getUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "2") int size
+    ) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        log.info("Username : {}", authentication.getName());
+        authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
+
+        return ApiResponse.<Page<UserResponse>>
+                builder().result(userService.getUsers(PageRequest.of(page, size)))
                 .build();
     }
 
@@ -43,7 +50,6 @@ public class UserController {
 
     @GetMapping("/{id}")
     ApiResponse<UserResponse> getUserById(@PathVariable("id") Long id) {
-        ApiResponse<UserResponse> api = new ApiResponse<>();
         return ApiResponse.<UserResponse>builder()
                 .result(userService.getUserById(id))
                 .build();
