@@ -1,7 +1,7 @@
 package com.vehicle.marketplace.configuration;
 
 import com.vehicle.marketplace.model.request.IntrospectRequest;
-import com.vehicle.marketplace.service.AuthenticationService;
+import com.vehicle.marketplace.service.impl.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;

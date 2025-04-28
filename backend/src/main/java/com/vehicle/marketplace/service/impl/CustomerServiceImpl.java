@@ -1,8 +1,9 @@
-package com.vehicle.marketplace.service;
+package com.vehicle.marketplace.service.impl;
 
 import com.vehicle.marketplace.model.dto.CustomerDTO;
 import com.vehicle.marketplace.Entity.CustomerEntity;
 import com.vehicle.marketplace.repository.CustomerRepository;
+import com.vehicle.marketplace.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;

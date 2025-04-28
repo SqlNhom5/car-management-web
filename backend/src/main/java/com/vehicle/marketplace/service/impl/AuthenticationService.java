@@ -1,4 +1,4 @@
-package com.vehicle.marketplace.service;
+package com.vehicle.marketplace.service.impl;
 
 
 import com.nimbusds.jose.*;
@@ -18,7 +18,7 @@ import com.vehicle.marketplace.model.response.AuthenticationResponse;
 import com.vehicle.marketplace.model.response.IntrospectResponse;
 import com.vehicle.marketplace.repository.InvalidatedTokenRepository;
 import com.vehicle.marketplace.repository.UserRepository;
-import io.jsonwebtoken.JwsHeader;
+import com.vehicle.marketplace.service.IAuthenticationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -32,7 +32,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
 import java.util.UUID;
@@ -41,7 +40,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 @RequiredArgsConstructor
-public class AuthenticationService {
+public class AuthenticationService implements IAuthenticationService {
     UserRepository userRepository;
     InvalidatedTokenRepository invalidatedTokenRepository;
 

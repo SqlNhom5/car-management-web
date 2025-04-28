@@ -1,43 +1,40 @@
-package com.vehicle.marketplace.service;
+package com.vehicle.marketplace.service.impl;
 
 
 import com.vehicle.marketplace.Entity.RoleEntity;
 import com.vehicle.marketplace.Entity.UserEntity;
 import com.vehicle.marketplace.Enum.ErrorCode;
-import com.vehicle.marketplace.Enum.Role;
 import com.vehicle.marketplace.constant.PredefinedRole;
 import com.vehicle.marketplace.exception.AppException;
 import com.vehicle.marketplace.mapper.UserMapper;
 import com.vehicle.marketplace.model.request.UserCreationRequest;
-import com.vehicle.marketplace.model.request.UserSearchRequest;
 import com.vehicle.marketplace.model.request.UserUpdateRequest;
-import com.vehicle.marketplace.model.response.ApiResponse;
 import com.vehicle.marketplace.model.response.UserResponse;
 import com.vehicle.marketplace.repository.RoleRepository;
 import com.vehicle.marketplace.repository.UserRepository;
+import com.vehicle.marketplace.service.IUserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
-import org.springframework.context.annotation.Bean;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.crossstore.ChangeSetPersister;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements IUserService {
     UserRepository userRepository;
     UserMapper userMapper;
     RoleRepository roleRepository;
@@ -95,13 +92,9 @@ public class UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         return userMapper.toUserResponse(user);
     }
-//
-//    public List<UserResponse> searchUsers(UserSearchRequest request) {
-//        List<UserEntity> userEntities = userRepository.searchUsers(
-//                request.getUsername(),
-//                request.getFirstName(),
-//                request.getLastName(),
-//                request.getEmail()
-//        );
-//    }
+    public Page<UserResponse> searchUsersByKeyword(String keyword, Pageable pageable) {
+
+        Page<UserEntity> users = userRepository.searchUsersByKeyword(keyword, pageable);
+        return users.map(userMapper::toUserResponse);
+    }
 }

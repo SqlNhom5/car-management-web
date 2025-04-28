@@ -1,7 +1,7 @@
 package com.vehicle.marketplace.controller;
 
 import com.vehicle.marketplace.model.Vehicle;
-import com.vehicle.marketplace.service.VehicleService;
+import com.vehicle.marketplace.service.impl.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

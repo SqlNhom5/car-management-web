@@ -9,7 +9,8 @@ import com.vehicle.marketplace.model.request.RefreshTokenRequest;
 import com.vehicle.marketplace.model.response.ApiResponse;
 import com.vehicle.marketplace.model.response.AuthenticationResponse;
 import com.vehicle.marketplace.model.response.IntrospectResponse;
-import com.vehicle.marketplace.service.AuthenticationService;
+import com.vehicle.marketplace.service.IAuthenticationService;
+import com.vehicle.marketplace.service.impl.AuthenticationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,7 +23,7 @@ import java.text.ParseException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/auth")
 public class AuthenticationController {
-    AuthenticationService authenticationService;
+    IAuthenticationService authenticationService;
 
 
     // log in : dựa theo token

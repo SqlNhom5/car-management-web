@@ -1,11 +1,11 @@
-package com.vehicle.marketplace.service;
+package com.vehicle.marketplace.service.impl;
 
 
 import com.vehicle.marketplace.mapper.RoleMapper;
 import com.vehicle.marketplace.model.request.RoleRequest;
-import com.vehicle.marketplace.model.response.ApiResponse;
 import com.vehicle.marketplace.model.response.RoleResponse;
 import com.vehicle.marketplace.repository.RoleRepository;
+import com.vehicle.marketplace.service.IRoleService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,7 +18,7 @@ import java.util.List;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-public class RoleService {
+public class RoleService implements IRoleService {
 
     RoleRepository roleRepository;
     RoleMapper roleMapper;

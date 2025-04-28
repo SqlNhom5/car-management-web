@@ -1,4 +1,4 @@
-package com.vehicle.marketplace.service;
+package com.vehicle.marketplace.service.impl;
 
 import com.vehicle.marketplace.model.Vehicle;
 import com.vehicle.marketplace.repository.VehicleRepository;

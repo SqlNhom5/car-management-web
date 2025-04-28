@@ -4,7 +4,7 @@ package com.vehicle.marketplace.controller;
 import com.vehicle.marketplace.model.request.RoleRequest;
 import com.vehicle.marketplace.model.response.ApiResponse;
 import com.vehicle.marketplace.model.response.RoleResponse;
-import com.vehicle.marketplace.service.RoleService;
+import com.vehicle.marketplace.service.IRoleService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RoleController {
-    RoleService roleService;
+    IRoleService roleService;
 
     @GetMapping
     ApiResponse<List<RoleResponse>> getAllRoles() {
