@@ -27,8 +27,9 @@ public class CarService {
     
     CarRepository carRepository;
     CarMapper carMapper;
-    
-    public List<CarEntity> getAllCars(CarSearchRequest carSearchRequest) {
+
+
+    public List<CarEntity> findCars(CarSearchRequest carSearchRequest) {
         return carRepository.findAll(carSearchRequest);
     }
     

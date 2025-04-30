@@ -3,9 +3,7 @@ package com.vehicle.marketplace.repository;
 import com.vehicle.marketplace.Entity.CarEntity;
 import com.vehicle.marketplace.repository.custom.CarRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import java.util.List;
+
 
 public interface CarRepository extends JpaRepository<CarEntity, Long>, CarRepositoryCustom {
 //    List<CarEntity> findByBrand(String brand);

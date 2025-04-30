@@ -25,10 +25,11 @@ import lombok.extern.slf4j.Slf4j;
 public class CarController {
     
     CarService carService;
-    
+
+    // get all car truyen vao carSearchRequest voi cac thuoc tinh null
     @GetMapping
-    ApiResponse<List<CarEntity>> getAllCars(@RequestBody CarSearchRequest carSearchRequest) {
-        List<CarEntity> cars = carService.getAllCars(carSearchRequest);
+    ApiResponse<List<CarEntity>> findCars(@RequestBody CarSearchRequest carSearchRequest) {
+        List<CarEntity> cars = carService.findCars(carSearchRequest);
         return ApiResponse.<List<CarEntity>>builder().result(cars).build();
     }
     

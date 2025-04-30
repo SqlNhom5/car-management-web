@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.2 (Oracle Corporation)"
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.z20250331-1358, environment: Java 21.0.6 (Eclipse Adoptium)"
 )
 @Component
 public class CarMapperImpl implements CarMapper {
@@ -22,16 +22,16 @@ public class CarMapperImpl implements CarMapper {
 
         CarEntity.CarEntityBuilder carEntity = CarEntity.builder();
 
-        carEntity.carName( carCreationRequest.getCarName() );
         carEntity.brand( carCreationRequest.getBrand() );
-        carEntity.model( carCreationRequest.getModel() );
-        carEntity.manufactureYear( carCreationRequest.getManufactureYear() );
-        carEntity.licensePlate( carCreationRequest.getLicensePlate() );
-        carEntity.price( carCreationRequest.getPrice() );
-        carEntity.status( carCreationRequest.getStatus() );
+        carEntity.carName( carCreationRequest.getCarName() );
         carEntity.color( carCreationRequest.getColor() );
-        carEntity.specifications( carCreationRequest.getSpecifications() );
         carEntity.imageUrl( carCreationRequest.getImageUrl() );
+        carEntity.licensePlate( carCreationRequest.getLicensePlate() );
+        carEntity.manufactureYear( carCreationRequest.getManufactureYear() );
+        carEntity.model( carCreationRequest.getModel() );
+        carEntity.price( carCreationRequest.getPrice() );
+        carEntity.specifications( carCreationRequest.getSpecifications() );
+        carEntity.status( carCreationRequest.getStatus() );
         carEntity.warrantyPeriod( carCreationRequest.getWarrantyPeriod() );
 
         return carEntity.build();
@@ -45,19 +45,19 @@ public class CarMapperImpl implements CarMapper {
 
         CarResponse carResponse = new CarResponse();
 
+        carResponse.setBrand( carEntity.getBrand() );
         if ( carEntity.getCarId() != null ) {
             carResponse.setCarId( carEntity.getCarId().longValue() );
         }
         carResponse.setCarName( carEntity.getCarName() );
-        carResponse.setBrand( carEntity.getBrand() );
-        carResponse.setModel( carEntity.getModel() );
-        carResponse.setManufactureYear( carEntity.getManufactureYear() );
-        carResponse.setLicensePlate( carEntity.getLicensePlate() );
-        carResponse.setPrice( carEntity.getPrice() );
-        carResponse.setStatus( carEntity.getStatus() );
         carResponse.setColor( carEntity.getColor() );
-        carResponse.setSpecifications( carEntity.getSpecifications() );
         carResponse.setImageUrl( carEntity.getImageUrl() );
+        carResponse.setLicensePlate( carEntity.getLicensePlate() );
+        carResponse.setManufactureYear( carEntity.getManufactureYear() );
+        carResponse.setModel( carEntity.getModel() );
+        carResponse.setPrice( carEntity.getPrice() );
+        carResponse.setSpecifications( carEntity.getSpecifications() );
+        carResponse.setStatus( carEntity.getStatus() );
         carResponse.setWarrantyPeriod( carEntity.getWarrantyPeriod() );
 
         return carResponse;
@@ -69,16 +69,16 @@ public class CarMapperImpl implements CarMapper {
             return;
         }
 
-        carEntity.setCarName( request.getCarName() );
         carEntity.setBrand( request.getBrand() );
-        carEntity.setModel( request.getModel() );
-        carEntity.setManufactureYear( request.getManufactureYear() );
-        carEntity.setLicensePlate( request.getLicensePlate() );
-        carEntity.setPrice( request.getPrice() );
-        carEntity.setStatus( request.getStatus() );
+        carEntity.setCarName( request.getCarName() );
         carEntity.setColor( request.getColor() );
-        carEntity.setSpecifications( request.getSpecifications() );
         carEntity.setImageUrl( request.getImageUrl() );
+        carEntity.setLicensePlate( request.getLicensePlate() );
+        carEntity.setManufactureYear( request.getManufactureYear() );
+        carEntity.setModel( request.getModel() );
+        carEntity.setPrice( request.getPrice() );
+        carEntity.setSpecifications( request.getSpecifications() );
+        carEntity.setStatus( request.getStatus() );
         carEntity.setWarrantyPeriod( request.getWarrantyPeriod() );
     }
 }

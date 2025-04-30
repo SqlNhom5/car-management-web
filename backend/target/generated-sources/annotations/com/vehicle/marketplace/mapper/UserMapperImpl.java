@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.2 (Oracle Corporation)"
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.z20250331-1358, environment: Java 21.0.6 (Eclipse Adoptium)"
 )
 @Component
 public class UserMapperImpl implements UserMapper {
@@ -22,11 +22,11 @@ public class UserMapperImpl implements UserMapper {
 
         UserEntity.UserEntityBuilder userEntity = UserEntity.builder();
 
-        userEntity.username( userCreationRequest.getUsername() );
-        userEntity.password( userCreationRequest.getPassword() );
+        userEntity.email( userCreationRequest.getEmail() );
         userEntity.firstName( userCreationRequest.getFirstName() );
         userEntity.lastName( userCreationRequest.getLastName() );
-        userEntity.email( userCreationRequest.getEmail() );
+        userEntity.password( userCreationRequest.getPassword() );
+        userEntity.username( userCreationRequest.getUsername() );
 
         return userEntity.build();
     }
@@ -39,10 +39,10 @@ public class UserMapperImpl implements UserMapper {
 
         UserResponse userResponse = new UserResponse();
 
-        userResponse.setUsername( userEntity.getUsername() );
+        userResponse.setEmail( userEntity.getEmail() );
         userResponse.setFirstName( userEntity.getFirstName() );
         userResponse.setLastName( userEntity.getLastName() );
-        userResponse.setEmail( userEntity.getEmail() );
+        userResponse.setUsername( userEntity.getUsername() );
 
         return userResponse;
     }
@@ -53,8 +53,8 @@ public class UserMapperImpl implements UserMapper {
             return;
         }
 
-        userEntity.setPassword( request.getPassword() );
         userEntity.setFirstName( request.getFirstName() );
         userEntity.setLastName( request.getLastName() );
+        userEntity.setPassword( request.getPassword() );
     }
 }
