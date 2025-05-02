@@ -1,12 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-<<<<<<< HEAD
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="79336c97-1060-4601-b838-114d3f298af5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/CarMarketplaceApplication.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/Entity/CarEntity$CarEntityBuilder.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/Entity/CarEntity.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/Entity/SupplierEntity$SupplierEntityBuilder.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/Entity/SupplierEntity.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/controller/CarController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/controller/CustomerController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/controller/SupplierController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/controller/VehicleController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/mapper/CarMapper.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/mapper/CarMapperImpl.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/mapper/SupplierMapper.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/mapper/SupplierMapperImpl.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/request/CarCreationRequest$CarCreationRequestBuilder.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/request/CarCreationRequest.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/request/CarSearchRequest$CarSearchRequestBuilder.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/request/CarSearchRequest.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/request/CarUpdateRequest.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/request/SupplierCreationRequest$SupplierCreationRequestBuilder.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/request/SupplierCreationRequest.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/request/SupplierSearchRequest$SupplierSearchRequestBuilder.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/request/SupplierSearchRequest.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/request/SupplierUpdateRequest$SupplierUpdateRequestBuilder.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/request/SupplierUpdateRequest.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/response/ApiResponse.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/response/CarResponse.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/response/SupplierResponse$SupplierResponseBuilder.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/model/response/SupplierResponse.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/repository/CarRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/repository/CustomerRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/repository/SupplierRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/repository/custom/CarRepositoryCustom.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/repository/custom/SupplierRepositoryCustom.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/repository/custom/impl/CarRepositoryImpl.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/repository/custom/impl/SupplierRepositoryImpl.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/service/CarService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/service/CustomerService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/vehicle/marketplace/service/SupplierService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/generated-sources/annotations/com/vehicle/marketplace/mapper/CarMapperImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/generated-sources/annotations/com/vehicle/marketplace/mapper/SupplierMapperImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/vehicle-marketplace-0.0.1-SNAPSHOT.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/vehicle-marketplace-0.0.1-SNAPSHOT.jar.original" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vehicle-marketplace.iml" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,42 +98,48 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "Spring Boot.VehicleMarketplaceApplication.executor": "Run",
-    "git-widget-placeholder": "van-save-to-favorite",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "reference.settings.project.maven.importing",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;Spring Boot.VehicleMarketplaceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;be&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/hoangkhanhvan/Desktop/BaitaplonSQL/CarManagementWeb/backend&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.importing&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="vehicle-marketplace" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="vehicle-marketplace" />
+      <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="VehicleMarketplaceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="vehicle-marketplace" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.vehicle.marketplace.VehicleMarketplaceApplication" />
-=======
-  <component name="PropertiesComponent">{}</component>
-  <component name="RunManager">
-    <configuration name="CarMarketplaceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="vehicle-marketplace" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.vehicle.marketplace.CarMarketplaceApplication" />
->>>>>>> truong-manageCar
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
   </component>
-<<<<<<< HEAD
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -102,6 +160,12 @@
       <workItem from="1745631993363" duration="3118000" />
       <workItem from="1745823790748" duration="7804000" />
       <workItem from="1745832891183" duration="2985000" />
+      <workItem from="1746169853662" duration="31000" />
+      <workItem from="1746169891054" duration="95000" />
+      <workItem from="1746169999886" duration="36000" />
+      <workItem from="1746170041681" duration="45000" />
+      <workItem from="1746170112133" duration="54000" />
+      <workItem from="1746170178735" duration="137000" />
     </task>
     <servers />
   </component>
@@ -119,6 +183,4 @@
       </map>
     </option>
   </component>
-=======
->>>>>>> truong-manageCar
 </project>
