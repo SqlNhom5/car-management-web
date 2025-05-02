@@ -32,7 +32,15 @@ public class CarController {
         List<CarEntity> cars = carService.findCars(carSearchRequest);
         return ApiResponse.<List<CarEntity>>builder().result(cars).build();
     }
-    
+
+    @GetMapping("/compare/{id1}/{id2}")
+    ApiResponse<List<CarResponse>> compareCars(@PathVariable Long id1, @PathVariable Long id2) {
+        List<CarResponse> comparedCars = carService.compareCars(id1, id2);
+        return ApiResponse.<List<CarResponse>>builder()
+                .result(comparedCars)
+                .build();
+    }
+
     @GetMapping("/{id}")
     ApiResponse<CarResponse> getCarById(@PathVariable Long id) {
         return ApiResponse.<CarResponse>builder()

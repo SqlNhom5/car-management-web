@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,8 +36,17 @@ public class CarService {
     }
     
     public CarResponse getCarById(Long id) {
-        return carMapper.toUCarResponse(carRepository.findById(id)
+        return carMapper.toCarResponse(carRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Car not found")));
+    }
+
+    public List<CarResponse> compareCars(Long id1, Long id2){
+        List<CarResponse> carResponses = new ArrayList<>();
+        carResponses.add(carMapper.toCarResponse(carRepository.findById(id1)
+                .orElseThrow(() -> new RuntimeException("Car not found"))));
+        carResponses.add(carMapper.toCarResponse(carRepository.findById(id2)
+                .orElseThrow(() -> new RuntimeException("Car not found"))));
+        return carResponses;
     }
     
     public CarEntity createCar(CarCreationRequest carCreationRequest) {
@@ -46,7 +57,7 @@ public class CarService {
         CarEntity carEntity = carRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Car not found"));
             carMapper.updateCar(carEntity, carUpdateRequest);
-            return carMapper.toUCarResponse(carRepository.save(carEntity)); 
+            return carMapper.toCarResponse(carRepository.save(carEntity));
     }
     
     public void deleteCarById(Long id) {

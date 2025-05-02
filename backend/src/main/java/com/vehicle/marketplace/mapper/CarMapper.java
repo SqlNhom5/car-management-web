@@ -11,7 +11,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface CarMapper {
     CarEntity toCarEntity(CarCreationRequest carCreationRequest); 
-    CarResponse toUCarResponse(CarEntity carEntity);
+    CarResponse toCarResponse(CarEntity carEntity);
     void updateCar(@MappingTarget CarEntity carEntity, CarUpdateRequest request);
 }
  
