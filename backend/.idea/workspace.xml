@@ -6,9 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="79336c97-1060-4601-b838-114d3f298af5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/vehicle/marketplace/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vehicle/marketplace/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/vehicle/marketplace/service/IUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vehicle/marketplace/service/IUserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/vehicle/marketplace/service/impl/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vehicle/marketplace/service/impl/UserService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,7 +53,7 @@
     "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "Spring Boot.VehicleMarketplaceApplication.executor": "Run",
-    "git-widget-placeholder": "be",
+    "git-widget-placeholder": "van-save-to-favorite",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -94,7 +91,8 @@
       <updated>1745589388132</updated>
       <workItem from="1745589389263" duration="394000" />
       <workItem from="1745631993363" duration="3118000" />
-      <workItem from="1745823790748" duration="4671000" />
+      <workItem from="1745823790748" duration="7804000" />
+      <workItem from="1745832891183" duration="2985000" />
     </task>
     <servers />
   </component>
