@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+<<<<<<< HEAD
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
@@ -68,11 +69,19 @@
     <configuration name="VehicleMarketplaceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="vehicle-marketplace" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.vehicle.marketplace.VehicleMarketplaceApplication" />
+=======
+  <component name="PropertiesComponent">{}</component>
+  <component name="RunManager">
+    <configuration name="CarMarketplaceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="vehicle-marketplace" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.vehicle.marketplace.CarMarketplaceApplication" />
+>>>>>>> truong-manageCar
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
   </component>
+<<<<<<< HEAD
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -110,4 +119,6 @@
       </map>
     </option>
   </component>
+=======
+>>>>>>> truong-manageCar
 </project>
