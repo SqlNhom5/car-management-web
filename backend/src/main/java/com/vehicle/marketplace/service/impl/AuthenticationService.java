@@ -56,12 +56,13 @@ public class AuthenticationService implements IAuthenticationService {
     protected Long REFRESH_DURATION;
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         var user = userRepository
                 .findByUsername(request.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+
         if(!authenticated){
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
@@ -115,8 +116,6 @@ public class AuthenticationService implements IAuthenticationService {
                 .build();
     }
 
-
-
     private String buildScope(UserEntity user){
         StringJoiner stringJoiner = new StringJoiner(" ");
         if(!CollectionUtils.isEmpty(user.getRoles())){
@@ -143,9 +142,7 @@ public class AuthenticationService implements IAuthenticationService {
 
     private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
         JWSVerifier jwsVerifier = new MACVerifier(SIGNER_KEY.getBytes());
-
         SignedJWT signedJWT = SignedJWT.parse(token);
-
         // kiểm tra token hết hạn hay chưa
         Date expirationTime = (isRefresh)
                 ? new Date(

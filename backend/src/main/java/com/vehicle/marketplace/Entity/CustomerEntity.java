@@ -22,6 +22,10 @@ public class CustomerEntity {
 
     private String status;
 
+    @OneToOne
+    @JoinColumn(name = "user_id", unique = true)
+    private UserEntity user;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -33,6 +37,7 @@ public class CustomerEntity {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
+
 
     @PreUpdate
     public void onUpdate() {

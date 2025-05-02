@@ -34,6 +34,8 @@ public class AuthenticationController {
                 .build();
     }
 
+    //
+
     // xác nhận token còn hiệu lực không
     @PostMapping("/introspect")
     ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request) throws ParseException, JOSEException {
