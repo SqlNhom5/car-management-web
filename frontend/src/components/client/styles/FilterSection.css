@@ -1,0 +1,77 @@
+.filter-section {
+    background: #fff;
+    padding: 2rem 1.5rem 2rem 1.5rem;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(35, 64, 142, 0.10);
+    width: 100%;
+    min-width: 240px;
+    max-width: 340px;
+    position: sticky;
+    top: 2.5rem;
+    margin-bottom: 2rem;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 2.2rem;
+}
+
+.filter-section h2 {
+    margin: 0 0 2rem 0;
+    color: #23408e;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.filter-group {
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 0.2rem;
+    color: #7a869a;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.price-range {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.price-range input[type="range"] {
+    width: 100%;
+    accent-color: #23408e;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #23408e 0%, #4e6cbf 100%);
+}
+
+.price-range span {
+    font-size: 1rem;
+    color: #23408e;
+    font-weight: 500;
+}
+
+select {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 1.5px solid #e0e6ed;
+    border-radius: 8px;
+    background-color: #f7f9fc;
+    font-size: 1rem;
+    color: #23408e;
+    font-weight: 500;
+    transition: border 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+
+select:focus {
+    border: 1.5px solid #23408e;
+    box-shadow: 0 0 0 2px #23408e22;
+}

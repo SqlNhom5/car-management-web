@@ -1,0 +1,42 @@
+.header {
+    background-color: #23408e;
+    color: white;
+    padding: 1.2rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(35, 64, 142, 0.08);
+    min-height: 64px;
+}
+
+.logo h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.logout-button {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.5rem 1.2rem;
+    transition: background 0.15s;
+    box-shadow: none;
+    border-radius: 0;
+    outline: none;
+}
+
+.logout-button svg {
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.logout-button:active {
+    background: rgba(255, 255, 255, 0.08);
+}
