@@ -5,57 +5,86 @@ import com.vehicle.marketplace.model.request.UserCreationRequest;
 import com.vehicle.marketplace.model.request.UserUpdateRequest;
 import com.vehicle.marketplace.model.response.ApiResponse;
 import com.vehicle.marketplace.model.response.UserResponse;
-import com.vehicle.marketplace.service.UserService;
+import com.vehicle.marketplace.service.IUserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 @Slf4j
 public class UserController {
-    UserService userService;
+    IUserService userService;
 
     @GetMapping
-    ApiResponse<List<UserResponse>> getUsers() {
-        return ApiResponse.<List<UserResponse>>
-                builder().result(userService.getUsers())
+    ApiResponse<Page<UserResponse>> getUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "2") int size
+    ) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        log.info("Username : {}", authentication.getName());
+        authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
+
+        return ApiResponse.<Page<UserResponse>>
+                builder().result(userService.getUsers(PageRequest.of(page, size)))
                 .build();
     }
 
     @PostMapping
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest userCreationRequest) {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.createUser(userCreationRequest));
-        return apiResponse;
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.createUser(userCreationRequest))
+                .build();
     }
 
     @GetMapping("/{id}")
     ApiResponse<UserResponse> getUserById(@PathVariable("id") Long id) {
-        ApiResponse<UserResponse> api = new ApiResponse<>();
         return ApiResponse.<UserResponse>builder()
                 .result(userService.getUserById(id))
                 .build();
     }
 
     @DeleteMapping("/{id}")
-    String deleteUserById(@PathVariable("id") Long id) {
+    ApiResponse<Void> deleteUserById(@PathVariable("id") Long id) {
         userService.deleteUserById(id);
-        return "User deleted";
+        return ApiResponse.<Void>builder().build();
     }
 
     @PutMapping("/{id}")
     ApiResponse<UserResponse> updateUser(@PathVariable Long id,@RequestBody UserUpdateRequest userUpdateRequest) {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.updateUser(id, userUpdateRequest))
+                .build();
+    }
+
+    @GetMapping("/my-info")
+    ApiResponse<UserResponse> getMyInfo(){
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getMyInfo())
+                .build();
+    }
+
+    @GetMapping("/search")
+    public ApiResponse<Page<UserResponse>> searchUsers(
+            @RequestParam("keyword") String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "2") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<UserResponse> users = userService.searchUsersByKeyword(keyword, pageable);
+        return ApiResponse.<Page<UserResponse>>builder()
+                .result(users)
                 .build();
     }
 }

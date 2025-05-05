@@ -9,6 +9,7 @@ const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
   const [cars, setCars] = useState(carData);
+  console.log("carData:",carData);
   const [customers, setCustomers] = useState(customerData);
   const [sales, setSales] = useState(salesData);
   const [employees, setEmployees] = useState(employeeData);

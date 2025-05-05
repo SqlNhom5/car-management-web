@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/Login.css';
@@ -7,20 +7,49 @@ const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, error: authError, isAuthenticated, isLoading, user } = useAuth();
 
-    const handleSubmit = (e) => {
+    // Chuyển hướng nếu đã đăng nhập
+    useEffect(() => {
+        if (!isLoading && isAuthenticated) {
+            const role = user?.role;
+            if (role === 'admin') {
+                navigate('/dashboard');
+            } else if (role === 'staff') {
+                navigate('/staff');
+            }
+        }
+    }, [isAuthenticated, isLoading, navigate, user]);
+
+    // Hiển thị lỗi từ AuthContext
+    useEffect(() => {
+        if (authError) {
+            setError(authError);
+        }
+    }, [authError]);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setIsSubmitting(true);
 
-        const role = login(username, password);
-        if (role === 'admin') {
-            navigate('/dashboard');
-        } else if (role === 'client') {
-            navigate('/client');
-        } else {
-            setError('Tên đăng nhập hoặc mật khẩu không đúng');
+        try {
+            const role = await login(username, password); // Sử dụng await để lấy role
+            console.log('Đăng nhập với vai trò:', role); // role sẽ là "admin", "staff", hoặc null
+            if (role === 'admin') {
+                navigate('/dashboard');
+            } else if (role === 'staff') {
+                navigate('/staff');
+            } else {
+                setError('Tên đăng nhập hoặc mật khẩu không đúng');
+            }
+        } catch (err) {
+            setError('Có lỗi xảy ra khi đăng nhập');
+            console.error('Lỗi đăng nhập:', err);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -37,6 +66,7 @@ const Login = () => {
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required
+                            disabled={isSubmitting}
                         />
                     </div>
                     <div className="form-group">
@@ -46,13 +76,16 @@ const Login = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
+                            disabled={isSubmitting}
                         />
                     </div>
-                    <button className='btn' type="submit">Đăng nhập</button>
+                    <button className='btn' type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                    </button>
                 </form>
             </div>
         </div>
     );
 };
 
-export default Login; 
+export default Login;
