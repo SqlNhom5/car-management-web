@@ -1,7 +1,9 @@
 import React from 'react';
+import { useEffect } from 'react';
 import { Edit2, Trash2 } from 'lucide-react';
 
-const CustomerTable = ({ customers, onEdit, onDelete }) => {
+const CustomerTable = React.memo(({ customers = [], onEdit, onDelete }) => {
+
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <table className="min-w-full divide-y divide-gray-200">
@@ -31,19 +33,19 @@ const CustomerTable = ({ customers, onEdit, onDelete }) => {
           {customers.map((customer) => (
             <tr key={customer.id}>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm font-medium text-gray-900">{customer.name}</div>
+                <div className="text-sm font-medium text-gray-900">{customer.fullName}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-500">{customer.email}</div>
+                <div className="text-sm text-gray-500">{customer.id}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-500">{customer.phone}</div>
+                <div className="text-sm text-gray-500">{customer.phoneNumber}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {customer.purchased}
+                1
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {customer.appointments}
+                1
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center justify-center space-x-2">
@@ -67,6 +69,8 @@ const CustomerTable = ({ customers, onEdit, onDelete }) => {
       </table>
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  return JSON.stringify(prevProps.customers) === JSON.stringify(nextProps.customers);
+});
 
 export default CustomerTable;

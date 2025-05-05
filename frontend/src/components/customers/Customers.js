@@ -16,9 +16,9 @@ const Customers = () => {
   const { customers, addCustomer, updateCustomer, deleteCustomer } = useData();
 
   const filteredCustomers = customers.filter(customer => 
-    customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.phone.includes(searchTerm)
+    customer.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.phoneNumber.includes(searchTerm)
   );
 
   const handleAdd = (formData) => {
@@ -73,6 +73,7 @@ const Customers = () => {
           setSelectedCustomer(customer);
           setIsDeleteModalOpen(true);
         }}
+        
       />
 
       <Modal 
@@ -104,7 +105,7 @@ const Customers = () => {
         title="Xác Nhận Xóa"
       >
         <DeleteConfirmation 
-          message={`Bạn có chắc chắn muốn xóa khách hàng ${selectedCustomer?.name}?`}
+          message={`Bạn có chắc chắn muốn xóa khách hàng ${selectedCustomer?.fullName}?`}
           onConfirm={handleDelete}
           onCancel={() => setIsDeleteModalOpen(false)}
         />

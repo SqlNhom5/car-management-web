@@ -1,18 +1,51 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import { formatPrice, formatPhoneNumber } from '../utils/formatters';
 import { carData } from '../data/carData';
 import { customerData } from '../data/customerData';
 import { salesData } from '../data/salesData';
 import { employeeData } from '../data/employeeData';
+import { getToken, setToken, removeToken } from "./localStorageService";
+
+
 
 const DataContext = createContext();
 
+
 export const DataProvider = ({ children }) => {
+
   const [cars, setCars] = useState(carData);
-  console.log("carData:",carData);
-  const [customers, setCustomers] = useState(customerData);
+  const [customers, setCustomers] = useState([]);
   const [sales, setSales] = useState(salesData);
   const [employees, setEmployees] = useState(employeeData);
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const token = getToken();
+        const response = await fetch('http://localhost:8080/api/customers', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : '',
+          },
+        });
+        console.log("Response status:", response.status); // Log status code để kiểm tra
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json(); // Parse JSON từ response
+        console.log("Customer data:", data); // Log dữ liệu để kiểm tra
+        setCustomers(data); // Cập nhật state với dữ liệu từ API
+        console.log("Fetched customers:", data); // Log dữ liệu để kiểm tra
+      } catch (error) {
+        console.error('Failed to fetch customers:', error);
+      }
+    };
+  
+    fetchCustomers();
+  }, []);
+  
 
   const addCar = (newCar) => {
     const formattedCar = {
@@ -25,14 +58,14 @@ export const DataProvider = ({ children }) => {
   };
 
   const updateCar = (updatedCar) => {
-    setCars(prevCars => prevCars.map(car => 
-      car.id === updatedCar.id 
+    setCars(prevCars => prevCars.map(car =>
+      car.id === updatedCar.id
         ? {
-            ...car,
-            ...updatedCar,
-            price: Number(updatedCar.price),
-            quantity: Number(updatedCar.quantity)
-          }
+          ...car,
+          ...updatedCar,
+          price: Number(updatedCar.price),
+          quantity: Number(updatedCar.quantity)
+        }
         : car
     ));
   };
@@ -103,7 +136,7 @@ export const DataProvider = ({ children }) => {
   };
 
   const updateEmployee = (updatedEmployee) => {
-    setEmployees(prevEmployees => prevEmployees.map(emp => 
+    setEmployees(prevEmployees => prevEmployees.map(emp =>
       emp.id === updatedEmployee.id ? { ...emp, ...updatedEmployee } : emp
     ));
   };
@@ -116,8 +149,29 @@ export const DataProvider = ({ children }) => {
     setSales(prevSales => prevSales.filter(sale => sale.id !== saleId));
   };
 
-  const deleteEmployee = (employeeId) => {
-    setEmployees(prevEmployees => prevEmployees.filter(emp => emp.id !== employeeId));
+  const deleteEmployee = async (customerId) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/customers/${customerId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          // Thêm các headers khác nếu cần (như Authorization)
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Không thể xóa khách hàng');
+      }
+  
+      // Nếu xóa thành công trên server, cập nhật state ở client
+      setCustomers(prevCustomers => prevCustomers.filter(customer => customer.id !== customerId));
+      
+      // Có thể thêm thông báo thành công hoặc cập nhật UI khác ở đây
+      console.log('Xóa khách hàng thành công');
+    } catch (error) {
+      console.error('Lỗi khi xóa khách hàng:', error);
+      // Xử lý lỗi (hiển thị thông báo cho người dùng, v.v.)
+    }
   };
 
   return (
