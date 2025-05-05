@@ -74,15 +74,42 @@ export const DataProvider = ({ children }) => {
     setCars(prevCars => prevCars.filter(car => car.id !== carId));
   };
 
-  const addCustomer = (newCustomer) => {
-    const formattedCustomer = {
-      ...newCustomer,
-      id: Date.now(),
-      purchased: 0,
-      appointments: 0,
-      phone: formatPhoneNumber(newCustomer.phone)
-    };
-    setCustomers(prevCustomers => [...prevCustomers, formattedCustomer]);
+  const addCustomer = async (newCustomer) => {
+    try {
+      // Format dữ liệu trước khi gửi lên server
+      const formattedCustomer = {
+        ...newCustomer,
+        phone: formatPhoneNumber(newCustomer.phoneNumber),
+        // Không cần tự tạo ID ở client nữa, server sẽ tự tạo
+        // purchased và appointments có thể được server khởi tạo
+      };
+      const token = getToken();
+      const response = await fetch('http://localhost:8080/api/customers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': getToken() ? `Bearer ${getToken()}` : '',
+        },
+        body: JSON.stringify(formattedCustomer),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Không thể thêm khách hàng');
+      }
+  
+      const createdCustomer = await response.json(); // Giả sử server trả về khách hàng đã tạo
+      
+      // Cập nhật state với khách hàng từ server (bao gồm ID chính xác)
+      setCustomers(prevCustomers => [...prevCustomers, createdCustomer]);
+      
+      // Có thể thêm thông báo thành công hoặc cập nhật UI khác ở đây
+      console.log('Thêm khách hàng thành công');
+      return createdCustomer; // Trả về khách hàng đã tạo nếu cần
+    } catch (error) {
+      console.error('Lỗi khi thêm khách hàng:', error);
+      // Xử lý lỗi (hiển thị thông báo cho người dùng, v.v.)
+      throw error; // Ném lỗi để component gọi có thể xử lý
+    }
   };
 
   const addSale = (newSale) => {
@@ -108,7 +135,7 @@ export const DataProvider = ({ children }) => {
       if (customer.name === newSale.customer) {
         return { ...customer, purchased: customer.purchased + 1 };
       }
-      return customer;
+      return customer; 
     });
     setCustomers(updatedCustomers);
   };
@@ -123,10 +150,49 @@ export const DataProvider = ({ children }) => {
     setEmployees(prevEmployees => [...prevEmployees, formattedEmployee]);
   };
 
-  const updateCustomer = (updatedCustomer) => {
-    setCustomers(customers.map(customer =>
-      customer.id === updatedCustomer.id ? { ...customer, ...updatedCustomer } : customer
-    ));
+  const updateCustomer = async (updatedCustomer) => {
+    try {
+      // 1. Optimistic update - cập nhật UI trước
+      setCustomers(prevCustomers => 
+        prevCustomers.map(customer =>
+          customer.id === updatedCustomer.id 
+            ? { ...customer, ...updatedCustomer } 
+            : customer
+        )
+      );
+      const token = getToken();
+      // 2. Gọi API để cập nhật trên server
+      const response = await fetch(`http://localhost:8080/api/customers/${updatedCustomer.id}`, {
+        method: 'PUT', // hoặc 'PATCH' tùy API của bạn
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': getToken() ? `Bearer ${getToken()}` : '',
+        },
+        body: JSON.stringify(updatedCustomer),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Cập nhật không thành công');
+      }
+  
+      // 3. (Tùy chọn) Cập nhật lại với dữ liệu chính xác từ server
+      const serverUpdatedCustomer = await response.json();
+      setCustomers(prevCustomers => 
+        prevCustomers.map(customer =>
+          customer.id === serverUpdatedCustomer.id 
+            ? serverUpdatedCustomer 
+            : customer
+        )
+      );
+  
+    } catch (error) {
+      console.error('Lỗi khi cập nhật khách hàng:', error);
+      
+      // Rollback state nếu có lỗi
+      setCustomers(customers);
+      
+      // Có thể thêm thông báo lỗi cho người dùng
+    }
   };
 
   const updateSale = (updatedSale) => {
@@ -141,21 +207,14 @@ export const DataProvider = ({ children }) => {
     ));
   };
 
-  const deleteCustomer = (customerId) => {
-    setCustomers(prevCustomers => prevCustomers.filter(customer => customer.id !== customerId));
-  };
-
-  const deleteSale = (saleId) => {
-    setSales(prevSales => prevSales.filter(sale => sale.id !== saleId));
-  };
-
-  const deleteEmployee = async (customerId) => {
+  const deleteCustomer = async (customerId) => {
     try {
+      const token = getToken();
       const response = await fetch(`http://localhost:8080/api/customers/${customerId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          // Thêm các headers khác nếu cần (như Authorization)
+          'Authorization': token ? `Bearer ${token}` : '',
         },
       });
   
@@ -172,6 +231,14 @@ export const DataProvider = ({ children }) => {
       console.error('Lỗi khi xóa khách hàng:', error);
       // Xử lý lỗi (hiển thị thông báo cho người dùng, v.v.)
     }
+  };
+
+  const deleteSale = (saleId) => {
+    setSales(prevSales => prevSales.filter(sale => sale.id !== saleId));
+  };
+
+  const deleteEmployee = (employeeId) => {
+    setEmployees(prevEmployees => prevEmployees.filter(emp => emp.id !== employeeId));
   };
 
   return (

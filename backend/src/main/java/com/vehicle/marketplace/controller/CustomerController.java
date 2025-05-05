@@ -1,6 +1,7 @@
 package com.vehicle.marketplace.controller;
 
 import com.vehicle.marketplace.model.dto.CustomerDTO;
+import com.vehicle.marketplace.model.response.ApiResponse;
 import com.vehicle.marketplace.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -42,13 +43,9 @@ public class CustomerController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCustomer(@PathVariable Long id) {
-        try {
-            customerService.deleteCustomer(id);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    ApiResponse<Void> deleteUserById(@PathVariable("id") Long id) {
+        customerService.deleteCustomer(id);
+        return ApiResponse.<Void>builder().build();
     }
 
     @GetMapping("/search")

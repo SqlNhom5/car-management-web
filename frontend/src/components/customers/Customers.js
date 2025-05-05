@@ -34,7 +34,7 @@ const Customers = () => {
   const handleEditSubmit = (formData) => {
     updateCustomer({
       ...formData,
-      phone: formatPhoneNumber(formData.phone)
+      phoneNumber: formatPhoneNumber(formData.phoneNumber)
     });
     setIsEditModalOpen(false);
   };
