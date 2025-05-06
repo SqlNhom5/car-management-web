@@ -1,12 +1,14 @@
 package com.vehicle.marketplace.service.impl;
 
 
+import com.vehicle.marketplace.Entity.CarEntity;
 import com.vehicle.marketplace.Entity.RoleEntity;
 import com.vehicle.marketplace.Entity.UserEntity;
 import com.vehicle.marketplace.Enum.ErrorCode;
 import com.vehicle.marketplace.constant.PredefinedRole;
 import com.vehicle.marketplace.exception.AppException;
 import com.vehicle.marketplace.mapper.UserMapper;
+import com.vehicle.marketplace.model.request.CarSearchRequest;
 import com.vehicle.marketplace.model.request.UserCreationRequest;
 import com.vehicle.marketplace.model.request.UserUpdateRequest;
 import com.vehicle.marketplace.model.response.UserResponse;
@@ -26,6 +28,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,6 +67,11 @@ public class UserService implements IUserService {
     public Page<UserResponse> getUsers(Pageable pageable) {
         return userRepository.findAll(pageable).map(userMapper::toUserResponse);
     }
+
+    public List<UserEntity> findAll() {
+        return userRepository.findAll();
+    }
+
     @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     public UserResponse getUserById(Long id) {
         return userMapper.toUserResponse(userRepository.findById(id)

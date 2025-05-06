@@ -16,7 +16,7 @@ export const DataProvider = ({ children }) => {
   const [cars, setCars] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [sales, setSales] = useState(salesData);
-  const [employees, setEmployees] = useState(employeeData);
+  const [employees, setEmployees] = useState([]);
   
   // lay du lieu tu API ve cars
   useEffect(() => {
@@ -30,15 +30,12 @@ export const DataProvider = ({ children }) => {
             'Authorization': token ? `Bearer ${token}` : '',
           },
         });
-        console.log("Response status:", response.status); // Log status code để kiểm tra
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json(); // Parse JSON từ response
-        console.log("Car data:", data); // Log dữ liệu để kiểm tra
         setCars(data.result); // Cập nhật state với dữ liệu từ API
-        console.log("Fetched Cars:", cars); // Log dữ liệu để kiểm tra
       } catch (error) {
         console.error('Failed to fetch customers:', error);
       }
@@ -59,15 +56,12 @@ export const DataProvider = ({ children }) => {
             'Authorization': token ? `Bearer ${token}` : '',
           },
         });
-        console.log("Response status:", response.status); // Log status code để kiểm tra
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json(); // Parse JSON từ response
-        console.log("Customer data:", data); // Log dữ liệu để kiểm tra
         setCustomers(data); // Cập nhật state với dữ liệu từ API
-        console.log("Fetched customers:", data); // Log dữ liệu để kiểm tra
       } catch (error) {
         console.error('Failed to fetch customers:', error);
       }
@@ -75,6 +69,41 @@ export const DataProvider = ({ children }) => {
   
     fetchCustomers();
   }, []);
+  
+  // Lay du lieu tu API ve employees
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const token = getToken(); // Thay thế bằng cách lấy token thực tế của bạn
+
+        const response = await fetch('http://localhost:8080/api/users', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : '',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Employee data:", data);
+
+        // Giả sử API trả về trực tiếp mảng users
+        // Nếu API trả về dạng { result: [...] } thì dùng data.result
+        setEmployees(data.result); 
+
+        // Lưu ý: giá trị employees ở đây chưa được cập nhật ngay
+        console.log("Fetched Employees:", employees);
+      } catch (error) {
+        console.error('Failed to fetch employees:', error);
+      }
+    };
+
+    fetchEmployees();
+  }, []); // Chỉ chạy một lần khi component mount
   
 
   const addCar = async (newCar) => {
@@ -127,7 +156,6 @@ export const DataProvider = ({ children }) => {
         count: Number(updatedCar.count)
         // Thêm các trường cần convert sang number khác nếu cần
       };
-      console.log("Car data to update:", carData); // Log dữ liệu để kiểm tra
       // Gọi API để cập nhật xe
       const response = await fetch(`http://localhost:8080/api/cars/${carData.carId}`, {
         method: 'PUT', // Hoặc 'PATCH' tùy API
@@ -236,7 +264,6 @@ export const DataProvider = ({ children }) => {
       setCustomers(prevCustomers => [...prevCustomers, createdCustomer]);
       
       // Có thể thêm thông báo thành công hoặc cập nhật UI khác ở đây
-      console.log('Thêm khách hàng thành công');
       return createdCustomer; // Trả về khách hàng đã tạo nếu cần
     } catch (error) {
       console.error('Lỗi khi thêm khách hàng:', error);
@@ -273,14 +300,45 @@ export const DataProvider = ({ children }) => {
     setCustomers(updatedCustomers);
   };
 
-  const addEmployee = (newEmployee) => {
-    const formattedEmployee = {
-      id: Date.now(),
-      ...newEmployee,
-      status: 'Đang Hoạt Động',
-      joinDate: new Date().toLocaleDateString('vi-VN')
-    };
-    setEmployees(prevEmployees => [...prevEmployees, formattedEmployee]);
+  const addEmployee = async (newEmployee) => {
+    console.log("Adding employee:", newEmployee); // Log dữ liệu để kiểm tra
+    try {
+      const token = getToken(); // Lấy token từ localStorage hoặc context
+  
+      // Format dữ liệu gửi lên API (phải khớp với schema backend)
+      const formattedEmployee = {
+        ...newEmployee
+      };
+  
+      // Gửi request POST đến API
+      const response = await fetch('http://localhost:8080/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // Token bắt buộc
+        },
+        body: JSON.stringify(formattedEmployee)
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      // Nhận dữ liệu employee mới từ API
+      const createdEmployee = await response.json();
+  
+      const employeeWithRoles = {
+        ...createdEmployee.result,
+        roles: [{ name: "USER" }] // Mặc định nếu không có roles
+      };
+      console.log("Created employee:", employeeWithRoles); // Log dữ liệu để kiểm tra
+  
+      setEmployees(prev => [...prev, employeeWithRoles]); // Sử dụng dữ liệu đã được đảm bảo  
+  
+    } catch (error) {
+      console.error("Failed to add employee:", error);
+      // Có thể thêm xử lý hiển thị thông báo lỗi
+    }
   };
 
   const updateCustomer = async (updatedCustomer) => {
@@ -334,10 +392,56 @@ export const DataProvider = ({ children }) => {
     ));
   };
 
-  const updateEmployee = (updatedEmployee) => {
-    setEmployees(prevEmployees => prevEmployees.map(emp =>
-      emp.id === updatedEmployee.id ? { ...emp, ...updatedEmployee } : emp
-    ));
+  const updateEmployee = async (updatedEmployee) => {
+    const employeeToSend = { 
+      ...updatedEmployee,
+      roles: ["USER"] // Thêm roles mới dạng mảng string
+    };
+    console.log("Updating employee:", employeeToSend); // Log dữ liệu để kiểm tra
+    
+    try {
+      const token = getToken(); // Lấy token từ localStorage hoặc context
+  
+      // Gửi request PUT đến API
+      const response = await fetch(`http://localhost:8080/api/users/${updatedEmployee.id}`, {
+        method: 'PUT', // Hoặc 'PATCH' tùy backend
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(employeeToSend)
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+  
+      const responseData = await response.json();
+      const updatedData = responseData.result; 
+  
+      // Cập nhật state với dữ liệu mới từ server
+      setEmployees(prevEmployees => 
+        prevEmployees.map(emp =>
+          emp.id === updatedEmployee.id 
+            ? { 
+                ...emp, 
+                ...updatedData,
+                roles: [{ name: "USER" }]
+              } 
+            : emp
+        )
+      );
+  
+      console.log("Employee updated successfully:", updatedData);
+      return updatedData; // Trả về dữ liệu đã update nếu cần
+  
+    } catch (error) {
+      console.error("Failed to update employee:", error);
+      // Hiển thị thông báo lỗi cho người dùng
+      alert(`Cập nhật thông tin thất bại: ${error.message}`);
+      throw error; // Re-throw nếu cần xử lý tiếp ở nơi gọi hàm
+    }
   };
 
   const deleteCustomer = async (customerId) => {
@@ -370,8 +474,29 @@ export const DataProvider = ({ children }) => {
     setSales(prevSales => prevSales.filter(sale => sale.id !== saleId));
   };
 
-  const deleteEmployee = (employeeId) => {
-    setEmployees(prevEmployees => prevEmployees.filter(emp => emp.id !== employeeId));
+  const deleteEmployee = async (employeeId) => {
+    // Lưu lại state trước khi thay đổi
+    const prevEmployees = employees;
+    
+    try {
+      // Optimistic update
+      setEmployees(prev => prev.filter(emp => emp.id !== employeeId));
+      
+      const token = getToken();
+      const response = await fetch(`http://localhost:8080/api/users/${employeeId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+  
+      if (!response.ok) throw new Error('Delete failed');
+      
+      return true;
+    } catch (error) {
+      // Rollback nếu có lỗi
+      setEmployees(prevEmployees);
+      alert("Xóa thất bại, đã khôi phục dữ liệu");
+      return false;
+    }
   };
 
   return (

@@ -1,6 +1,8 @@
 package com.vehicle.marketplace.controller;
 
 
+import com.vehicle.marketplace.Entity.CarEntity;
+import com.vehicle.marketplace.Entity.UserEntity;
 import com.vehicle.marketplace.model.request.UserCreationRequest;
 import com.vehicle.marketplace.model.request.UserUpdateRequest;
 import com.vehicle.marketplace.model.response.ApiResponse;
@@ -17,6 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -27,19 +31,25 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     IUserService userService;
 
+//    @GetMapping
+//    ApiResponse<Page<UserResponse>> getUsers(
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "2") int size
+//    ) {
+//        var authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//        log.info("Username : {}", authentication.getName());
+//        authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
+//
+//        return ApiResponse.<Page<UserResponse>>
+//                builder().result(userService.getUsers(PageRequest.of(page, size)))
+//                .build();
+//    }
+
     @GetMapping
-    ApiResponse<Page<UserResponse>> getUsers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "2") int size
-    ) {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        log.info("Username : {}", authentication.getName());
-        authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
-
-        return ApiResponse.<Page<UserResponse>>
-                builder().result(userService.getUsers(PageRequest.of(page, size)))
-                .build();
+    ApiResponse<List<UserEntity>> findAllUsers() {
+        List<UserEntity> users = userService.findAll();
+        return ApiResponse.<List<UserEntity>>builder().result(users).build();
     }
 
     @PostMapping

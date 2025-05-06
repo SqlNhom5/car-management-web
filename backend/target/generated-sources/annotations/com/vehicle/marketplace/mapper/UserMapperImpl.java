@@ -31,6 +31,7 @@ public class UserMapperImpl implements UserMapper {
         userEntity.firstName( userCreationRequest.getFirstName() );
         userEntity.lastName( userCreationRequest.getLastName() );
         userEntity.email( userCreationRequest.getEmail() );
+        userEntity.phone( userCreationRequest.getPhone() );
 
         return userEntity.build();
     }
@@ -44,10 +45,12 @@ public class UserMapperImpl implements UserMapper {
         UserResponse userResponse = new UserResponse();
 
         userResponse.setRoles( roleEntitySetToRoleResponseSet( userEntity.getRoles() ) );
+        userResponse.setId( userEntity.getId() );
         userResponse.setUsername( userEntity.getUsername() );
         userResponse.setFirstName( userEntity.getFirstName() );
         userResponse.setLastName( userEntity.getLastName() );
         userResponse.setEmail( userEntity.getEmail() );
+        userResponse.setPhone( userEntity.getPhone() );
 
         return userResponse;
     }
@@ -61,6 +64,7 @@ public class UserMapperImpl implements UserMapper {
         userEntity.setPassword( request.getPassword() );
         userEntity.setFirstName( request.getFirstName() );
         userEntity.setLastName( request.getLastName() );
+        userEntity.setPhone( request.getPhone() );
     }
 
     protected RoleResponse roleEntityToRoleResponse(RoleEntity roleEntity) {

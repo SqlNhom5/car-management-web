@@ -24,6 +24,7 @@ public class UserEntity {
     String firstName;
     String lastName;
     String email;
+    String phone;
 
     @ManyToMany
     Set<RoleEntity> roles;

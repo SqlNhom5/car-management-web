@@ -14,5 +14,5 @@ public class UserSearchRequest {
     String firstName;
     String lastName;
     String email;
-    String phoneNumber;
+    String phone;
 }

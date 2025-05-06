@@ -16,9 +16,8 @@ const Employees = () => {
 
   const stats = {
     total: employees.length,
-    admin: employees.filter(e => e.role === "Quản Trị").length,
-    sales: employees.filter(e => e.role === "Bán Hàng").length,
-    warehouse: employees.filter(e => e.role === "Kho").length
+    admin: employees.filter(e => e.roles[0].name === "ADMIN").length,
+    sales: employees.filter(e => e.roles[0].name === "USER").length
   };
 
   const handleAdd = (formData) => {
@@ -73,7 +72,6 @@ const Employees = () => {
         <StatsCard title="Tổng Nhân Viên" value={stats.total} subtext="Tất cả nhân viên trong hệ thống" />
         <StatsCard title="Quản Trị" value={stats.admin} subtext="Nhân viên quản trị hệ thống" />
         <StatsCard title="Bán Hàng" value={stats.sales} subtext="Nhân viên bán hàng" />
-        <StatsCard title="Kho" value={stats.warehouse} subtext="Nhân viên kho" />
       </div>
 
       <EmployeeTable 
@@ -117,7 +115,7 @@ const Employees = () => {
         title="Xác Nhận Xóa"
       >
         <DeleteConfirmation 
-          message={`Bạn có chắc chắn muốn xóa nhân viên ${selectedEmployee?.name}?`}
+          message={`Bạn có chắc chắn muốn xóa nhân viên ${selectedEmployee?.firstName} ${selectedEmployee?.lastName}?`}
           onConfirm={handleDelete}
           onCancel={() => setIsDeleteModalOpen(false)}
         />
