@@ -28,9 +28,15 @@ public class CarController {
     CarService carService;
 
     // get all car truyen vao carSearchRequest voi cac thuoc tinh null
+//    @GetMapping
+//    ApiResponse<List<CarEntity>> findCars(@RequestBody CarSearchRequest carSearchRequest) {
+//        List<CarEntity> cars = carService.findCars(carSearchRequest);
+//        return ApiResponse.<List<CarEntity>>builder().result(cars).build();
+//    }
+
     @GetMapping
-    ApiResponse<List<CarEntity>> findCars(@RequestBody CarSearchRequest carSearchRequest) {
-        List<CarEntity> cars = carService.findCars(carSearchRequest);
+    ApiResponse<List<CarEntity>> findAllCars() {
+        List<CarEntity> cars = carService.findAllCars();
         return ApiResponse.<List<CarEntity>>builder().result(cars).build();
     }
 

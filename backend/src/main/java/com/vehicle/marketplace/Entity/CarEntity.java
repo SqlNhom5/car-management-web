@@ -34,6 +34,9 @@ public class CarEntity {
     @Column(name = "price")
     Integer price;
 
+    @Column(name="count")
+    Integer count;
+
     @Column(name = "status")
     String status;
 

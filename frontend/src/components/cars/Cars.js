@@ -17,7 +17,7 @@ const Cars = () => {
   const { cars, addCar, updateCar, deleteCar } = useData();
 
   const filteredCars = cars.filter(car => {
-    const matchesSearch = car.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = car.carName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesBrand = selectedBrand === 'Tất Cả Hãng Xe' || car.brand === selectedBrand;
     return matchesSearch && matchesBrand;
   });
@@ -34,7 +34,7 @@ const Cars = () => {
   };
 
   const handleDelete = () => {
-    deleteCar(selectedCar.id);
+    deleteCar(selectedCar.carId);
     setIsDeleteModalOpen(false);
     setSelectedCar(null);
   };

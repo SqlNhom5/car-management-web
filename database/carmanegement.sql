@@ -32,6 +32,7 @@ CREATE TABLE Car (
     ManufactureYear INT,
     LicensePlate VARCHAR(100),
     Price INT,
+    Count INT,
     Status NVARCHAR(200),
     Color NVARCHAR(50),
     Specifications TEXT,

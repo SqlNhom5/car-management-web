@@ -13,11 +13,41 @@ const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
 
-  const [cars, setCars] = useState(carData);
+  const [cars, setCars] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [sales, setSales] = useState(salesData);
   const [employees, setEmployees] = useState(employeeData);
-
+  
+  // lay du lieu tu API ve cars
+  useEffect(() => {
+    const fetchCars = async () => {
+      try {
+        const token = getToken();
+        const response = await fetch('http://localhost:8080/api/cars', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : '',
+          },
+        });
+        console.log("Response status:", response.status); // Log status code để kiểm tra
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json(); // Parse JSON từ response
+        console.log("Car data:", data); // Log dữ liệu để kiểm tra
+        setCars(data.result); // Cập nhật state với dữ liệu từ API
+        console.log("Fetched Cars:", cars); // Log dữ liệu để kiểm tra
+      } catch (error) {
+        console.error('Failed to fetch customers:', error);
+      }
+    };
+  
+    fetchCars();
+  }, []); 
+  
+  // lay du lieu tu API ve customers
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
@@ -47,31 +77,134 @@ export const DataProvider = ({ children }) => {
   }, []);
   
 
-  const addCar = (newCar) => {
-    const formattedCar = {
-      id: Date.now(),
-      ...newCar,
-      price: Number(newCar.price),
-      quantity: Number(newCar.quantity)
-    };
-    setCars(prevCars => [...prevCars, formattedCar]);
+  const addCar = async (newCar) => {
+    try {
+      const token = getToken();
+      
+      // Format dữ liệu trước khi gửi
+      const carData = {
+        ...newCar,
+        price: Number(newCar.price),
+        count: Number(newCar.count)
+        // Các trường number khác cần convert
+      };
+  
+      const response = await fetch('http://localhost:8080/api/cars', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
+        },
+        body: JSON.stringify(carData) // Sử dụng spread object
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      
+      if (data.code === 1000 && data.result) {
+        setCars(prevCars => [...prevCars, data.result]);
+        return data.result; // Trả về kết quả nếu cần
+      } else {
+        throw new Error(data.message || 'Failed to add car');
+      }
+    } catch (error) {
+      console.error('Failed to add car:', error);
+      throw error; // Ném lỗi để component có thể xử lý
+    }
   };
 
-  const updateCar = (updatedCar) => {
-    setCars(prevCars => prevCars.map(car =>
-      car.id === updatedCar.id
-        ? {
-          ...car,
-          ...updatedCar,
-          price: Number(updatedCar.price),
-          quantity: Number(updatedCar.quantity)
+  const updateCar = async (updatedCar) => {
+    try {
+      const token = getToken();
+      
+      // Chuẩn bị dữ liệu gửi lên API
+      const carData = {
+        ...updatedCar,
+        price: Number(updatedCar.price),
+        count: Number(updatedCar.count)
+        // Thêm các trường cần convert sang number khác nếu cần
+      };
+      console.log("Car data to update:", carData); // Log dữ liệu để kiểm tra
+      // Gọi API để cập nhật xe
+      const response = await fetch(`http://localhost:8080/api/cars/${carData.carId}`, {
+        method: 'PUT', // Hoặc 'PATCH' tùy API
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
+        },
+        body: JSON.stringify(carData)
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update car');
+      }
+  
+      const data = await response.json();
+      
+      // Kiểm tra response và cập nhật state
+      if (data.code === 1000 && data.result) {
+        setCars(prevCars => 
+          prevCars.map(car =>
+            car.carId === updatedCar.carId
+              ? { ...car, ...data.result }
+              : car
+          )
+        );
+        return data.result;
+      } else {
+        throw new Error(data.message || 'Invalid API response');
+      }
+    } catch (error) {
+      console.error('Update car error:', error);
+      throw error; // Ném lỗi để component có thể xử lý
+    }
+  };
+
+  const deleteCar = async (carId) => {
+    try {
+      const token = getToken();
+      if (!token) throw new Error('Missing authentication token');
+      // 1. Gọi API DELETE
+      const response = await fetch(`http://localhost:8080/api/cars/${carId}`, {
+        
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-        : car
-    ));
-  };
-
-  const deleteCar = (carId) => {
-    setCars(prevCars => prevCars.filter(car => car.id !== carId));
+      });
+  
+      // 2. Kiểm tra response
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        const errorMessage = errorData?.message || `HTTP ${response.status}`;
+        throw new Error(`Delete failed: ${errorMessage}`);
+      }
+  
+      
+      // 4. Kiểm tra cấu trúc response (tùy API của bạn)
+      if (response.status === 200) {
+        // 5. Cập nhật state nếu API thành công
+        setCars(prevCars => prevCars.filter(car => car.carId !== carId));
+        return true; // Trả về true nếu xóa thành công
+      } else {
+        throw new Error('Unknown API error');
+      }
+  
+    } catch (error) {
+      console.error('Delete car error:', {
+        carId,
+        error: error.message,
+        time: new Date().toISOString()
+      });
+      
+      // 6. Có thể thêm xử lý UI thông báo lỗi ở đây
+      throw error; // Ném lỗi để component có thể bắt và hiển thị
+    }
   };
 
   const addCustomer = async (newCustomer) => {

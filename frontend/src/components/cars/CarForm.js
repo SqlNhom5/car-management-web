@@ -3,11 +3,11 @@ import { Upload } from 'lucide-react';
 
 const CarForm = ({ car, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
-    name: car?.name || '',
+    carName: car?.carName || '',
     brand: car?.brand || '',
     price: car?.price || '',
-    quantity: car?.quantity || '',
-    image: car?.image || ''
+    count: car?.count || '',
+    imageUrl: car?.imageUrl || ''
   });
 
   const handleImageChange = (e) => {
@@ -15,7 +15,7 @@ const CarForm = ({ car, onSubmit, onCancel }) => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData({ ...formData, image: reader.result });
+        setFormData({ ...formData, imageUrl: reader.result });
       };
       reader.readAsDataURL(file);
     }
@@ -30,16 +30,16 @@ const CarForm = ({ car, onSubmit, onCancel }) => {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700">Hình Ảnh</label>
-        {formData.image ? (
+        {formData.imageUrl ? (
           <div className="mt-2 relative">
             <img 
-              src={formData.image} 
+              src={formData.imageUrl} 
               alt="Preview" 
               className="w-full h-48 object-cover rounded-lg"
             />
             <button
               type="button"
-              onClick={() => setFormData({ ...formData, image: '' })}
+              onClick={() => setFormData({ ...formData, imageUrl: '' })}
               className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
             >
               ×
@@ -65,8 +65,8 @@ const CarForm = ({ car, onSubmit, onCancel }) => {
         <label className="block text-sm font-medium text-gray-700">Tên Xe</label>
         <input
           type="text"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          value={formData.carName}
+          onChange={(e) => setFormData({ ...formData, carName: e.target.value })}
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
           required
         />
@@ -104,8 +104,8 @@ const CarForm = ({ car, onSubmit, onCancel }) => {
         <label className="block text-sm font-medium text-gray-700">Tồn Kho</label>
         <input
           type="number"
-          value={formData.quantity}
-          onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+          value={formData.count}
+          onChange={(e) => setFormData({ ...formData, count: e.target.value })}
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
           required
         />

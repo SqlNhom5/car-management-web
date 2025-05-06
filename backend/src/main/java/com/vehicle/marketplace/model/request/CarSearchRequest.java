@@ -18,6 +18,7 @@ public class CarSearchRequest {
     Integer manufactureYearTo;
     Integer priceFrom;
     Integer priceTo;
+    Integer count;
     String status;
     String color;
     Integer warrantyPeriod;

@@ -30,16 +30,16 @@ const CarTable = ({ cars, onEdit, onDelete }) => {
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {cars.map((car) => (
-            <tr key={car.id}>
+            <tr key={car.carId}>
               <td className="px-6 py-4 whitespace-nowrap">
                 <img 
-                  src={car.image} 
-                  alt={car.name} 
+                  src={car.imageUrl} 
+                  alt={car.carName} 
                   className="h-16 w-24 object-cover rounded"
                 />
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm font-medium text-gray-900">{car.name}</div>
+                <div className="text-sm font-medium text-gray-900">{car.carName}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {car.brand}
@@ -48,7 +48,7 @@ const CarTable = ({ cars, onEdit, onDelete }) => {
                 {formatPrice(car.price)}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {car.quantity}
+                {car.count}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center justify-center space-x-2">

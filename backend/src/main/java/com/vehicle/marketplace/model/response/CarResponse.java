@@ -15,6 +15,7 @@ public class CarResponse {
     Integer manufactureYear;
     String licensePlate;
     Integer price;
+    Integer count;
     String status;
     String color;
     String specifications;
