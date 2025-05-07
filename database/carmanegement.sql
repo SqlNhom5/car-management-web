@@ -1,137 +1,152 @@
 -- Tạo database
-CREATE DATABASE CarManagement;
+CREATE DATABASE CarManagement CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE CarManagement;
 
+-- Bảng Role (quản lý vai trò của người dùng)
+CREATE TABLE role (
+    name VARCHAR(255) PRIMARY KEY,
+    description TEXT
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- Bảng User (quản lý tài khoản đăng nhập và phân quyền)
-CREATE TABLE User (
-    UserID INT PRIMARY KEY,
-    Username VARCHAR(50) NOT NULL,
-    Password VARCHAR(255) NOT NULL,
-    Role VARCHAR(50) NOT NULL,
-    Email VARCHAR(100),
-    IsActive BOOLEAN DEFAULT TRUE
-);
+CREATE TABLE user (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    firstName VARCHAR(255),
+    lastName VARCHAR(255),
+    email VARCHAR(255)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Bảng User_Role (bảng liên kết ManyToMany giữa User và Role)
+CREATE TABLE user_roles (
+    user_id BIGINT NOT NULL,
+    role_name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (user_id, role_name),
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+    FOREIGN KEY (role_name) REFERENCES role(name) ON DELETE CASCADE
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Bảng Customer
-CREATE TABLE Customer (
-    CustomerID INT PRIMARY KEY,
-    FullName NVARCHAR(100) NOT NULL,
-    Address NVARCHAR(200),
-    PhoneNumber VARCHAR(15),
-    Email VARCHAR(100),
-    Notes TEXT,
-    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+CREATE TABLE customer (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    fullName VARCHAR(255) NOT NULL,
+    phoneNumber VARCHAR(15) NOT NULL UNIQUE,
+    address TEXT,
+    status VARCHAR(255),
+    createdAt DATETIME NOT NULL,
+    updatedAt DATETIME NOT NULL
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Bảng Car
-CREATE TABLE Car (
-    CarID INT AUTO_INCREMENT PRIMARY KEY,
-    CarName NVARCHAR(100),
-    Brand NVARCHAR(50),
-    Model NVARCHAR(50),
-    ManufactureYear INT,
-    LicensePlate VARCHAR(100),
-    Price INT,
-    Count INT,
-    Status NVARCHAR(200),
-    Color NVARCHAR(50),
-    Specifications TEXT,
-    ImageURL VARCHAR(255),
-    WarrantyPeriod INT
-);
+CREATE TABLE car (
+    carId INT PRIMARY KEY AUTO_INCREMENT,
+    carName VARCHAR(255),
+    brand VARCHAR(255),
+    model VARCHAR(255),
+    manufactureYear INT,
+    licensePlate VARCHAR(255),
+    price INT,
+    count INT,
+    status VARCHAR(255),
+    color VARCHAR(255),
+    specifications TEXT,
+    imageUrl VARCHAR(255),
+    warrantyPeriod INT
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Bảng Inventory
-CREATE TABLE Inventory (
-    InventoryID INT PRIMARY KEY,
-    StoreName NVARCHAR(100) NOT NULL,
-    CarID INT NOT NULL,
-    Quantity INT,
-    FOREIGN KEY (CarID) REFERENCES Car(CarID)
-);
+CREATE TABLE inventory (
+    inventoryId INT PRIMARY KEY AUTO_INCREMENT,
+    storeName VARCHAR(100) NOT NULL,
+    carId INT NOT NULL,
+    quantity INT,
+    FOREIGN KEY (carId) REFERENCES car(carId) ON DELETE CASCADE
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Bảng Invoice
-CREATE TABLE Invoice (
-    InvoiceID INT PRIMARY KEY,
-    CustomerID INT NOT NULL,
-    UserID INT NOT NULL,
-    CarID INT NOT NULL,
-    Quantity INT NOT NULL,
-    UnitPrice DECIMAL(18,2) NOT NULL,
-    Discount DECIMAL(5,2) DEFAULT 0,
-    TotalAmount DECIMAL(18,2) NOT NULL,
-    InvoiceDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PaymentMethod ENUM('Cash', 'Credit Card', 'Bank Transfer') NOT NULL,
-    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID),
-    FOREIGN KEY (UserID) REFERENCES User(UserID),
-    FOREIGN KEY (CarID) REFERENCES Car(CarID)
-);
+CREATE TABLE invoice (
+    invoiceId INT PRIMARY KEY AUTO_INCREMENT,
+    customerId BIGINT NOT NULL,
+    userId BIGINT NOT NULL,
+    carId INT NOT NULL,
+    quantity INT NOT NULL,
+    unitPrice DECIMAL(18,2) NOT NULL,
+    discount DECIMAL(5,2) DEFAULT 0,
+    totalAmount DECIMAL(18,2) NOT NULL,
+    invoiceDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    paymentMethod ENUM('Cash', 'Credit Card', 'Bank Transfer') NOT NULL,
+    FOREIGN KEY (customerId) REFERENCES customer(id) ON DELETE CASCADE,
+    FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE,
+    FOREIGN KEY (carId) REFERENCES car(carId) ON DELETE CASCADE
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Bảng Supplier
-CREATE TABLE Supplier (
-    SupplierID INT auto_increment PRIMARY KEY,
-    SupplierName NVARCHAR(100) NOT NULL,
-    Address NVARCHAR(200),
-    PhoneNumber VARCHAR(15),
-    Email VARCHAR(100)
-);
+CREATE TABLE supplier (
+    supplierId INT AUTO_INCREMENT PRIMARY KEY,
+    supplierName VARCHAR(100) NOT NULL,
+    address VARCHAR(200),
+    phoneNumber VARCHAR(15),
+    email VARCHAR(100)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Bảng PurchaseOrder
-CREATE TABLE PurchaseOrder (
-    PurchaseOrderID INT AUTO_INCREMENT PRIMARY KEY,
-    SupplierID INT NOT NULL,
-    UserID INT NOT NULL,
-    CarID INT NOT NULL,
-    Quantity INT NOT NULL,
-    UnitPrice DECIMAL(18,2) NOT NULL,
-    TotalAmount DECIMAL(18,2) NOT NULL,
-    OrderDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (SupplierID) REFERENCES Supplier(SupplierID),
-    FOREIGN KEY (UserID) REFERENCES User(UserID),
-    FOREIGN KEY (CarID) REFERENCES Car(CarID)
-);
+CREATE TABLE purchaseOrder (
+    purchaseOrderId INT AUTO_INCREMENT PRIMARY KEY,
+    supplierId INT NOT NULL,
+    userId BIGINT NOT NULL,
+    carId INT NOT NULL,
+    quantity INT NOT NULL,
+    unitPrice DECIMAL(18,2) NOT NULL,
+    totalAmount DECIMAL(18,2) NOT NULL,
+    orderDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (supplierId) REFERENCES supplier(supplierId) ON DELETE CASCADE,
+    FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE,
+    FOREIGN KEY (carId) REFERENCES car(carId) ON DELETE CASCADE
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Bảng Promotion
-CREATE TABLE Promotion (
-    PromotionID INT AUTO_INCREMENT PRIMARY KEY,
-    PromoCode VARCHAR(50) UNIQUE NOT NULL,
-    DiscountPercentage DECIMAL(5,2) NOT NULL,
-    StartDate DATETIME NOT NULL,
-    EndDate DATETIME NOT NULL,
-    ApplicableTo ENUM('Car', 'Invoice') NOT NULL,
-    CarID INT NULL,
-    FOREIGN KEY (CarID) REFERENCES Car(CarID) ON DELETE CASCADE
-);
+CREATE TABLE promotion (
+    promotionId INT AUTO_INCREMENT PRIMARY KEY,
+    promoCode VARCHAR(50) UNIQUE NOT NULL,
+    discountPercentage DECIMAL(5,2) NOT NULL,
+    startDate DATETIME NOT NULL,
+    endDate DATETIME NOT NULL,
+    applicableTo ENUM('Car', 'Invoice') NOT NULL,
+    carId INT NULL,
+    FOREIGN KEY (carId) REFERENCES car(carId) ON DELETE CASCADE
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Bảng InvoicePromotion
-CREATE TABLE InvoicePromotion (
-    InvoiceID INT NOT NULL,
-    PromotionID INT NOT NULL,
-    PRIMARY KEY (InvoiceID, PromotionID),
-    FOREIGN KEY (InvoiceID) REFERENCES Invoice(InvoiceID) ON DELETE CASCADE,
-    FOREIGN KEY (PromotionID) REFERENCES Promotion(PromotionID) ON DELETE CASCADE
-);
+CREATE TABLE invoicePromotion (
+    invoiceId INT NOT NULL,
+    promotionId INT NOT NULL,
+    PRIMARY KEY (invoiceId, promotionId),
+    FOREIGN KEY (invoiceId) REFERENCES invoice(invoiceId) ON DELETE CASCADE,
+    FOREIGN KEY (promotionId) REFERENCES promotion(promotionId) ON DELETE CASCADE
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- Bảng Appointment (thêm UserID để gán nhân viên phụ trách lịch hẹn)
-CREATE TABLE Appointment (
-    AppointmentID INT AUTO_INCREMENT PRIMARY KEY,
-    CustomerID INT NOT NULL,
-    CarID INT NOT NULL,
-    UserID INT NOT NULL,
-    AppointmentDate DATETIME NOT NULL,
-    Status ENUM('Pending', 'Confirmed', 'Cancelled') DEFAULT 'Pending',
-    Notes TEXT,
-    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID),
-    FOREIGN KEY (CarID) REFERENCES Car(CarID),
-    FOREIGN KEY (UserID) REFERENCES User(UserID)
-);
+-- Bảng Appointment
+CREATE TABLE appointment (
+    appointmentId INT AUTO_INCREMENT PRIMARY KEY,
+    customerId BIGINT NOT NULL,
+    carId INT NOT NULL,
+    userId BIGINT NOT NULL,
+    appointmentDate DATETIME NOT NULL,
+    status ENUM('Pending', 'Confirmed', 'Cancelled') DEFAULT 'Pending',
+    notes TEXT,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customerId) REFERENCES customer(id) ON DELETE CASCADE,
+    FOREIGN KEY (carId) REFERENCES car(carId) ON DELETE CASCADE,
+    FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- Bảng FavoriteCar (mục yêu thích của khách hàng)
-CREATE TABLE FavoriteCar (
-    CustomerID INT NOT NULL,
-    CarID INT NOT NULL,
-    AddedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (CustomerID, CarID),
-    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID),
-    FOREIGN KEY (CarID) REFERENCES Car(CarID)
-);
+-- Bảng FavoriteCar
+CREATE TABLE favoriteCar (
+    customerId BIGINT NOT NULL,
+    carId INT NOT NULL,
+    addedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (customerId, carId),
+    FOREIGN KEY (customerId) REFERENCES customer(id) ON DELETE CASCADE,
+    FOREIGN KEY (carId) REFERENCES car(carId) ON DELETE CASCADE
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
