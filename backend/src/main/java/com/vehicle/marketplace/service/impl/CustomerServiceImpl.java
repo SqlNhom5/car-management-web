@@ -1,13 +1,23 @@
 package com.vehicle.marketplace.service.impl;
 
+import com.vehicle.marketplace.Entity.RoleEntity;
+import com.vehicle.marketplace.Entity.UserEntity;
+import com.vehicle.marketplace.constant.PredefinedRole;
 import com.vehicle.marketplace.model.dto.CustomerDTO;
 import com.vehicle.marketplace.Entity.CustomerEntity;
+import com.vehicle.marketplace.model.dto.CustomerRegistrationDTO;
 import com.vehicle.marketplace.repository.CustomerRepository;
+import com.vehicle.marketplace.repository.RoleRepository;
+import com.vehicle.marketplace.repository.UserRepository;
 import com.vehicle.marketplace.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -15,6 +25,15 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    RoleRepository roleRepository;
+
+    @Autowired
+    UserRepository userRepository;
 
     private CustomerDTO convertToDTO(CustomerEntity customerEntity) {
         CustomerDTO dto = new CustomerDTO();
@@ -80,6 +99,35 @@ public class CustomerServiceImpl implements CustomerService {
     public List<CustomerDTO> getCustomersByStatus(String status) {
         return customerRepository.findByStatus(status)
             .stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    public void registerCustomer(CustomerRegistrationDTO registrationDTO) {
+        // Tạo UserEntity
+        UserEntity user = UserEntity.builder()
+                .username(registrationDTO.getUsername())
+                .password(passwordEncoder.encode(registrationDTO.getPassword())) // Mã hóa mật khẩu
+                .email(registrationDTO.getEmail())
+                .phone(registrationDTO.getPhone())
+                .build();
+
+        // Gán vai trò mặc định (CUSTOMER)
+        HashSet<RoleEntity> roles = new HashSet<>();
+        roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
+        user.setRoles(roles);
+
+        // Lưu UserEntity
+        userRepository.save(user);
+
+        // Tạo CustomerEntity
+        CustomerEntity customer = CustomerEntity.builder()
+                .fullName(registrationDTO.getFullName())
+                .phoneNumber(registrationDTO.getPhone())
+                .address(registrationDTO.getAddress())
+                .user(user) // Liên kết trực tiếp với UserEntity
+                .build();
+
+        // Lưu CustomerEntity
+        customerRepository.save(customer);
     }
 }
 

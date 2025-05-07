@@ -6,11 +6,13 @@ import com.vehicle.marketplace.model.response.CarResponse;
 import com.vehicle.marketplace.Entity.CarEntity;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface CarMapper {
-    CarEntity toCarEntity(CarCreationRequest carCreationRequest); 
+    CarEntity toCarEntity(CarCreationRequest carCreationRequest);
+    @Mapping(source = "carId", target = "carId")
     CarResponse toCarResponse(CarEntity carEntity);
     void updateCar(@MappingTarget CarEntity carEntity, CarUpdateRequest request);
 }

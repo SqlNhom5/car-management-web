@@ -14,7 +14,6 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class UserUpdateRequest {
-    String username;
     String password;
     String firstName;
     String lastName;

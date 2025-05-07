@@ -7,16 +7,16 @@ import lombok.experimental.FieldDefaults;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "appointment")
+@Table(name = "favoritecar")
 @Data // Tạo getter, setter, toString, equals, hashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AppointmentEntity {
+public class FavoriteCarEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer appointmentId;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "customerid", nullable = false)
@@ -25,18 +25,11 @@ public class AppointmentEntity {
     @ManyToOne
     @JoinColumn(name = "carid", nullable = false)
     private CarEntity car;
+    @Column(name = "createdat")
+    private LocalDateTime createdAt;
 
-    @ManyToOne
-    @JoinColumn(name = "userid", nullable = false)
-    private UserEntity user;
-
-    @Column(nullable = false)
-    private LocalDateTime appointmentDate;
-
-    @Column(columnDefinition = "TEXT")
-    private String notes;
-
-    @Column(updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
+    @PrePersist
+    public void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }

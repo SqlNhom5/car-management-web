@@ -1,6 +1,7 @@
 package com.vehicle.marketplace.controller;
 
 import com.vehicle.marketplace.model.dto.CustomerDTO;
+import com.vehicle.marketplace.model.dto.CustomerRegistrationDTO;
 import com.vehicle.marketplace.model.response.ApiResponse;
 import com.vehicle.marketplace.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,12 @@ public class CustomerController {
     @GetMapping("/status/{status}")
     public List<CustomerDTO> getCustomersByStatus(@PathVariable String status) {
         return customerService.getCustomersByStatus(status);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<String> registerCustomer(@RequestBody CustomerRegistrationDTO registrationDTO) {
+        customerService.registerCustomer(registrationDTO);
+        return ResponseEntity.ok("Customer registered successfully");
     }
 }
 

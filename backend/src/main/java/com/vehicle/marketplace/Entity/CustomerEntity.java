@@ -1,22 +1,33 @@
 package com.vehicle.marketplace.Entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Data
 @Entity
 @Table(name = "customer")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CustomerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String fullName;
+    @Column(name = "fullname")
+    String fullName;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "phonenumber")
     private String phoneNumber;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", unique = true)
+    private UserEntity user;
 
     private String address;
 
