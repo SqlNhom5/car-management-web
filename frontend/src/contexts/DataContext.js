@@ -105,43 +105,52 @@ export const DataProvider = ({ children }) => {
     fetchEmployees();
   }, []); // Chỉ chạy một lần khi component mount
   
-
-  const addCar = async (newCar) => {
+  const addCar = async (newCar, imageFile) => {
     try {
       const token = getToken();
-      
-      // Format dữ liệu trước khi gửi
+  
+      // Format dữ liệu
       const carData = {
         ...newCar,
         price: Number(newCar.price),
-        count: Number(newCar.count)
-        // Các trường number khác cần convert
+        count: Number(newCar.count),
+        manufactureYear: Number(newCar.manufactureYear),
+        warrantyPeriod: Number(newCar.warrantyPeriod),
       };
   
+      // Kiểm tra imageFile
+      if (!imageFile || !(imageFile instanceof File)) {
+        throw new Error('Vui lòng chọn một file ảnh hợp lệ');
+      }
+  
+      // Tạo FormData
+      const formData = new FormData();
+      formData.append('car', JSON.stringify(carData));
+      formData.append('image', imageFile);
+      console.log(formData);
       const response = await fetch('http://localhost:8080/api/cars', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
+          Authorization: token ? `Bearer ${token}` : '',
         },
-        body: JSON.stringify(carData) // Sử dụng spread object
+        body: formData,
       });
   
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
   
       const data = await response.json();
-      
       if (data.code === 1000 && data.result) {
-        setCars(prevCars => [...prevCars, data.result]);
-        return data.result; // Trả về kết quả nếu cần
+        setCars((prevCars) => [...prevCars, data.result]);
+        return data.result;
       } else {
         throw new Error(data.message || 'Failed to add car');
       }
     } catch (error) {
       console.error('Failed to add car:', error);
-      throw error; // Ném lỗi để component có thể xử lý
+      throw error;
     }
   };
 

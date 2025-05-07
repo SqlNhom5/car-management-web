@@ -3,6 +3,9 @@ import { Edit2, Trash2 } from 'lucide-react';
 import { formatPrice } from '../../utils/formatters';
 
 const CarTable = ({ cars, onEdit, onDelete }) => {
+  // Debug danh sách xe
+  console.log('Cars in CarTable:', cars);
+
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <table className="min-w-full divide-y divide-gray-200">
@@ -32,11 +35,23 @@ const CarTable = ({ cars, onEdit, onDelete }) => {
           {cars.map((car) => (
             <tr key={car.carId}>
               <td className="px-6 py-4 whitespace-nowrap">
-                <img 
-                  src={car.imageUrl} 
-                  alt={car.carName} 
-                  className="h-16 w-24 object-cover rounded"
-                />
+                {car.imageUrl ? (
+                  <img
+                    src={`http://localhost:8080${car.imageUrl}`}
+                    alt={car.carName}
+                    className="h-16 w-24 object-cover rounded"
+                    onError={(e) => {
+                      console.error(`Cannot load image for ${car.carName}:`, e);
+                      e.target.src = 'https://via.placeholder.com/96x64?text=No+Image'; // Ảnh mặc định
+                    }}
+                  />
+                ) : (
+                  <img
+                    src="https://via.placeholder.com/96x64?text=No+Image"
+                    alt="No Image"
+                    className="h-16 w-24 object-cover rounded"
+                  />
+                )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm font-medium text-gray-900">{car.carName}</div>
@@ -52,13 +67,13 @@ const CarTable = ({ cars, onEdit, onDelete }) => {
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center justify-center space-x-2">
-                  <button 
+                  <button
                     onClick={() => onEdit(car)}
                     className="text-blue-600 hover:text-blue-800"
                   >
                     <Edit2 className="w-5 h-5" />
                   </button>
-                  <button 
+                  <button
                     onClick={() => onDelete(car)}
                     className="text-red-600 hover:text-red-800"
                   >

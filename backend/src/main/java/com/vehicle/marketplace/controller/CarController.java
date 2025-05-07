@@ -1,10 +1,16 @@
 package com.vehicle.marketplace.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vehicle.marketplace.Entity.CarEntity;
-import com.vehicle.marketplace.model.request.CarSearchRequest;
 import com.vehicle.marketplace.model.response.ApiResponse;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import com.vehicle.marketplace.model.response.CarResponse;
@@ -16,6 +22,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -26,6 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 public class CarController {
     
     CarService carService;
+
+    ObjectMapper objectMapper;
 
     // get all car truyen vao carSearchRequest voi cac thuoc tinh null
 //    @GetMapping
@@ -54,12 +63,45 @@ public class CarController {
                 .result(carService.getCarById(id))
                 .build();
     }
-    
-    @PostMapping
-    ApiResponse<CarEntity> createCar(@RequestBody CarCreationRequest carCreationRequest) {
-         return ApiResponse.<CarEntity>builder()
-                .result(carService.createCar(carCreationRequest))
-                .build();
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<CarEntity> createCar(
+            @RequestPart(name = "car") String carJson, // Nhận chuỗi JSON
+            @RequestPart(name = "image") MultipartFile image) throws IOException {
+        try {
+            // Log dữ liệu nhận được
+            System.out.println("Received carJson: " + carJson);
+            System.out.println("Received image: " + image.getOriginalFilename() + ", Size: " + image.getSize());
+
+            // Parse chuỗi JSON thành CarCreationRequest
+            CarCreationRequest carCreationRequest = objectMapper.readValue(carJson, CarCreationRequest.class);
+
+            // Lưu ảnh và lấy URL
+            String imageUrl = saveImage(image);
+            carCreationRequest.setImageUrl(imageUrl);
+
+            // Gọi service để tạo car
+            CarEntity carEntity = carService.createCar(carCreationRequest);
+
+            return ApiResponse.<CarEntity>builder()
+                    .code(1000)
+                    .result(carEntity)
+                    .build();
+        } catch (Exception e) {
+            System.err.println("Error processing request: " + e.getMessage());
+            return ApiResponse.<CarEntity>builder()
+                    .code(400)
+                    .message("Invalid request: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    private String saveImage(MultipartFile image) throws IOException {
+        String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
+        Path path = Paths.get("uploads/" + fileName);
+        Files.createDirectories(path.getParent());
+        Files.write(path, image.getBytes());
+        return "/uploads/" + fileName;
     }
     
     @PutMapping("/{id}")
