@@ -14,7 +14,7 @@ public class CarEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "carid")
-    Integer carId;
+    Long carId;
 
     @Column(name = "carname")
     String carName;
