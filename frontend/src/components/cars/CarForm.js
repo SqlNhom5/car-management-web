@@ -74,7 +74,7 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
 
     try {
       await onSubmit(formData, imageFile);
-      setSuccess('Thêm xe thành công!');
+      setSuccess(car ? 'Cập nhật xe thành công!' : 'Thêm xe thành công!');
       setFormData({
         carName: '',
         brand: '',
@@ -170,7 +170,18 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
         </select>
       </div>
 
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Model</label>
+        <input
+          type="text"
+          name="model"
+          value={formData.model}
+          onChange={handleInputChange}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+        />
+      </div>
 
+     
 
       <div>
         <label className="block text-sm font-medium text-gray-700">Giá Bán</label>
@@ -196,7 +207,7 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
         />
       </div>
 
-
+ 
 
       <div className="flex justify-end space-x-2 pt-4">
         <button
