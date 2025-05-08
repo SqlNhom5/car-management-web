@@ -4,6 +4,8 @@ import com.vehicle.marketplace.Entity.CarEntity;
 import com.vehicle.marketplace.Entity.CustomerEntity;
 import com.vehicle.marketplace.Entity.FavoriteCarEntity;
 import com.vehicle.marketplace.Entity.UserEntity;
+import com.vehicle.marketplace.Enum.ErrorCode;
+import com.vehicle.marketplace.exception.AppException;
 import com.vehicle.marketplace.mapper.CarMapper;
 import com.vehicle.marketplace.model.request.FavoriteCarRequest;
 import com.vehicle.marketplace.model.response.CarResponse;
@@ -41,7 +43,7 @@ public class FavoriteCarService implements IFavoriteCarService {
     public String addFavorite(String username, FavoriteCarRequest request) {
         CustomerEntity customer = getCustomerFromUsername(username);
         if (favoriteCarRepository.existsByCustomerIdAndCarCarId(customer.getId(), request.getCarId())) {
-            throw new IllegalStateException("Car is already in favorites");
+            throw new AppException(ErrorCode.CAR_EXISTED);
         }
         CarEntity car = carRepository.findById(request.getCarId())
                 .orElseThrow(() -> new IllegalArgumentException("Car not found"));
