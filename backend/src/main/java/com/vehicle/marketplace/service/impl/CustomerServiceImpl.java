@@ -2,7 +2,9 @@ package com.vehicle.marketplace.service.impl;
 
 import com.vehicle.marketplace.Entity.RoleEntity;
 import com.vehicle.marketplace.Entity.UserEntity;
+import com.vehicle.marketplace.Enum.ErrorCode;
 import com.vehicle.marketplace.constant.PredefinedRole;
+import com.vehicle.marketplace.exception.AppException;
 import com.vehicle.marketplace.model.dto.CustomerDTO;
 import com.vehicle.marketplace.Entity.CustomerEntity;
 import com.vehicle.marketplace.model.dto.CustomerRegistrationDTO;
@@ -102,6 +104,11 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     public void registerCustomer(CustomerRegistrationDTO registrationDTO) {
+
+        if(userRepository.existsByUsername(registrationDTO.getUsername())) {
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
+
         // Tạo UserEntity
         UserEntity user = UserEntity.builder()
                 .username(registrationDTO.getUsername())
