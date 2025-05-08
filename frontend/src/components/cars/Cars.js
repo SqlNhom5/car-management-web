@@ -22,15 +22,23 @@ const Cars = () => {
     return matchesSearch && matchesBrand;
   });
 
-  const handleAdd = (formData) => {
-    addCar(formData);
-    setIsAddModalOpen(false);
+  const handleAdd = async (formData, imageFile) => {
+    try {
+      await addCar(formData, imageFile);
+      setIsAddModalOpen(false);
+    } catch (error) {
+      console.error('Failed to add car:', error);
+    }
   };
 
-  const handleEdit = (formData) => {
-    updateCar({ ...selectedCar, ...formData });
-    setIsEditModalOpen(false);
-    setSelectedCar(null);
+  const handleEdit = async (formData, imageFile) => {
+    try {
+      await updateCar({ ...selectedCar, ...formData }, imageFile);
+      setIsEditModalOpen(false);
+      setSelectedCar(null);
+    } catch (error) {
+      console.error('Failed to update car:', error);
+    }
   };
 
   const handleDelete = () => {
@@ -90,7 +98,7 @@ const Cars = () => {
         title="Xác Nhận Xóa"
       >
         <DeleteConfirmation 
-          message={`Bạn có chắc chắn muốn xóa xe ${selectedCar?.name}?`}
+          message={`Bạn có chắc chắn muốn xóa xe ${selectedCar?.carName}?`}
           onConfirm={handleDelete}
           onCancel={() => setIsDeleteModalOpen(false)}
         />

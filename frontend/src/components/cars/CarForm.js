@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Upload } from 'lucide-react';
 
-const CarForm = ({ car, onCancel, onCarAdded }) => {
+const CarForm = ({ car, onCancel, onSubmit }) => {
   const [formData, setFormData] = useState({
     carName: car?.carName || '',
     brand: car?.brand || '',
@@ -20,10 +20,6 @@ const CarForm = ({ car, onCancel, onCarAdded }) => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const fileInputRef = useRef(null);
-
-  const getToken = () => {
-    return localStorage.getItem('token');
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -66,58 +62,6 @@ const CarForm = ({ car, onCancel, onCarAdded }) => {
     }
   };
 
-  const addCar = async (newCar, imageFile) => {
-    try {
-      const token = getToken();
-
-      const carData = {
-        ...newCar,
-        price: Number(newCar.price) || 0,
-        count: Number(newCar.count) || 0,
-        manufactureYear: Number(newCar.manufactureYear) || 0,
-        warrantyPeriod: Number(newCar.warrantyPeriod) || 0,
-      };
-
-      if (!imageFile || !(imageFile instanceof File)) {
-        throw new Error('Vui lòng chọn một file ảnh hợp lệ');
-      }
-
-      const formData = new FormData();
-      formData.append('car', new Blob([JSON.stringify(carData)], { type: 'application/json' }));
-      formData.append('image', imageFile);
-
-      for (let [key, value] of formData.entries()) {
-        console.log(`FormData ${key}:`, value);
-      }
-
-      const response = await fetch('http://localhost:8080/api/cars', {
-        method: 'POST',
-        headers: {
-          Authorization: token ? `Bearer ${token}` : '',
-        },
-        body: formData,
-      });
-
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (data.code === 1000 && data.result) {
-        return data.result;
-      } else {
-        throw new Error(data.message || 'Failed to add car');
-      }
-    } catch (error) {
-      console.error('Failed to add car:', error);
-      throw error;
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -129,9 +73,8 @@ const CarForm = ({ car, onCancel, onCarAdded }) => {
     }
 
     try {
-      const newCar = await addCar(formData, imageFile);
+      await onSubmit(formData, imageFile);
       setSuccess('Thêm xe thành công!');
-      setImagePreview(`http://localhost:8080${newCar.imageUrl}`);
       setFormData({
         carName: '',
         brand: '',
@@ -146,14 +89,9 @@ const CarForm = ({ car, onCancel, onCarAdded }) => {
         warrantyPeriod: '',
       });
       setImageFile(null);
+      setImagePreview('');
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
-      } else {
-        console.warn('File input ref is not available');
-      }
-      if (onCarAdded) {
-        console.log('Calling onCarAdded with:', newCar);
-        onCarAdded(newCar);
       }
     } catch (error) {
       setError(error.message);
@@ -233,6 +171,39 @@ const CarForm = ({ car, onCancel, onCarAdded }) => {
       </div>
 
       <div>
+        <label className="block text-sm font-medium text-gray-700">Model</label>
+        <input
+          type="text"
+          name="model"
+          value={formData.model}
+          onChange={handleInputChange}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Năm sản xuất</label>
+        <input
+          type="number"
+          name="manufactureYear"
+          value={formData.manufactureYear}
+          onChange={handleInputChange}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Biển số</label>
+        <input
+          type="text"
+          name="licensePlate"
+          value={formData.licensePlate}
+          onChange={handleInputChange}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+        />
+      </div>
+
+      <div>
         <label className="block text-sm font-medium text-gray-700">Giá Bán</label>
         <input
           type="number"
@@ -256,14 +227,53 @@ const CarForm = ({ car, onCancel, onCarAdded }) => {
         />
       </div>
 
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Trạng thái</label>
+        <input
+          type="text"
+          name="status"
+          value={formData.status}
+          onChange={handleInputChange}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Màu sắc</label>
+        <input
+          type="text"
+          name="color"
+          value={formData.color}
+          onChange={handleInputChange}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Thông số kỹ thuật</label>
+        <textarea
+          name="specifications"
+          value={formData.specifications}
+          onChange={handleInputChange}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Thời gian bảo hành</label>
+        <input
+          type="number"
+          name="warrantyPeriod"
+          value={formData.warrantyPeriod}
+          onChange={handleInputChange}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+        />
+      </div>
 
       <div className="flex justify-end space-x-2 pt-4">
         <button
           type="button"
-          onClick={() => {
-            console.log('Calling onCancel');
-            onCancel();
-          }}
+          onClick={onCancel}
           className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
         >
           Hủy
