@@ -1,11 +1,11 @@
 package com.vehicle.marketplace.service.impl;
 
-import com.vehicle.marketplace.Entity.AppointmentEntity;
-import com.vehicle.marketplace.Entity.CarEntity;
-import com.vehicle.marketplace.Entity.CustomerEntity;
-import com.vehicle.marketplace.Entity.UserEntity;
+import com.vehicle.marketplace.Entity.*;
 import com.vehicle.marketplace.Enum.AppointmentStatus;
+import com.vehicle.marketplace.Enum.ErrorCode;
+import com.vehicle.marketplace.exception.AppException;
 import com.vehicle.marketplace.model.request.AppointmentRequest;
+import com.vehicle.marketplace.model.request.CustomerAppointmentRequest;
 import com.vehicle.marketplace.model.response.AppointmentResponse;
 import com.vehicle.marketplace.repository.AppointmentRepository;
 import com.vehicle.marketplace.repository.CarRepository;
@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,6 +63,46 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public void delete(Integer id) {
         appointmentRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public String createAppointment(String username, CustomerAppointmentRequest request) {
+        CustomerEntity customer = getCustomerFromUsername(username);
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow( () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        customer.setFullName(request.getFullName());
+        if (appointmentRepository.existsByCustomerIdAndCarCarId(customer.getId(), request.getCarId())) {
+            throw new AppException(ErrorCode.CAR_EXISTED);
+        }
+        CarEntity car = carRepository.findById(request.getCarId())
+                .orElseThrow(() -> new IllegalArgumentException("Car not found"));
+        AppointmentEntity appointment = AppointmentEntity.builder()
+                .customer(customer)
+                .appointmentDate(request.getAppointmentDate())
+                .car(car)
+                .phone(request.getPhone())
+                .user(user)
+                .notes(request.getNotes())
+                .status(AppointmentStatus.Pending)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+
+        appointmentRepository.save(appointment);
+        return "add appointment successfully";
+    }
+
+    private CustomerEntity getCustomerFromUsername(String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        boolean isCustomer = user.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("USER"));
+        if (!isCustomer) {
+            throw new IllegalStateException("Only customers can manage favorites");
+        }
+        return customerRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Customer profile not found for this user"));
     }
 
     @Override

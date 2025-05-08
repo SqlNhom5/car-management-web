@@ -42,6 +42,9 @@ public class AppointmentEntity {
     @Column(name = "notes")
     String notes;
 
+    @Column(name = "phone")
+    String phone;
+
     @Column(name = "createdat")
     LocalDateTime createdAt = LocalDateTime.now();
 }
