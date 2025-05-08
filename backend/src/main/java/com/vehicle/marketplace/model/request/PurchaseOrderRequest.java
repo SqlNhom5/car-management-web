@@ -1,9 +1,9 @@
-package com.vehicle.marketplace.model.dto;
+package com.vehicle.marketplace.model.request;
 
 import lombok.Data;
 
 @Data
-public class PurchaseOrderRequestDTO {
+public class PurchaseOrderRequest {
     private Integer supplierId;
     private Long userId;
     private Long carId;

@@ -1,11 +1,11 @@
-package com.vehicle.marketplace.model.dto;
+package com.vehicle.marketplace.model.response;
 
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
-public class PurchaseOrderResponseDTO {
+public class PurchaseOrderResponse {
     private Long id;
 
     private Integer supplierId;

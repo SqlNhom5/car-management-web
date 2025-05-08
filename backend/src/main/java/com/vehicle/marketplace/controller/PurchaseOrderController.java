@@ -1,7 +1,7 @@
 package com.vehicle.marketplace.controller;
 
-import com.vehicle.marketplace.model.dto.PurchaseOrderRequestDTO;
-import com.vehicle.marketplace.model.dto.PurchaseOrderResponseDTO;
+import com.vehicle.marketplace.model.request.PurchaseOrderRequest;
+import com.vehicle.marketplace.model.response.PurchaseOrderResponse;
 import com.vehicle.marketplace.model.response.ApiResponse;
 import com.vehicle.marketplace.service.PurchaseOrderService;
 import lombok.RequiredArgsConstructor;
@@ -19,30 +19,30 @@ public class PurchaseOrderController {
     private final PurchaseOrderService purchaseOrderService;
 
     @GetMapping
-    public ApiResponse<List<PurchaseOrderResponseDTO>> getAllOrders() {
-        return ApiResponse.<List<PurchaseOrderResponseDTO>>builder()
+    public ApiResponse<List<PurchaseOrderResponse>> getAllOrders() {
+        return ApiResponse.<List<PurchaseOrderResponse>>builder()
                 .result(purchaseOrderService.getAllOrders())
                 .build();
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<PurchaseOrderResponseDTO> getOrderById(@PathVariable Long id) {
-        return ApiResponse.<PurchaseOrderResponseDTO>builder()
+    public ApiResponse<PurchaseOrderResponse> getOrderById(@PathVariable Long id) {
+        return ApiResponse.<PurchaseOrderResponse>builder()
                 .result(purchaseOrderService.getOrderById(id)
                         .orElseThrow(() -> new RuntimeException("Order not found")))
                 .build();
     }
 
     @PostMapping
-    public ApiResponse<PurchaseOrderResponseDTO> createOrder(@RequestBody PurchaseOrderRequestDTO dto) {
-        return ApiResponse.<PurchaseOrderResponseDTO>builder()
+    public ApiResponse<PurchaseOrderResponse> createOrder(@RequestBody PurchaseOrderRequest dto) {
+        return ApiResponse.<PurchaseOrderResponse>builder()
                 .result(purchaseOrderService.createOrder(dto))
                 .build();
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<PurchaseOrderResponseDTO> updateOrder(@PathVariable Long id, @RequestBody PurchaseOrderRequestDTO dto) {
-        return ApiResponse.<PurchaseOrderResponseDTO>builder()
+    public ApiResponse<PurchaseOrderResponse> updateOrder(@PathVariable Long id, @RequestBody PurchaseOrderRequest dto) {
+        return ApiResponse.<PurchaseOrderResponse>builder()
                 .result(purchaseOrderService.updateOrder(id, dto))
                 .build();
     }
