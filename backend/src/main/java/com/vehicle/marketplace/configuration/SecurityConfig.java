@@ -33,7 +33,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(authorizeRequests -> authorizeRequests
                 .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-                .requestMatchers(HttpMethod.GET, "/uploads/**","/api/cars").permitAll()
+                .requestMatchers(HttpMethod.GET, "/uploads/**","/api/cars", "api/cars/**").permitAll()
                 .anyRequest().authenticated()
         );
 
