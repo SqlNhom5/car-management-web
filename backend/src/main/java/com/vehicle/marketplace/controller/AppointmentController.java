@@ -2,11 +2,13 @@ package com.vehicle.marketplace.controller;
 
 import com.vehicle.marketplace.model.request.AppointmentRequest;
 import com.vehicle.marketplace.model.request.AppointmentUpdateRequest;
+import com.vehicle.marketplace.model.request.CustomerAppointmentRequest;
 import com.vehicle.marketplace.model.response.ApiResponse;
 import com.vehicle.marketplace.model.response.AppointmentResponse;
 import com.vehicle.marketplace.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,6 +49,7 @@ public class AppointmentController {
     ApiResponse<AppointmentResponse> update(@PathVariable Integer id, @RequestBody AppointmentUpdateRequest request) {
         return ApiResponse.<AppointmentResponse>builder()
                 .result(appointmentService.update(id, request.getStatus()))
+
                 .build();
     }
 
@@ -54,6 +57,24 @@ public class AppointmentController {
     ApiResponse<String> delete(@PathVariable Integer id) {
         appointmentService.delete(id);
         return ApiResponse.<String>builder().result("Deleted successfully").build();
+    }
+
+
+    @PostMapping("/customer")
+    ApiResponse<String> createAppointment(@RequestBody CustomerAppointmentRequest request) {
+        String username = getCurrentUsername();
+        return ApiResponse.<String>builder()
+                .result(appointmentService.createAppointment(username, request))
+                .build();
+    }
+
+    private String getCurrentUsername() {
+        var context = SecurityContextHolder.getContext();
+        var authentication = context.getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("User not authenticated");
+        }
+        return authentication.getName();
     }
 }
 

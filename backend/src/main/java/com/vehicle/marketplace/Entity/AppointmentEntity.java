@@ -36,18 +36,18 @@ public class AppointmentEntity {
     @Column(name="appointmentdate", nullable = false)
     LocalDateTime appointmentDate;
 
-    @Column(name="phone")
-    String phone;
 
     @Column(name="mail")
     String mail;
-
 
     @Enumerated(EnumType.STRING)
     AppointmentStatus status = AppointmentStatus.Pending;
 
     @Column(name = "notes")
     String notes;
+
+    @Column(name = "phone")
+    String phone;
 
     @Column(name = "createdat")
     LocalDateTime createdAt = LocalDateTime.now();

@@ -19,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
+
 public class FavoriteCarController {
     FavoriteCarService favoriteCarService;
 
