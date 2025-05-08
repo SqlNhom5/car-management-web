@@ -28,27 +28,31 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+    console.log('handleImageChange triggered, file:', file);
     if (file) {
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
       if (!allowedTypes.includes(file.type)) {
         setError('Chỉ hỗ trợ file ảnh JPEG, PNG hoặc GIF');
+        console.error('Invalid file type:', file.type);
         return;
       }
 
       setImageFile(file);
-      console.log('Selected file:', file, 'Type:', file.type, 'Size:', file.size);
+      console.log('Selected file:', file.name, 'Type:', file.type, 'Size:', file.size);
 
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
-        console.log('Base64 preview:', reader.result.substring(0, 50));
+        console.log('Image preview set, base64:', reader.result.substring(0, 50));
       };
       reader.onerror = () => {
         setError('Lỗi khi đọc file ảnh');
+        console.error('FileReader error');
       };
       reader.readAsDataURL(file);
     } else {
       setError('Vui lòng chọn một file ảnh hợp lệ');
+      console.error('No file selected');
     }
   };
 
@@ -57,6 +61,7 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
     setImagePreview('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+      console.log('Image removed, file input reset');
     } else {
       console.warn('File input ref is not available');
     }
@@ -67,14 +72,17 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
     setError(null);
     setSuccess(null);
 
+    console.log('handleSubmit triggered, formData:', formData, 'imageFile:', imageFile);
+
     if (!imageFile && !car?.imageUrl) {
       setError('Vui lòng chọn một file ảnh');
+      console.error('No image provided for new car');
       return;
     }
 
     try {
       await onSubmit(formData, imageFile);
-      setSuccess('Thêm xe thành công!');
+      setSuccess(car ? 'Cập nhật xe thành công!' : 'Thêm xe thành công!');
       setFormData({
         carName: '',
         brand: '',
@@ -95,6 +103,7 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
       }
     } catch (error) {
       setError(error.message);
+      console.error('Submit error:', error.message);
     }
   };
 
@@ -170,7 +179,38 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
         </select>
       </div>
 
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Model</label>
+        <input
+          type="text"
+          name="model"
+          value={formData.model}
+          onChange={handleInputChange}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+        />
+      </div>
 
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Năm sản xuất</label>
+        <input
+          type="number"
+          name="manufactureYear"
+          value={formData.manufactureYear}
+          onChange={handleInputChange}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Biển số</label>
+        <input
+          type="text"
+          name="licensePlate"
+          value={formData.licensePlate}
+          onChange={handleInputChange}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+        />
+      </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700">Giá Bán</label>
@@ -196,7 +236,48 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
         />
       </div>
 
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Trạng thái</label>
+        <input
+          type="text"
+          name="status"
+          value={formData.status}
+          onChange={handleInputChange}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+        />
+      </div>
 
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Màu sắc</label>
+        <input
+          type="text"
+          name="color"
+          value={formData.color}
+          onChange={handleInputChange}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Thông số kỹ thuật</label>
+        <textarea
+          name="specifications"
+          value={formData.specifications}
+          onChange={handleInputChange}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Thời gian bảo hành</label>
+        <input
+          type="number"
+          name="warrantyPeriod"
+          value={formData.warrantyPeriod}
+          onChange={handleInputChange}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+        />
+      </div>
 
       <div className="flex justify-end space-x-2 pt-4">
         <button

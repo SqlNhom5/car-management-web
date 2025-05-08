@@ -189,50 +189,69 @@ export const DataProvider = ({ children }) => {
     }
   };
 
-  const updateCar = async (updatedCar) => {
+  const updateCar = async (updatedCar, imageFile) => {
     try {
       const token = getToken();
-      
-      // Chuẩn bị dữ liệu gửi lên API
       const carData = {
         ...updatedCar,
-        price: Number(updatedCar.price),
-        count: Number(updatedCar.count)
-        // Thêm các trường cần convert sang number khác nếu cần
+        price: Number(updatedCar.price) || 0,
+        count: Number(updatedCar.count) || 0,
+        manufactureYear: Number(updatedCar.manufactureYear) || 0,
+        warrantyPeriod: Number(updatedCar.warrantyPeriod) || 0,
       };
-      // Gọi API để cập nhật xe
-      const response = await fetch(`http://localhost:8080/api/cars/${carData.carId}`, {
-        method: 'PUT', // Hoặc 'PATCH' tùy API
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
-        },
-        body: JSON.stringify(carData)
-      });
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update car');
+
+      console.log('updateCar input:', { carData, imageFile });
+
+      const formData = new FormData();
+      formData.append('car', new Blob([JSON.stringify(carData)], { type: 'application/json' }));
+      if (imageFile) {
+        if (!(imageFile instanceof File)) {
+          throw new Error('File ảnh không hợp lệ');
+        }
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!allowedTypes.includes(imageFile.type)) {
+          throw new Error('Chỉ hỗ trợ file ảnh JPEG, PNG hoặc GIF');
+        }
+        console.log('Appending image to FormData:', imageFile.name, imageFile.type, imageFile.size);
+        formData.append('image', imageFile);
+      } else {
+        console.log('No imageFile provided, sending only car data');
       }
-  
+
+      console.log('Sending updateCar FormData:');
+      for (let [key, value] of formData.entries()) {
+        console.log(`  ${key}:`, value);
+      }
+
+      const response = await fetch(`http://localhost:8080/api/cars/${updatedCar.carId}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
+        body: formData,
+      });
+
+      console.log('updateCar response status:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
-      
-      // Kiểm tra response và cập nhật state
+      console.log('updateCar response data:', data);
+
       if (data.code === 1000 && data.result) {
-        setCars(prevCars => 
-          prevCars.map(car =>
-            car.carId === updatedCar.carId
-              ? { ...car, ...data.result }
-              : car
-          )
+        setCars(prev =>
+          prev.map(c => (c.carId === data.result.carId ? data.result : c))
         );
         return data.result;
       } else {
-        throw new Error(data.message || 'Invalid API response');
+        throw new Error(data.message || 'Failed to update car');
       }
     } catch (error) {
-      console.error('Update car error:', error);
-      throw error; // Ném lỗi để component có thể xử lý
+      console.error('Lỗi khi cập nhật xe:', error);
+      throw error;
     }
   };
 
