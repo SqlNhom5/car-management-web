@@ -1,7 +1,8 @@
 package com.vehicle.marketplace.service.impl;
 
 import com.vehicle.marketplace.Entity.*;
-import com.vehicle.marketplace.model.dto.*;
+import com.vehicle.marketplace.model.request.*;
+import com.vehicle.marketplace.model.response.*;
 import com.vehicle.marketplace.repository.*;
 import com.vehicle.marketplace.service.PurchaseOrderService;
 import lombok.RequiredArgsConstructor;
@@ -21,19 +22,19 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     private final CarRepository carRepository;
 
     @Override
-    public List<PurchaseOrderResponseDTO> getAllOrders() {
+    public List<PurchaseOrderResponse> getAllOrders() {
         return purchaseOrderRepository.findAll().stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<PurchaseOrderResponseDTO> getOrderById(Long id) {
+    public Optional<PurchaseOrderResponse> getOrderById(Long id) {
         return purchaseOrderRepository.findById(id).map(this::mapToDTO);
     }
 
     @Override
-    public PurchaseOrderResponseDTO createOrder(PurchaseOrderRequestDTO dto) {
+    public PurchaseOrderResponse createOrder(PurchaseOrderRequest dto) {
         PurchaseOrderEntity entity = new PurchaseOrderEntity();
         populateEntityFromDTO(entity, dto);
         entity.setTotalAmount(dto.getUnitPrice() * dto.getQuantity());
@@ -41,7 +42,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     }
 
     @Override
-    public PurchaseOrderResponseDTO updateOrder(Long id, PurchaseOrderRequestDTO dto) {
+    public PurchaseOrderResponse updateOrder(Long id, PurchaseOrderRequest dto) {
         PurchaseOrderEntity entity = purchaseOrderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("PurchaseOrder not found"));
         populateEntityFromDTO(entity, dto);
@@ -54,7 +55,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         purchaseOrderRepository.deleteById(id);
     }
 
-    private void populateEntityFromDTO(PurchaseOrderEntity entity, PurchaseOrderRequestDTO dto) {
+    private void populateEntityFromDTO(PurchaseOrderEntity entity, PurchaseOrderRequest dto) {
         SupplierEntity supplier = supplierRepository.findById(dto.getSupplierId())
                 .orElseThrow(() -> new RuntimeException("Supplier not found"));
         UserEntity user = userRepository.findById(dto.getUserId())
@@ -70,8 +71,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     }
 
-    private PurchaseOrderResponseDTO mapToDTO(PurchaseOrderEntity entity) {
-        PurchaseOrderResponseDTO dto = new PurchaseOrderResponseDTO();
+    private PurchaseOrderResponse mapToDTO(PurchaseOrderEntity entity) {
+        PurchaseOrderResponse dto = new PurchaseOrderResponse();
         dto.setId(entity.getId());
         dto.setSupplierId(entity.getSupplier().getSupplierId());
         dto.setSupplierName(entity.getSupplier().getSupplierName());
