@@ -51,4 +51,16 @@ public class CarEntity {
 
     @Column(name = "warrantyperiod")
     Integer warrantyPeriod;
+
+    @Column(name="number_of_seats")
+    Integer numberOfSeats;
+
+    @Column(name="fuel")
+    String fuel;
+
+    @Column(name="gear")
+    String gear;
+
+    @Column(name="note")
+    String note;
 }

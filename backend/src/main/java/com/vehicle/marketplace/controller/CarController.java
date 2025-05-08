@@ -64,6 +64,13 @@ public class CarController {
                 .build();
     }
 
+//    @PostMapping
+//    ApiResponse<CarEntity> createCar(@RequestBody CarCreationRequest carCreationRequest) {
+//        return ApiResponse.<CarEntity>builder()
+//                .result(carService.createCar(carCreationRequest))
+//                .build();
+//    }
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<CarEntity> createCar(
             @RequestPart(name = "car") String carJson, // Nhận chuỗi JSON
@@ -95,6 +102,8 @@ public class CarController {
                     .build();
         }
     }
+
+
 
     private String saveImage(MultipartFile image) throws IOException {
         String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();

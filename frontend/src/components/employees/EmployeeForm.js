@@ -2,12 +2,10 @@ import React, { useState } from 'react';
 
 const EmployeeForm = ({ employee, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
-    username: employee?.username || '',
-    password: employee?.password || '',
-    firstName: employee?.firstName || '',
-    lastName: employee?.lastName || '',
+    name: employee?.name || '',
     email: employee?.email || '',
-    phone: employee?.phone || ''
+    phone: employee?.phone || '',
+    role: employee?.role || 'Bán Hàng'
   });
 
   const handleSubmit = (e) => {
@@ -18,44 +16,12 @@ const EmployeeForm = ({ employee, onSubmit, onCancel }) => {
   return (
     <form onSubmit={handleSubmit}>
       <div className="space-y-4">
-      <div>
-          <label className="block text-sm font-medium text-gray-700">Tên đăng nhập</label>
-          <input
-            type="text"
-            value={formData.username}
-            onChange={(e) => setFormData({...formData, username: e.target.value})}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            required
-          />
-        </div>
-
         <div>
-          <label className="block text-sm font-medium text-gray-700">Mật khẩu</label>
+          <label className="block text-sm font-medium text-gray-700">Họ Tên</label>
           <input
             type="text"
-            onChange={(e) => setFormData({...formData, password: e.target.value})}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Họ</label>
-          <input
-            type="text"
-            value={formData.firstName}
-            onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Tên</label>
-          <input
-            type="text"
-            value={formData.lastName}
-            onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+            value={formData.name}
+            onChange={(e) => setFormData({...formData, name: e.target.value})}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
             required
           />
@@ -83,6 +49,18 @@ const EmployeeForm = ({ employee, onSubmit, onCancel }) => {
           />
         </div>
 
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Vai Trò</label>
+          <select
+            value={formData.role}
+            onChange={(e) => setFormData({...formData, role: e.target.value})}
+            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+          >
+            <option value="Quản Trị">Quản Trị</option>
+            <option value="Bán Hàng">Bán Hàng</option>
+            <option value="Kho">Kho</option>
+          </select>
+        </div>
 
         <div className="flex justify-end space-x-2 pt-4">
           <button

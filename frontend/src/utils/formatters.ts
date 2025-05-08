@@ -5,11 +5,11 @@ export const formatPrice = (price: number) => {
   }).format(price);
 };
 
-export const formatPhoneNumber = (phoneNumber: string) => {
-  const cleaned = phoneNumber.replace(/\D/g, '');
+export const formatPhoneNumber = (phone: string) => {
+  const cleaned = phone.replace(/\D/g, '');
   const match = cleaned.match(/^(\d{4})(\d{3})(\d{3})$/);
   if (match) {
     return `${match[1]} ${match[2]} ${match[3]}`;
   }
-  return phoneNumber;
+  return phone;
 };

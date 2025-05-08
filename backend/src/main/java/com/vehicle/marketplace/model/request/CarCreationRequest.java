@@ -23,4 +23,8 @@ public class CarCreationRequest {
     String specifications;
     String imageUrl;
     Integer warrantyPeriod;
+    Integer numberOfSeats;
+    String fuel;
+    String gear;
+    String note;
 }

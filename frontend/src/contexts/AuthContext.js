@@ -22,8 +22,8 @@ const parseJwt = (token) => {
 // Hàm chuẩn hóa scope thành role
 const normalizeRole = (scope) => {
   if (scope === "ROLE_ADMIN") return "admin";
-  if (scope === "ROLE_STAFF") return "staff";
-  return "user"; // Vai trò mặc định nếu scope không khớp
+  if (scope === "ROLE_USER") return "user";
+  return "all"; // Vai trò mặc định nếu scope không khớp
 };
 
 const AuthContext = createContext();

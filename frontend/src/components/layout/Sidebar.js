@@ -1,9 +1,8 @@
 import React from 'react';
-import { ChevronLeft, Car, Users, ShoppingBag, UserCircle, LogOut } from 'lucide-react';
-import NavItem from './NavItem';
+import { ChevronLeft, Car, Users, ShoppingBag, UserCircle, Calendar, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-
+import NavItem from './NavItem';
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -14,12 +13,11 @@ const Sidebar = () => {
     navigate('/login');
   };
 
-
   const navItems = [
-    {
-      id: 'dashboard',
+    { 
+      id: 'dashboard', 
       to: '/dashboard',
-      title: 'Tổng Quan',
+      title: 'Tổng Quan', 
       icon: (
         <div className="w-6 h-6 flex items-center justify-center">
           <div className="w-4 h-4 grid grid-cols-2 gap-0.5">
@@ -35,6 +33,7 @@ const Sidebar = () => {
     { id: 'customers', to: '/customers', title: 'Quản Lý Khách Hàng', icon: <Users className="w-6 h-6" /> },
     { id: 'sales', to: '/sales', title: 'Quản Lý Bán Hàng', icon: <ShoppingBag className="w-6 h-6" /> },
     { id: 'employees', to: '/employees', title: 'Quản Lý Nhân Viên', icon: <UserCircle className="w-6 h-6" /> },
+    { id: 'appointments', to: '/appointments', title: 'Quản Lý Lịch Hẹn', icon: <Calendar className="w-6 h-6" /> },
   ];
 
   return (
@@ -49,11 +48,11 @@ const Sidebar = () => {
         </div>
         <ChevronLeft className="w-6 h-6 cursor-pointer hover:text-blue-300" />
       </div>
-
+      
       <nav className="flex-1 py-4">
         <ul className="space-y-1">
           {navItems.map(item => (
-            <NavItem
+            <NavItem 
               key={item.id}
               to={item.to}
               title={item.title}
@@ -62,10 +61,11 @@ const Sidebar = () => {
           ))}
         </ul>
       </nav>
-
+      
       <div className="border-t border-blue-800">
-        <div className="p-4 flex items-center space-x-3 hover:bg-blue-800 cursor-pointer transition-colors"
+        <div 
           onClick={handleLogout}
+          className="p-4 flex items-center space-x-3 hover:bg-blue-800 cursor-pointer transition-colors"
         >
           <LogOut className="w-6 h-6" />
           <span>Đăng Xuất</span>

@@ -22,4 +22,8 @@ public class CarSearchRequest {
     String status;
     String color;
     Integer warrantyPeriod;
+    Integer numberOfSeats;
+    String fuel;
+    String gear;
+    String note;
 }

@@ -33,14 +33,12 @@ CREATE TABLE customer (
     fullName VARCHAR(255) NOT NULL,
     phoneNumber VARCHAR(15) NOT NULL UNIQUE,
     address TEXT,
-    status VARCHAR(255),
-    createdAt DATETIME NOT NULL,
-    updatedAt DATETIME NOT NULL
+    status VARCHAR(255)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- Bảng Car
+-- Bảng Car (giữ BIGINT cho carId)
 CREATE TABLE car (
-    carId INT PRIMARY KEY AUTO_INCREMENT,
+    carId BIGINT PRIMARY KEY AUTO_INCREMENT,
     carName VARCHAR(255),
     brand VARCHAR(255),
     model VARCHAR(255),
@@ -52,24 +50,28 @@ CREATE TABLE car (
     color VARCHAR(255),
     specifications TEXT,
     imageUrl VARCHAR(255),
-    warrantyPeriod INT
+    warrantyPeriod INT,
+    number_of_seats int,
+    fuel VARCHAR(255),
+    gear VARCHAR(255),
+    note VARCHAR(1000)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- Bảng Inventory
+-- Bảng Inventory (carId là BIGINT)
 CREATE TABLE inventory (
     inventoryId INT PRIMARY KEY AUTO_INCREMENT,
     storeName VARCHAR(100) NOT NULL,
-    carId INT NOT NULL,
+    carId BIGINT NOT NULL,
     quantity INT,
     FOREIGN KEY (carId) REFERENCES car(carId) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- Bảng Invoice
+-- Bảng Invoice (carId là BIGINT)
 CREATE TABLE invoice (
     invoiceId INT PRIMARY KEY AUTO_INCREMENT,
     customerId BIGINT NOT NULL,
     userId BIGINT NOT NULL,
-    carId INT NOT NULL,
+    carId BIGINT NOT NULL,
     quantity INT NOT NULL,
     unitPrice DECIMAL(18,2) NOT NULL,
     discount DECIMAL(5,2) DEFAULT 0,
@@ -90,12 +92,12 @@ CREATE TABLE supplier (
     email VARCHAR(100)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- Bảng PurchaseOrder
+-- Bảng PurchaseOrder (carId là BIGINT)
 CREATE TABLE purchaseOrder (
     purchaseOrderId INT AUTO_INCREMENT PRIMARY KEY,
     supplierId INT NOT NULL,
     userId BIGINT NOT NULL,
-    carId INT NOT NULL,
+    carId BIGINT NOT NULL,
     quantity INT NOT NULL,
     unitPrice DECIMAL(18,2) NOT NULL,
     totalAmount DECIMAL(18,2) NOT NULL,
@@ -105,7 +107,7 @@ CREATE TABLE purchaseOrder (
     FOREIGN KEY (carId) REFERENCES car(carId) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- Bảng Promotion
+-- Bảng Promotion (carId là BIGINT)
 CREATE TABLE promotion (
     promotionId INT AUTO_INCREMENT PRIMARY KEY,
     promoCode VARCHAR(50) UNIQUE NOT NULL,
@@ -113,7 +115,7 @@ CREATE TABLE promotion (
     startDate DATETIME NOT NULL,
     endDate DATETIME NOT NULL,
     applicableTo ENUM('Car', 'Invoice') NOT NULL,
-    carId INT NULL,
+    carId BIGINT NULL,
     FOREIGN KEY (carId) REFERENCES car(carId) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -126,14 +128,15 @@ CREATE TABLE invoicePromotion (
     FOREIGN KEY (promotionId) REFERENCES promotion(promotionId) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- Bảng Appointment
+-- Bảng Appointment (carId là BIGINT)
 CREATE TABLE appointment (
     appointmentId INT AUTO_INCREMENT PRIMARY KEY,
     customerId BIGINT NOT NULL,
-    carId INT NOT NULL,
+    carId BIGINT NOT NULL,
     userId BIGINT NOT NULL,
     appointmentDate DATETIME NOT NULL,
-    status ENUM('Pending', 'Confirmed', 'Cancelled') DEFAULT 'Pending',
+    phone VARCHAR(50),
+    main VARCHAR(100),
     notes TEXT,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (customerId) REFERENCES customer(id) ON DELETE CASCADE,
@@ -141,13 +144,12 @@ CREATE TABLE appointment (
     FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- Bảng FavoriteCar
-CREATE TABLE favoriteCar (
-    customerId BIGINT NOT NULL,
-    carId INT NOT NULL,
-    addedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (customerId, carId),
+-- Bảng FavoriteCar (carId là BIGINT)
+CREATE TABLE favoritecar (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    customerid BIGINT NOT NULL,
+    carid BIGINT NOT NULL,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (customerId) REFERENCES customer(id) ON DELETE CASCADE,
     FOREIGN KEY (carId) REFERENCES car(carId) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-

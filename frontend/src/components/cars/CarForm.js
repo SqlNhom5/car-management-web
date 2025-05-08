@@ -170,38 +170,7 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
         </select>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Model</label>
-        <input
-          type="text"
-          name="model"
-          value={formData.model}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        />
-      </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Năm sản xuất</label>
-        <input
-          type="number"
-          name="manufactureYear"
-          value={formData.manufactureYear}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Biển số</label>
-        <input
-          type="text"
-          name="licensePlate"
-          value={formData.licensePlate}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        />
-      </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700">Giá Bán</label>
@@ -227,48 +196,7 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Trạng thái</label>
-        <input
-          type="text"
-          name="status"
-          value={formData.status}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        />
-      </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Màu sắc</label>
-        <input
-          type="text"
-          name="color"
-          value={formData.color}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Thông số kỹ thuật</label>
-        <textarea
-          name="specifications"
-          value={formData.specifications}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Thời gian bảo hành</label>
-        <input
-          type="number"
-          name="warrantyPeriod"
-          value={formData.warrantyPeriod}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        />
-      </div>
 
       <div className="flex justify-end space-x-2 pt-4">
         <button

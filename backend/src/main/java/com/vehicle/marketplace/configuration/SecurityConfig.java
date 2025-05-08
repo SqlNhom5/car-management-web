@@ -23,8 +23,9 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINTS = {
             "/auth/token", "/auth/logout", "/api/users", "/auth/introspect","/auth/refresh",
-            "/uploads", "/api/cars"
+            "/uploads", "/api/cars",
     };
+
 
 
     // Security
@@ -32,7 +33,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(authorizeRequests -> authorizeRequests
                 .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-                .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/uploads/**","/api/cars", "api/cars/**").permitAll()
                 .anyRequest().authenticated()
         );
 

@@ -6,18 +6,11 @@ import { salesData } from '../data/salesData';
 import { employeeData } from '../data/employeeData';
 import { getToken, setToken, removeToken } from "./localStorageService";
 
-
-
 const DataContext = createContext();
 
-
 export const DataProvider = ({ children }) => {
-
+  // Khởi tạo state từ localStorage hoặc dữ liệu mặc định
   const [cars, setCars] = useState([]);
-  const [customers, setCustomers] = useState([]);
-  const [sales, setSales] = useState(salesData);
-  const [employees, setEmployees] = useState([]);
-  
   // lay du lieu tu API ve cars
   useEffect(() => {
     const fetchCars = async () => {
@@ -27,7 +20,6 @@ export const DataProvider = ({ children }) => {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : '',
           },
         });
         if (!response.ok) {
@@ -42,8 +34,14 @@ export const DataProvider = ({ children }) => {
     };
   
     fetchCars();
-  }, []); 
-  
+  }, []);  
+
+
+
+
+
+  const [customers, setCustomers] = useState([]);
+  // lay du lieu tu API ve customers
   // lay du lieu tu API ve customers
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -70,41 +68,82 @@ export const DataProvider = ({ children }) => {
     fetchCustomers();
   }, []);
   
-  // Lay du lieu tu API ve employees
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const token = getToken(); // Thay thế bằng cách lấy token thực tế của bạn
 
-        const response = await fetch('http://localhost:8080/api/users', {
+  const [favorites, setFavorites] = useState([]);
+  useEffect(() => {
+    const fetchFavorite = async () => {
+      try {
+        const token = getToken();
+        const response = await fetch('http://localhost:8080/api/favorite', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': token ? `Bearer ${token}` : '',
           },
         });
-
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-
-        const data = await response.json();
-        console.log("Employee data:", data);
-
-        // Giả sử API trả về trực tiếp mảng users
-        // Nếu API trả về dạng { result: [...] } thì dùng data.result
-        setEmployees(data.result); 
-
-        // Lưu ý: giá trị employees ở đây chưa được cập nhật ngay
-        console.log("Fetched Employees:", employees);
+        
+        const data = await response.json(); // Parse JSON từ response
+        setFavorites(data.result); // Cập nhật state với dữ liệu từ API
+        console.log("fetch: ",data.result);
       } catch (error) {
-        console.error('Failed to fetch employees:', error);
+        console.error('Failed to fetch favorites:', error);
       }
     };
-
-    fetchEmployees();
-  }, []); // Chỉ chạy một lần khi component mount
   
+    fetchFavorite();
+  }, []); 
+   
+
+  const [appointments, setAppointments] = useState([]);
+  useEffect(() => {
+    const fetchAppointments  = async () => {
+      try {
+        const token = getToken();
+        const response = await fetch('http://localhost:8080/api/appointments', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : '',
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json(); // Parse JSON từ response
+        setAppointments(data.result); // Cập nhật state với dữ liệu từ API
+        console.log("fetch: ",data.result);
+      } catch (error) {
+        console.error('Failed to fetch favorites:', error);
+      }
+    };
+  
+    fetchAppointments();
+  }, []); 
+
+  const [sales, setSales] = useState(salesData);
+  const [employees, setEmployees] = useState(employeeData);
+
+  // Lưu cars vào localStorage khi có thay đổi
+  useEffect(() => {
+    localStorage.setItem('cars', JSON.stringify(cars));
+  }, [cars]);
+
+  useEffect(() => {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  useEffect(() => {
+    localStorage.setItem('appointments', JSON.stringify(appointments));
+  }, [appointments]);
+
+  useEffect(() => {
+    localStorage.setItem('customers', JSON.stringify(customers));
+  }, [customers]);
+
   const addCar = async (formData, imageFile) => {
     try {
       const token = getToken();
@@ -277,6 +316,7 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+
   const addSale = (newSale) => {
     const formattedSale = {
       ...newSale,
@@ -300,50 +340,19 @@ export const DataProvider = ({ children }) => {
       if (customer.name === newSale.customer) {
         return { ...customer, purchased: customer.purchased + 1 };
       }
-      return customer; 
+      return customer;
     });
     setCustomers(updatedCustomers);
   };
 
-  const addEmployee = async (newEmployee) => {
-    console.log("Adding employee:", newEmployee); // Log dữ liệu để kiểm tra
-    try {
-      const token = getToken(); // Lấy token từ localStorage hoặc context
-  
-      // Format dữ liệu gửi lên API (phải khớp với schema backend)
-      const formattedEmployee = {
-        ...newEmployee
-      };
-  
-      // Gửi request POST đến API
-      const response = await fetch('http://localhost:8080/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // Token bắt buộc
-        },
-        body: JSON.stringify(formattedEmployee)
-      });
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-  
-      // Nhận dữ liệu employee mới từ API
-      const createdEmployee = await response.json();
-  
-      const employeeWithRoles = {
-        ...createdEmployee.result,
-        roles: [{ name: "USER" }] // Mặc định nếu không có roles
-      };
-      console.log("Created employee:", employeeWithRoles); // Log dữ liệu để kiểm tra
-  
-      setEmployees(prev => [...prev, employeeWithRoles]); // Sử dụng dữ liệu đã được đảm bảo  
-  
-    } catch (error) {
-      console.error("Failed to add employee:", error);
-      // Có thể thêm xử lý hiển thị thông báo lỗi
-    }
+  const addEmployee = (newEmployee) => {
+    const formattedEmployee = {
+      id: Date.now(),
+      ...newEmployee,
+      status: 'Đang Hoạt Động',
+      joinDate: new Date().toLocaleDateString('vi-VN')
+    };
+    setEmployees(prevEmployees => [...prevEmployees, formattedEmployee]);
   };
 
   const updateCustomer = async (updatedCustomer) => {
@@ -397,56 +406,10 @@ export const DataProvider = ({ children }) => {
     ));
   };
 
-  const updateEmployee = async (updatedEmployee) => {
-    const employeeToSend = { 
-      ...updatedEmployee,
-      roles: ["USER"] // Thêm roles mới dạng mảng string
-    };
-    console.log("Updating employee:", employeeToSend); // Log dữ liệu để kiểm tra
-    
-    try {
-      const token = getToken(); // Lấy token từ localStorage hoặc context
-  
-      // Gửi request PUT đến API
-      const response = await fetch(`http://localhost:8080/api/users/${updatedEmployee.id}`, {
-        method: 'PUT', // Hoặc 'PATCH' tùy backend
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(employeeToSend)
-      });
-  
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-      }
-  
-      const responseData = await response.json();
-      const updatedData = responseData.result; 
-  
-      // Cập nhật state với dữ liệu mới từ server
-      setEmployees(prevEmployees => 
-        prevEmployees.map(emp =>
-          emp.id === updatedEmployee.id 
-            ? { 
-                ...emp, 
-                ...updatedData,
-                roles: [{ name: "USER" }]
-              } 
-            : emp
-        )
-      );
-  
-      console.log("Employee updated successfully:", updatedData);
-      return updatedData; // Trả về dữ liệu đã update nếu cần
-  
-    } catch (error) {
-      console.error("Failed to update employee:", error);
-      // Hiển thị thông báo lỗi cho người dùng
-      alert(`Cập nhật thông tin thất bại: ${error.message}`);
-      throw error; // Re-throw nếu cần xử lý tiếp ở nơi gọi hàm
-    }
+  const updateEmployee = (updatedEmployee) => {
+    setEmployees(prevEmployees => prevEmployees.map(emp => 
+      emp.id === updatedEmployee.id ? { ...emp, ...updatedEmployee } : emp
+    ));
   };
 
   const deleteCustomer = async (customerId) => {
@@ -475,32 +438,151 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+
   const deleteSale = (saleId) => {
     setSales(prevSales => prevSales.filter(sale => sale.id !== saleId));
   };
 
-  const deleteEmployee = async (employeeId) => {
-    // Lưu lại state trước khi thay đổi
-    const prevEmployees = employees;
-    
+  const deleteEmployee = (employeeId) => {
+    setEmployees(prevEmployees => prevEmployees.filter(emp => emp.id !== employeeId));
+  };
+
+  const toggleFavorite = async (carId) => {
+    console.log('Toggling favorite for carId:', carId); // Để debug
     try {
-      // Optimistic update
-      setEmployees(prev => prev.filter(emp => emp.id !== employeeId));
-      
       const token = getToken();
-      const response = await fetch(`http://localhost:8080/api/users/${employeeId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-  
-      if (!response.ok) throw new Error('Delete failed');
-      
-      return true;
+      if (!token) throw new Error('No token found');
+
+      const isFavorite = favorites.some((fav) => fav.carId === carId);
+      console.log('Is favorite:', isFavorite); // Để debug
+
+      if (isFavorite) {
+        // Xóa khỏi yêu thích
+        const response = await fetch(`http://localhost:8080/api/favorite/${carId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to remove favorite: HTTP error! status: ${response.status}`);
+        }
+        // Cập nhật state: Xóa car khỏi favorites
+        setFavorites((prev) => prev.filter((fav) => fav.carId !==carId));
+      } else {
+        // Thêm vào yêu thích
+        const response = await fetch('http://localhost:8080/api/favorite', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ carId: carId }),
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to add favorite: HTTP error! status: ${response.status}`);
+        }
+        // Giả sử API trả về object car vừa thêm
+        const data = await response.json();
+        // Cập nhật state: Thêm car vào favorites
+        // Nếu API trả về car đầy đủ, dùng data; nếu không, dùng car từ tham số
+        setFavorites((prev) => {
+          const carToAdd = data.car || cars.find((c) => c.carId === carId) || { carId };
+          return [...prev, carToAdd];
+        });
+      }
     } catch (error) {
-      // Rollback nếu có lỗi
-      setEmployees(prevEmployees);
-      alert("Xóa thất bại, đã khôi phục dữ liệu");
-      return false;
+      console.error('Failed to toggle favorite:', error);
+    }
+  };
+
+
+  const addAppointment = (newAppointment) => {
+    console.log('Adding new appointment:', newAppointment); // Để debug
+    setAppointments(prevAppointments => {
+      const updatedAppointments = [...prevAppointments, newAppointment];
+      // Lưu vào localStorage ngay lập tức
+      localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
+      return updatedAppointments;
+    });
+  };
+
+  const addAppointmentAndCustomer = (formData) => {
+    // Tạo appointment mới với status
+    const newAppointment = {
+      id: Date.now(),
+      ...formData,
+      status: 'Chờ xác nhận',
+      createdAt: new Date().toISOString()
+    };
+
+    // Lưu appointment vào state và localStorage
+    setAppointments(prev => {
+      const updatedAppointments = [...prev, newAppointment];
+      localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
+      return updatedAppointments;
+    });
+
+    // Kiểm tra và cập nhật thông tin khách hàng
+    const existingCustomer = customers.find(c => c.phone === formData.phone);
+    if (!existingCustomer) {
+      const newCustomer = {
+        id: Date.now(),
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        appointments: 1,
+        joinDate: new Date().toISOString(),
+        purchased: 0
+      };
+      setCustomers(prev => {
+        const updatedCustomers = [...prev, newCustomer];
+        localStorage.setItem('customers', JSON.stringify(updatedCustomers));
+        return updatedCustomers;
+      });
+    } else {
+      setCustomers(prev => {
+        const updatedCustomers = prev.map(customer =>
+          customer.id === existingCustomer.id
+            ? { ...customer, appointments: customer.appointments + 1 }
+            : customer
+        );
+        localStorage.setItem('customers', JSON.stringify(updatedCustomers));
+        return updatedCustomers;
+      });
+    }
+  };
+
+  const updateAppointmentStatus = async (appointmentId, newStatus) => {
+    try {
+      const token = getToken();
+      if (!token) throw new Error('No token found');
+  
+      // Gọi API để cập nhật trạng thái
+      const response = await fetch(`http://localhost:8080/api/appointments/${appointmentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Failed to update appointment status: HTTP error! status: ${response.status}`);
+      }
+  
+      // Cập nhật state appointments, chỉ thay đổi status
+      setAppointments((prevAppointments) =>
+        prevAppointments.map((appointment) =>
+          appointment.appointmentId === appointmentId
+            ? { ...appointment, status: newStatus }
+            : appointment
+        )
+      );
+    } catch (error) {
+      console.error('Failed to update appointment status:', error);
     }
   };
 
@@ -509,7 +591,10 @@ export const DataProvider = ({ children }) => {
       cars, setCars, addCar, updateCar, deleteCar,
       customers, setCustomers, addCustomer, updateCustomer, deleteCustomer,
       sales, setSales, addSale, updateSale, deleteSale,
-      employees, setEmployees, addEmployee, updateEmployee, deleteEmployee
+      employees, setEmployees, addEmployee, updateEmployee, deleteEmployee,
+      favorites, toggleFavorite,
+      appointments, setAppointments, addAppointment, updateAppointmentStatus,
+      addAppointmentAndCustomer
     }}>
       {children}
     </DataContext.Provider>

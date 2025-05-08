@@ -15,10 +15,11 @@ const Login = () => {
     useEffect(() => {
         if (!isLoading && isAuthenticated) {
             const role = user?.role;
+            console.log('Vai trò người dùng:', role); // In ra vai trò người dùng
             if (role === 'admin') {
                 navigate('/dashboard');
-            } else if (role === 'staff') {
-                navigate('/staff');
+            } else if (role === 'user') {
+                navigate('/');
             }
         }
     }, [isAuthenticated, isLoading, navigate, user]);

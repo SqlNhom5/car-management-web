@@ -18,6 +18,7 @@ import java.util.List;
 @RequestMapping("/api/favorite")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class FavoriteCarController {
     FavoriteCarService favoriteCarService;
 
