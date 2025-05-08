@@ -14,6 +14,7 @@ import com.vehicle.marketplace.repository.UserRepository;
 import com.vehicle.marketplace.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -70,7 +71,9 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
     }
 
+
     @Override
+    @Transactional(readOnly = true)
     public List<AppointmentResponse> getAll() {
         return appointmentRepository.findAll().stream()
                 .map(this::toResponse)

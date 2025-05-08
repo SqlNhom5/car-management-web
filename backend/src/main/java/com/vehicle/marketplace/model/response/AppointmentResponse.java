@@ -15,7 +15,7 @@ public class AppointmentResponse {
     Integer appointmentId;
     Long customerId;
     String customerName;
-    Integer carId;
+    Long carId;
     String carName;
     Long userId;
     String username;

@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/kv?createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/CarManagement?createDatabaseIfNotExist=true
     username: root
-    password: Kimvu@1207
+    password: Hoangkhanhvan703
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
