@@ -16,7 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +32,7 @@ public class CarService {
     
     CarRepository carRepository;
     CarMapper carMapper;
+    String uploadDir = "uploads/";
 
     public List<CarEntity> findAllCars() {
         return carRepository.findAll();
@@ -42,6 +46,10 @@ public class CarService {
         return carMapper.toCarResponse(carRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Car not found")));
     }
+    public CarEntity findCarEntityById(Long id) {
+        return carRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Car not found with id: " + id));
+    }
 
     public List<CarResponse> compareCars(Long id1, Long id2){
         List<CarResponse> carResponses = new ArrayList<>();
@@ -54,13 +62,10 @@ public class CarService {
     
     public CarEntity createCar(CarCreationRequest carCreationRequest) {
         return carRepository.save(carMapper.toCarEntity(carCreationRequest));
-    } 
-    
-    public CarResponse updateCar(Long id, CarUpdateRequest carUpdateRequest) {
-        CarEntity carEntity = carRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Car not found"));
-            carMapper.updateCar(carEntity, carUpdateRequest);
-            return carMapper.toCarResponse(carRepository.save(carEntity));
+    }
+
+    public CarEntity updateCar(CarEntity carEntity) {
+        return carRepository.save(carEntity);
     }
     
     public void deleteCarById(Long id) {

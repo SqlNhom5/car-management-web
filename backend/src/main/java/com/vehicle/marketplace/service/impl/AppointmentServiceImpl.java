@@ -89,6 +89,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .user(user)
                 .notes(request.getNotes())
                 .status(AppointmentStatus.Pending)
+                .mail(request.getMail())
                 .createdAt(LocalDateTime.now())
                 .build();
 

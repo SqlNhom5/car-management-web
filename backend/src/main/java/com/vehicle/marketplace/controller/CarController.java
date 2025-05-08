@@ -1,5 +1,6 @@
 package com.vehicle.marketplace.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -112,12 +113,76 @@ public class CarController {
         Files.write(path, image.getBytes());
         return "/uploads/" + fileName;
     }
-    
-    @PutMapping("/{id}")
-    ApiResponse<CarResponse> updateCar(@PathVariable Long id, @RequestBody CarUpdateRequest carUpdateRequest) {
-        return ApiResponse.<CarResponse>builder()
-                .result(carService.updateCar(id, carUpdateRequest))
-                .build();
+
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<CarEntity> updateCar(
+            @PathVariable Long id,
+            @RequestPart(name = "car") String carJson,
+            @RequestPart(name = "image", required = false) MultipartFile image) {
+        try {
+            // Validate id
+            if (id == null || id <= 0) {
+                return ApiResponse.<CarEntity>builder()
+                        .code(400)
+                        .message("Invalid car ID: " + id)
+                        .build();
+            }
+
+            System.out.println("Received carJson for update (ID: " + id + "): " + carJson);
+            System.out.println("Received image: " + (image != null ? image.getOriginalFilename() + ", Size: " + image.getSize() : "null"));
+
+            // Parse chuỗi JSON thành CarUpdateRequest
+            CarUpdateRequest carUpdateRequest = objectMapper.readValue(carJson, CarUpdateRequest.class);
+
+            // Lấy xe hiện tại từ database
+            CarEntity existingCar = carService.findCarEntityById(id);
+
+            // Cập nhật thông tin từ CarUpdateRequest
+            existingCar.setCarName(carUpdateRequest.getCarName());
+            existingCar.setBrand(carUpdateRequest.getBrand());
+            existingCar.setModel(carUpdateRequest.getModel());
+            // ... (cập nhật các trường khác tương ứng)
+
+            // Xử lý ảnh mới (nếu có)
+            if (image != null && !image.isEmpty()) {
+                String newImageUrl = saveImage(image);
+                // Xóa ảnh cũ nếu tồn tại
+                if (existingCar.getImageUrl() != null && !existingCar.getImageUrl().isEmpty()) {
+                    deleteOldImage(existingCar.getImageUrl());
+                }
+                existingCar.setImageUrl(newImageUrl);
+            }
+
+            // Lưu xe đã cập nhật
+            CarEntity updatedCar = carService.updateCar(existingCar);
+            return ApiResponse.<CarEntity>builder()
+                    .code(1000)
+                    .result(updatedCar)
+                    .build();
+        } catch (IllegalArgumentException e) {
+            System.err.println("Car not found: " + e.getMessage());
+            return ApiResponse.<CarEntity>builder()
+                    .code(404)
+                    .message(e.getMessage())
+                    .build();
+        } catch (Exception e) {
+            System.err.println("Error processing update request: " + e.getMessage());
+            return ApiResponse.<CarEntity>builder()
+                    .code(400)
+                    .message("Invalid update request: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    private void deleteOldImage(String imageUrl) {
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            Path oldImagePath = Paths.get("uploads/" + imageUrl.replace("/uploads/", ""));
+            File oldImageFile = oldImagePath.toFile();
+            if (oldImageFile.exists()) {
+                oldImageFile.delete();
+                System.out.println("Deleted old image: " + oldImagePath);
+            }
+        }
     }
     
     @DeleteMapping("/{id}")
