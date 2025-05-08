@@ -14,7 +14,7 @@ const FavoriteList = () => {
     <div key={car.carId} className="bg-white rounded-lg overflow-hidden">
       <div className="relative">
         <img 
-          src={car.imageUrl} 
+          src={`http://localhost:8080${car.imageUrl}`} 
           alt={car.carName} 
           className="w-full h-48 object-cover cursor-pointer"
           onClick={() => navigate(`/client/cars/${car.carId}`)}

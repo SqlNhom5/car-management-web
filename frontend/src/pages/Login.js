@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; // Thêm Link từ react-router-dom
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/Login.css';
 
@@ -15,7 +15,7 @@ const Login = () => {
     useEffect(() => {
         if (!isLoading && isAuthenticated) {
             const role = user?.role;
-            console.log('Vai trò người dùng:', role); // In ra vai trò người dùng
+            console.log('Vai trò người dùng:', role);
             if (role === 'admin') {
                 navigate('/dashboard');
             } else if (role === 'user') {
@@ -37,8 +37,8 @@ const Login = () => {
         setIsSubmitting(true);
 
         try {
-            const role = await login(username, password); // Sử dụng await để lấy role
-            console.log('Đăng nhập với vai trò:', role); // role sẽ là "admin", "staff", hoặc null
+            const role = await login(username, password);
+            console.log('Đăng nhập với vai trò:', role);
             if (role === 'admin') {
                 navigate('/dashboard');
             } else if (role === 'staff') {
@@ -80,10 +80,18 @@ const Login = () => {
                             disabled={isSubmitting}
                         />
                     </div>
-                    <button className='btn' type="submit" disabled={isSubmitting}>
+                    <button className="btn" type="submit" disabled={isSubmitting}>
                         {isSubmitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
                     </button>
                 </form>
+                <div className="register-link">
+                    <p>
+                        Chưa có tài khoản?{' '}
+                        <Link to="/register" className="text-blue-600 hover:underline">
+                            Đăng ký
+                        </Link>
+                    </p>
+                </div>
             </div>
         </div>
     );

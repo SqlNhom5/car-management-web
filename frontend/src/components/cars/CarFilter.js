@@ -27,15 +27,7 @@ const CarFilter = ({ searchTerm, onSearchChange, selectedBrand, onBrandChange, s
               <option value="Mercedes">Mercedes</option>
             </select>
 
-            <select
-              className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={selectedStatus}
-              onChange={(e) => onStatusChange(e.target.value)}
-            >
-              <option value="Tất Cả Trạng Thái">Tất Cả Trạng Thái</option>
-              <option value="Còn Hàng">Còn Hàng</option>
-              <option value="Hết Hàng">Hết Hàng</option>
-            </select>
+            
           </div>
 
           <button

@@ -12,8 +12,11 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
     count: car?.count || '',
     status: car?.status || '',
     color: car?.color || '',
-    specifications: car?.specifications || '',
+    note: car?.note || '',
     warrantyPeriod: car?.warrantyPeriod || '',
+    numberOfSeats: car?.numberOfSeats || '',
+    fuel: car?.fuel || '',
+    gear: car?.gear || ''
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(car?.imageUrl ? `http://localhost:8080${car.imageUrl}` : '');
@@ -108,193 +111,184 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Hình Ảnh</label>
-        {imagePreview ? (
-          <div className="mt-2 relative">
-            <img
-              src={imagePreview}
-              alt="Preview"
-              className="w-full h-48 object-cover rounded-lg"
-              onError={(e) => {
-                console.error('Image load error:', e);
-                setError('Không thể tải ảnh');
-              }}
-            />
-            <button
-              type="button"
-              onClick={handleRemoveImage}
-              className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
-            >
-              ×
-            </button>
-          </div>
-        ) : (
-          <div className="mt-2">
-            <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500">
-              <Upload className="w-8 h-8 text-gray-400" />
-              <span className="mt-2 text-sm text-gray-500">Click để tải ảnh lên</span>
-              <input
-                type="file"
-                className="hidden"
-                accept="image/*"
-                onChange={handleImageChange}
-                ref={fileInputRef}
+    <div className="max-w-6xl mx-auto p-4 bg-white rounded-lg shadow-md">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Phần ảnh */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Hình Ảnh</label>
+          {imagePreview ? (
+            <div className="mt-2 relative">
+              <img
+                src={imagePreview}
+                alt="Preview"
+                className="w-full max-w-xs h-32 object-cover rounded-lg"
+                onError={(e) => {
+                  console.error('Image load error:', e);
+                  setError('Không thể tải ảnh');
+                }}
               />
-            </label>
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
+              >
+                ×
+              </button>
+            </div>
+          ) : (
+            <div className="mt-2">
+              <label className="flex flex-col items-center justify-center w-full max-w-xs h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500">
+                <Upload className="w-8 h-8 text-gray-400" />
+                <span className="mt-2 text-sm text-gray-500">Click để tải ảnh lên</span>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  ref={fileInputRef}
+                />
+              </label>
+            </div>
+          )}
+          {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+          {success && <p className="text-green-500 text-sm mt-1">{success}</p>}
+        </div>
+
+        {/* Phần thông tin xe - Sử dụng grid với 3 cột */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Tên Xe</label>
+            <input
+              type="text"
+              name="carName"
+              value={formData.carName}
+              onChange={handleInputChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
           </div>
-        )}
-        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-        {success && <p className="text-green-500 text-sm mt-1">{success}</p>}
-      </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Tên Xe</label>
-        <input
-          type="text"
-          name="carName"
-          value={formData.carName}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-          required
-        />
-      </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Hãng Xe</label>
+            <select
+              name="brand"
+              value={formData.brand}
+              onChange={handleInputChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            >
+              <option value="">Chọn hãng xe</option>
+              <option value="Toyota">Toyota</option>
+              <option value="Honda">Honda</option>
+              <option value="Ford">Ford</option>
+              <option value="BMW">BMW</option>
+              <option value="Mercedes">Mercedes</option>
+            </select>
+          </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Hãng Xe</label>
-        <select
-          name="brand"
-          value={formData.brand}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-          required
-        >
-          <option value="">Chọn hãng xe</option>
-          <option value="Toyota">Toyota</option>
-          <option value="Honda">Honda</option>
-          <option value="Ford">Ford</option>
-          <option value="BMW">BMW</option>
-          <option value="Mercedes">Mercedes</option>
-        </select>
-      </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Model</label>
+            <input
+              type="text"
+              name="model"
+              value={formData.model}
+              onChange={handleInputChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Model</label>
-        <input
-          type="text"
-          name="model"
-          value={formData.model}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        />
-      </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Số chỗ</label>
+            <input
+              type="number"
+              name="numberOfSeats"
+              value={formData.numberOfSeats}
+              onChange={handleInputChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div> 
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Năm sản xuất</label>
-        <input
-          type="number"
-          name="manufactureYear"
-          value={formData.manufactureYear}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        />
-      </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Giá Bán</label>
+            <input
+              type="number"
+              name="price"
+              value={formData.price}
+              onChange={handleInputChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Biển số</label>
-        <input
-          type="text"
-          name="licensePlate"
-          value={formData.licensePlate}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        />
-      </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Tồn Kho</label>
+            <input
+              type="number"
+              name="count"
+              value={formData.count}
+              onChange={handleInputChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Giá Bán</label>
-        <input
-          type="number"
-          name="price"
-          value={formData.price}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-          required
-        />
-      </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Nhiên liệu</label>
+            <input
+              type="text"
+              name="fuel"
+              value={formData.fuel}
+              onChange={handleInputChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Tồn Kho</label>
-        <input
-          type="number"
-          name="count"
-          value={formData.count}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-          required
-        />
-      </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Hộp số</label>
+            <input
+              type="text"
+              name="gear"
+              value={formData.gear}
+              onChange={handleInputChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Trạng thái</label>
-        <input
-          type="text"
-          name="status"
-          value={formData.status}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        />
-      </div>
+          
+        </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Màu sắc</label>
-        <input
-          type="text"
-          name="color"
-          value={formData.color}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        />
-      </div>
+        {/* Thông số kỹ thuật - Đặt riêng với chiều cao ngắn hơn */}
+        <div>
+            <label className="block text-sm font-medium text-gray-700">Mô tả</label>
+            <input
+              type="text"
+              name="note"
+              value={formData.note}
+              onChange={handleInputChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Thông số kỹ thuật</label>
-        <textarea
-          name="specifications"
-          value={formData.specifications}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Thời gian bảo hành</label>
-        <input
-          type="number"
-          name="warrantyPeriod"
-          value={formData.warrantyPeriod}
-          onChange={handleInputChange}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        />
-      </div>
-
-      <div className="flex justify-end space-x-2 pt-4">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-        >
-          Hủy
-        </button>
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          {car ? 'Cập Nhật' : 'Thêm'}
-        </button>
-      </div>
-    </form>
+        {/* Nút hành động */}
+        <div className="flex justify-end space-x-3 pt-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition"
+          >
+            Hủy
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+          >
+            {car ? 'Cập Nhật' : 'Thêm'}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
 

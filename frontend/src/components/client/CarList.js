@@ -10,7 +10,7 @@ const CarList = () => {
   const [filteredCars, setFilteredCars] = useState(cars);
   const [priceRange, setPriceRange] = useState(maxPrice);
   const [selectedBrand, setSelectedBrand] = useState('Tất cả');
-  const [selectedType, setSelectedType] = useState('Tất cả');
+  const [selectedYear, setSelectedYear] = useState('Tất cả');
 
   useEffect(() => {
     let result = [...cars];
@@ -23,11 +23,18 @@ const CarList = () => {
       result = result.filter(car => car.brand === selectedBrand);
     }
 
+    // Lọc theo năm sản xuất
+    if (selectedYear !== 'Tất cả') {
+      result = result.filter(car => car.manufactureYear === Number(selectedYear));
+    }
+
     setFilteredCars(result);
-  }, [cars, priceRange, selectedBrand, selectedType]);
+  }, [cars, priceRange, selectedBrand, selectedYear]);
 
   // Tạo danh sách hãng xe duy nhất từ dữ liệu
   const brands = ['Tất cả', ...new Set(cars.map(car => car.brand))];
+  // Tạo danh sách năm sản xuất duy nhất từ dữ liệu
+  const years = ['Tất cả', ...new Set(cars.map(car => car.manufactureYear))].sort((a, b) => b - a);
 
   return (
     <div>
@@ -38,6 +45,7 @@ const CarList = () => {
           <h2 className="text-lg font-bold mb-4">Bộ lọc</h2>
 
           <div className="space-y-4">
+            {/* Lọc theo giá */}
             <div>
               <p className="mb-2">
                 Khoảng giá: {priceRange > 0 ? formatPrice(priceRange) : 'Tất cả'}
@@ -59,6 +67,7 @@ const CarList = () => {
               </div>
             </div>
 
+            {/* Lọc theo hãng xe */}
             <div>
               <p className="mb-2">Hãng xe:</p>
               <select
@@ -72,6 +81,19 @@ const CarList = () => {
               </select>
             </div>
 
+            {/* Lọc theo năm sản xuất */}
+            <div>
+              <p className="mb-2">Năm sản xuất:</p>
+              <select
+                className="w-full border p-2 rounded"
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
+              >
+                {years.map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -109,7 +131,7 @@ const CarCard = ({ car }) => {
     <div className="bg-white rounded-lg overflow-hidden">
       <div className="relative">
         <img
-          src={car.imageUrl}
+          src={`http://localhost:8080${car.imageUrl}`}
           alt={car.carName}
           className="w-full h-48 object-cover cursor-pointer"
           onClick={() => navigate(`/client/cars/${car.carId}`)}
@@ -134,7 +156,6 @@ const CarCard = ({ car }) => {
         <div className="flex flex-wrap gap-2 mb-4">
           <span className="px-2 py-1 bg-gray-100 rounded-full text-sm">{car.brand}</span>
           <span className="px-2 py-1 bg-gray-100 rounded-full text-sm">{car.model}</span>
-          <span className="px-2 py-1 bg-gray-100 rounded-full text-sm">{car.manufactureYear}</span>
           <span className="px-2 py-1 bg-gray-100 rounded-full text-sm">+3 more</span>
         </div>
         <div className="flex justify-between">

@@ -14,9 +14,9 @@ import Employees from './components/employees/Employees';
 import CarList from './components/client/CarList';
 import FavoriteList from './components/client/FavoriteList';
 import AppointmentForm from './components/client/AppointmentForm';
-import AppointmentPage from './components/client/AppointmentPage';
 import AppointmentManagement from './components/appointments/AppointmentManagement';
 import CarDetail from './components/client/CarDetail';
+import Register from './pages/Register';
 import { getToken } from './contexts/localStorageService';
 
 // ProtectedRoute cho Admin: Yêu cầu vai trò admin
@@ -61,7 +61,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
-
+            <Route path="/register" element={<Register />} />
             {/* Admin Routes */}
             <Route
               path="/"
@@ -75,7 +75,6 @@ function App() {
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="cars" element={<Cars />} />
               <Route path="customers" element={<Customers />} />
-              <Route path="sales" element={<Sales />} />
               <Route path="employees" element={<Employees />} />
               <Route path="appointments" element={<AppointmentManagement />} />
             </Route>
@@ -97,14 +96,6 @@ function App() {
               />
 
               {/* Yêu cầu token cho Appointment */}
-              <Route
-                path="appointment"
-                element={
-                  <ProtectedClientRoute>
-                    <AppointmentPage />
-                  </ProtectedClientRoute>
-                }
-              />
               <Route
                 path="appointment/:carId"
                 element={

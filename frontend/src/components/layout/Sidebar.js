@@ -31,8 +31,6 @@ const Sidebar = () => {
     },
     { id: 'cars', to: '/cars', title: 'Quản Lý Xe', icon: <Car className="w-6 h-6" /> },
     { id: 'customers', to: '/customers', title: 'Quản Lý Khách Hàng', icon: <Users className="w-6 h-6" /> },
-    { id: 'sales', to: '/sales', title: 'Quản Lý Bán Hàng', icon: <ShoppingBag className="w-6 h-6" /> },
-    { id: 'employees', to: '/employees', title: 'Quản Lý Nhân Viên', icon: <UserCircle className="w-6 h-6" /> },
     { id: 'appointments', to: '/appointments', title: 'Quản Lý Lịch Hẹn', icon: <Calendar className="w-6 h-6" /> },
   ];
 

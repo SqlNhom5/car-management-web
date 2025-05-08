@@ -33,7 +33,9 @@ CREATE TABLE customer (
     fullName VARCHAR(255) NOT NULL,
     phoneNumber VARCHAR(15) NOT NULL UNIQUE,
     address TEXT,
-    status VARCHAR(255)
+    status VARCHAR(255),
+    user_id BIGINT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Bảng Car (giữ BIGINT cho carId)
@@ -44,7 +46,7 @@ CREATE TABLE car (
     model VARCHAR(255),
     manufactureYear INT,
     licensePlate VARCHAR(255),
-    price INT,
+    price BIGINT,
     count INT,
     status VARCHAR(255),
     color VARCHAR(255),
@@ -54,7 +56,7 @@ CREATE TABLE car (
     number_of_seats int,
     fuel VARCHAR(255),
     gear VARCHAR(255),
-    note VARCHAR(1000)
+    note VARCHAR(2000)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Bảng Inventory (carId là BIGINT)
@@ -135,8 +137,6 @@ CREATE TABLE appointment (
     carId BIGINT NOT NULL,
     userId BIGINT NOT NULL,
     appointmentDate DATETIME NOT NULL,
-    phone VARCHAR(50),
-    main VARCHAR(100),
     notes TEXT,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (customerId) REFERENCES customer(id) ON DELETE CASCADE,

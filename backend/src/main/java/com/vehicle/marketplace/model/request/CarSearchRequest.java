@@ -16,8 +16,8 @@ public class CarSearchRequest {
     String model;
     Integer manufactureYearFrom;
     Integer manufactureYearTo;
-    Integer priceFrom;
-    Integer priceTo;
+    Long priceFrom;
+    Long priceTo;
     Integer count;
     String status;
     String color;

@@ -32,7 +32,7 @@ public class CarEntity {
     String licensePlate;
 
     @Column(name = "price")
-    Integer price;
+    Long price;
 
     @Column(name="count")
     Integer count;

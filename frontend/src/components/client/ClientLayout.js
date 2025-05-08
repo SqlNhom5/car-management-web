@@ -30,9 +30,7 @@ const ClientLayout = () => {
                 <Link to="/client/favorites" className="hover:text-blue-200">
                   <Heart className="w-4 h-4 inline mr-1" /> Yêu thích
                 </Link>
-                <Link to="/client/appointment" className="hover:text-blue-200">
-                  <Calendar className="w-4 h-4 inline mr-1" /> Đặt lịch hẹn
-                </Link>
+                
               </div>
             </div>
             <button

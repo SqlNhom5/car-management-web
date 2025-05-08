@@ -161,6 +161,7 @@ export const DataProvider = ({ children }) => {
 
       const formDataToSend = new FormData();
       formDataToSend.append('car', new Blob([JSON.stringify(carData)], { type: 'application/json' }));
+      console.log('Appending car data to FormData:', carData);
       formDataToSend.append('image', imageFile);
 
       const response = await fetch('http://localhost:8080/api/cars', {
@@ -170,7 +171,7 @@ export const DataProvider = ({ children }) => {
         },
         body: formDataToSend,
       });
-
+      
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
@@ -527,49 +528,72 @@ export const DataProvider = ({ children }) => {
     });
   };
 
-  const addAppointmentAndCustomer = (formData) => {
-    // Tạo appointment mới với status
-    const newAppointment = {
-      id: Date.now(),
-      ...formData,
-      status: 'Chờ xác nhận',
-      createdAt: new Date().toISOString()
-    };
-
-    // Lưu appointment vào state và localStorage
-    setAppointments(prev => {
-      const updatedAppointments = [...prev, newAppointment];
-      localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
-      return updatedAppointments;
-    });
-
-    // Kiểm tra và cập nhật thông tin khách hàng
-    const existingCustomer = customers.find(c => c.phone === formData.phone);
-    if (!existingCustomer) {
-      const newCustomer = {
-        id: Date.now(),
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        appointments: 1,
-        joinDate: new Date().toISOString(),
-        purchased: 0
+  const addAppointmentAndCustomer = async (formData, carId) => {
+    try {
+      // Ghép date và time thành appointmentDate
+      const token = getToken();
+      const appointmentDate = `${formData.date}T${formData.time}:00`;
+  
+      // Tạo object newAppointment theo cấu trúc API yêu cầu
+      const newAppointment = {
+        carId: carId,
+        fullName: formData.name || '',        // Ánh xạ 'name' thành 'fullName'
+        phone: formData.phone || '',          // Giữ nguyên
+        mail: formData.email || '',           // Ánh xạ 'email' thành 'mail'
+        appointmentDate: appointmentDate || new Date().toISOString(), // Sử dụng date và time đã ghép
+        notes: formData.note || '',           // Ánh xạ 'note' thành 'notes'
+        status: 'Chờ xác nhận',
+        createdAt: new Date().toISOString()
       };
-      setCustomers(prev => {
-        const updatedCustomers = [...prev, newCustomer];
-        localStorage.setItem('customers', JSON.stringify(updatedCustomers));
-        return updatedCustomers;
+  
+      // Gửi yêu cầu POST tới API
+      const response = await fetch('http://localhost:8080/api/appointments/customer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
+        },
+        body: JSON.stringify(newAppointment)
       });
-    } else {
-      setCustomers(prev => {
-        const updatedCustomers = prev.map(customer =>
-          customer.id === existingCustomer.id
-            ? { ...customer, appointments: customer.appointments + 1 }
-            : customer
-        );
-        localStorage.setItem('customers', JSON.stringify(updatedCustomers));
-        return updatedCustomers;
-      });
+  
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to add appointment');
+      }
+  
+      // Kiểm tra và cập nhật thông tin khách hàng trong state
+      const existingCustomer = customers.find(c => c.phone === formData.phone);
+      if (!existingCustomer) {
+        const newCustomer = {
+          id: Date.now(),
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          appointments: 1, // Khởi tạo với 1 cuộc hẹn
+          joinDate: new Date().toISOString(),
+          purchased: 0
+        };
+        setCustomers(prev => {
+          const updatedCustomers = [...prev, newCustomer];
+          localStorage.setItem('customers', JSON.stringify(updatedCustomers));
+          return updatedCustomers;
+        });
+      } else {
+        setCustomers(prev => {
+          const updatedCustomers = prev.map(customer =>
+            customer.id === existingCustomer.id
+              ? { ...customer, appointments: customer.appointments + 1 }
+              : customer
+          );
+          localStorage.setItem('customers', JSON.stringify(updatedCustomers));
+          return updatedCustomers;
+        });
+      }
+  
+      return result; // Trả về kết quả từ API
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
     }
   };
 

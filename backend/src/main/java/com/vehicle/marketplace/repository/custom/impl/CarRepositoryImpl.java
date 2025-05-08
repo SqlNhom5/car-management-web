@@ -44,8 +44,8 @@ public class CarRepositoryImpl implements CarRepositoryCustom {
     }
 
     public static void querySpecial(CarSearchRequest carSearchRequest, StringBuilder where){
-        Integer priceFrom=carSearchRequest.getPriceFrom();
-        Integer priceTo=carSearchRequest.getPriceTo();
+        Long priceFrom=carSearchRequest.getPriceFrom();
+        Long priceTo=carSearchRequest.getPriceTo();
         if(priceFrom != null){
             where.append(" and car.price  >= "+priceFrom);
         }

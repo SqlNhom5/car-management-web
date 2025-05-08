@@ -36,7 +36,7 @@ const AppointmentForm = () => {
         return;
       }
 
-      addAppointmentAndCustomer(formData);
+      addAppointmentAndCustomer(formData, carId );
       alert('Đặt lịch hẹn thành công!');
       navigate('/client/cars');
     } catch (error) {
@@ -54,7 +54,7 @@ const AppointmentForm = () => {
       <div className="bg-white rounded-lg p-6 mb-6">
         <div className="flex gap-4 mb-4">
           <img 
-            src={car.imageUrl} 
+            src={`http://localhost:8080${car.imageUrl}`} 
             alt={car.carName} 
             className="w-32 h-32 object-cover rounded"
           />

@@ -16,7 +16,7 @@ public class CarCreationRequest {
     String model;
     Integer manufactureYear;
     String licensePlate;
-    Integer price;
+    Long price;
     Integer count;
     String status;
     String color;

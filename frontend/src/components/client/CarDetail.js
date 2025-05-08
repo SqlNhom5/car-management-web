@@ -31,18 +31,11 @@ const CarDetail = () => {
           <div>
             <div className="relative">
               <img 
-                src={car.imageUrl} 
+                src={`http://localhost:8080${car.imageUrl}`}
                 alt={car.carName}
                 className="w-full h-[400px] object-cover rounded-lg"
               />
-              <button
-                onClick={() => toggleFavorite(car.carId)}
-                className="absolute top-4 right-4 p-2 rounded-full bg-white shadow hover:bg-gray-100"
-              >
-                <Heart 
-                  className={`w-6 h-6 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}`}
-                />
-              </button>
+              
             </div>
           </div>
 

@@ -12,8 +12,6 @@ const Header = () => {
         return 'Quản Lý Xe';
       case '/customers':
         return 'Quản Lý Khách Hàng';
-      case '/sales':
-        return 'Quản Lý Bán Hàng';
       case '/employees':
         return 'Quản Lý Nhân Viên';
       default:
