@@ -10,10 +10,9 @@ const CarTableWrapper = () => {
 
   const fetchCars = async () => {
     try {
-      console.log('Fetching cars from API...');
       const token = localStorage.getItem('token');
       if (!token) {
-        throw new Error('No token found in localStorage');
+        throw new Error('No token found. Please log in again.');
       }
       const response = await fetch('http://localhost:8080/api/cars', {
         headers: {
@@ -25,10 +24,8 @@ const CarTableWrapper = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      console.log('API response:', data);
       if (data.code === 1000 && Array.isArray(data.result)) {
         setCars(data.result);
-        console.log('Updated cars state:', data.result);
       } else {
         throw new Error(data.message || 'Invalid API response');
       }
@@ -39,15 +36,15 @@ const CarTableWrapper = () => {
   };
 
   useEffect(() => {
-    console.log('Initial fetchCars on mount');
     fetchCars();
   }, []);
 
   const handleCarAdded = (newCar) => {
     console.log('handleCarAdded called with:', newCar);
     fetchCars(); // Reload danh sách xe từ backend
-    setShowForm(false);
+    setShowForm(false); // Đóng popup
     setEditingCar(null);
+    window.location.reload(); // Reload trang
   };
 
   const handleCarUpdated = (updatedCar) => {
@@ -58,24 +55,20 @@ const CarTableWrapper = () => {
   };
 
   const handleCloseForm = () => {
-    console.log('handleCloseForm called');
-    fetchCars(); // Reload danh sách xe khi đóng popup
     setShowForm(false);
     setEditingCar(null);
   };
 
   const handleEdit = (car) => {
-    console.log('handleEdit called with:', car);
     setEditingCar(car);
     setShowForm(true);
   };
 
   const handleDelete = async (car) => {
     try {
-      console.log('handleDelete called with:', car);
       const token = localStorage.getItem('token');
       if (!token) {
-        throw new Error('No token found in localStorage');
+        throw new Error('No token found. Please log in again.');
       }
       const response = await fetch(`http://localhost:8080/api/cars/${car.carId}`, {
         method: 'DELETE',
@@ -83,7 +76,6 @@ const CarTableWrapper = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log('DELETE /api/cars status:', response.status);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -99,7 +91,6 @@ const CarTableWrapper = () => {
       {error && <p className="text-red-500">{error}</p>}
       <button
         onClick={() => {
-          console.log('Opening form for new car');
           setEditingCar(null);
           setShowForm(true);
         }}
