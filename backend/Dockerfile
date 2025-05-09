@@ -1,11 +1,9 @@
-# Sử dụng image Java 17 (hoặc phiên bản phù hợp với ứng dụng của bạn)
 FROM openjdk:17-jdk-slim
-
-# Đặt thư mục làm việc
 WORKDIR /app
-
-# Copy file JAR vào container
-COPY target/Vehicle-marketplace-0.0.1-SNAPSHOT.jar app.jar
-
-# Chạy ứng dụng
+# Copy toàn bộ mã nguồn
+COPY . .
+# Build project để tạo file JAR
+RUN ./mvnw clean package -DskipTests
+# Đổi tên file JAR (không cần COPY lại)
+RUN mv target/vehicle-marketplace-0.0.1-SNAPSHOT.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
