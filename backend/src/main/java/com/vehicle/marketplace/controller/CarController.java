@@ -141,6 +141,12 @@ public class CarController {
             existingCar.setCarName(carUpdateRequest.getCarName());
             existingCar.setBrand(carUpdateRequest.getBrand());
             existingCar.setModel(carUpdateRequest.getModel());
+            existingCar.setPrice(carUpdateRequest.getPrice());
+            existingCar.setNumberOfSeats(carUpdateRequest.getNumberOfSeats());
+            existingCar.setCount(carUpdateRequest.getCount());
+            existingCar.setFuel(carUpdateRequest.getFuel());
+            existingCar.setGear(carUpdateRequest.getGear());
+            existingCar.setNote(carUpdateRequest.getNote());
             // ... (cập nhật các trường khác tương ứng)
 
             // Xử lý ảnh mới (nếu có)

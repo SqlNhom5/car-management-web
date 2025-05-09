@@ -12,13 +12,10 @@ const CustomerTable = ({ customers, onEdit, onDelete }) => {
               Họ Tên
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Email
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Số Điện Thoại
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Đã Mua
+              Địa chỉ
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Lịch Hẹn
@@ -35,16 +32,13 @@ const CustomerTable = ({ customers, onEdit, onDelete }) => {
                 <div className="text-sm font-medium text-gray-900">{customer.fullName}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-500">{customer.id}</div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-500">{customer.phoneNumber}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                11
+                {customer.address || 'Chưa có địa chỉ'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                2
+                {customer.appointmentDate ? new Date(customer.appointmentDate).toLocaleDateString() : 'Chưa có lịch hẹn'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center justify-center space-x-2">

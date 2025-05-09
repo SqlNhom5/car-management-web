@@ -139,6 +139,8 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .status(entity.getStatus())
                 .notes(entity.getNotes())
                 .createdAt(entity.getCreatedAt())
+                .mail(entity.getMail())
+                .phone(entity.getPhone())
                 .build();
     }
 }

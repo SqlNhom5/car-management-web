@@ -115,7 +115,7 @@ export const DataProvider = ({ children }) => {
         
         const data = await response.json(); // Parse JSON từ response
         setAppointments(data.result); // Cập nhật state với dữ liệu từ API
-        console.log("fetch: ",data.result);
+        console.log("fetchAPpoint: ",data.result);
       } catch (error) {
         console.error('Failed to fetch favorites:', error);
       }
@@ -537,13 +537,13 @@ export const DataProvider = ({ children }) => {
       // Tạo object newAppointment theo cấu trúc API yêu cầu
       const newAppointment = {
         carId: carId,
-        fullName: formData.name || '',        // Ánh xạ 'name' thành 'fullName'
-        phone: formData.phone || '',          // Giữ nguyên
-        mail: formData.email || '',           // Ánh xạ 'email' thành 'mail'
+        fullName: formData.name || '', // Ánh xạ 'name' thành 'fullName'
+        phone: formData.phone || '', // Giữ nguyên
+        mail: formData.email || '', // Ánh xạ 'email' thành 'mail'
         appointmentDate: appointmentDate || new Date().toISOString(), // Sử dụng date và time đã ghép
-        notes: formData.note || '',           // Ánh xạ 'note' thành 'notes'
+        notes: formData.note || '', // Ánh xạ 'note' thành 'notes'
         status: 'Chờ xác nhận',
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       };
   
       // Gửi yêu cầu POST tới API
@@ -553,7 +553,7 @@ export const DataProvider = ({ children }) => {
           'Content-Type': 'application/json',
           'Authorization': token ? `Bearer ${token}` : '',
         },
-        body: JSON.stringify(newAppointment)
+        body: JSON.stringify(newAppointment),
       });
   
       const result = await response.json();
@@ -561,39 +561,12 @@ export const DataProvider = ({ children }) => {
         throw new Error(result.message || 'Failed to add appointment');
       }
   
-      // Kiểm tra và cập nhật thông tin khách hàng trong state
-      const existingCustomer = customers.find(c => c.phone === formData.phone);
-      if (!existingCustomer) {
-        const newCustomer = {
-          id: Date.now(),
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          appointments: 1, // Khởi tạo với 1 cuộc hẹn
-          joinDate: new Date().toISOString(),
-          purchased: 0
-        };
-        setCustomers(prev => {
-          const updatedCustomers = [...prev, newCustomer];
-          localStorage.setItem('customers', JSON.stringify(updatedCustomers));
-          return updatedCustomers;
-        });
-      } else {
-        setCustomers(prev => {
-          const updatedCustomers = prev.map(customer =>
-            customer.id === existingCustomer.id
-              ? { ...customer, appointments: customer.appointments + 1 }
-              : customer
-          );
-          localStorage.setItem('customers', JSON.stringify(updatedCustomers));
-          return updatedCustomers;
-        });
-      }
   
       return result; // Trả về kết quả từ API
     } catch (error) {
+      // Thông báo rằng đã đặt lịch hẹn với xe
+      alert(`Bạn đã đặt lịch hẹn với xe này rồi!`);
       console.error('Error:', error);
-      throw error;
     }
   };
 

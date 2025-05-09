@@ -84,11 +84,11 @@ const AppointmentManagement = () => {
                   <div className="flex items-center space-y-1 flex-col">
                     <div className="flex items-center">
                       <Phone className="w-4 h-4 mr-2" />
-                      {appointment.phone}09094797
+                      {appointment.phone}
                     </div>
                     <div className="flex items-center">
                       <Mail className="w-4 h-4 mr-2" />
-                      {appointment.mail}hayqua@gmail.com
+                      {appointment.mail}
                     </div>
                   </div>
                 </td>

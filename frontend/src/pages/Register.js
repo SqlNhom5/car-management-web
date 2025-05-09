@@ -28,7 +28,6 @@ const Register = () => {
                     password,
                     fullName,
                     phone,
-                    address,
                 }),
             });
 
@@ -90,16 +89,6 @@ const Register = () => {
                             type="text"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
-                            required
-                            disabled={isSubmitting}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Địa chỉ:</label>
-                        <input
-                            type="text"
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
                             required
                             disabled={isSubmitting}
                         />
