@@ -14,21 +14,6 @@ const Sidebar = () => {
   };
 
   const navItems = [
-    { 
-      id: 'dashboard', 
-      to: '/dashboard',
-      title: 'Tổng Quan', 
-      icon: (
-        <div className="w-6 h-6 flex items-center justify-center">
-          <div className="w-4 h-4 grid grid-cols-2 gap-0.5">
-            <div className="bg-white"></div>
-            <div className="bg-white"></div>
-            <div className="bg-white"></div>
-            <div className="bg-white"></div>
-          </div>
-        </div>
-      ),
-    },
     { id: 'cars', to: '/cars', title: 'Quản Lý Xe', icon: <Car className="w-6 h-6" /> },
     { id: 'customers', to: '/customers', title: 'Quản Lý Khách Hàng', icon: <Users className="w-6 h-6" /> },
     { id: 'appointments', to: '/appointments', title: 'Quản Lý Lịch Hẹn', icon: <Calendar className="w-6 h-6" /> },
