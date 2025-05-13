@@ -19,6 +19,8 @@ import com.vehicle.marketplace.repository.CustomerRepository;
 import com.vehicle.marketplace.repository.UserRepository;
 import com.vehicle.marketplace.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -120,10 +122,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<AppointmentResponse> getAll() {
-        return appointmentRepository.findAll().stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+    public Page<AppointmentResponse> getAll(Pageable pageable) {
+        return appointmentRepository.findAll(pageable)
+                .map(this::toResponse);
     }
 
     private AppointmentResponse toResponse(AppointmentEntity entity) {

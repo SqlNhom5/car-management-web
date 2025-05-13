@@ -5,6 +5,8 @@ import com.vehicle.marketplace.model.dto.CustomerRegistrationDTO;
 import com.vehicle.marketplace.model.response.ApiResponse;
 import com.vehicle.marketplace.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -17,9 +19,18 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService;
 
+//    @GetMapping
+//    public List<CustomerDTO> getAllCustomers() {
+//        return customerService.getAllCustomers();
+//    }
     @GetMapping
-    public List<CustomerDTO> getAllCustomers() {
-        return customerService.getAllCustomers();
+    public ApiResponse<Page<CustomerDTO>> findCustomers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ){
+        return ApiResponse.<Page<CustomerDTO>>builder()
+                .result(customerService.findCustomers(PageRequest.of(page, size)))
+                .build();
     }
 
     @GetMapping("/{id}")

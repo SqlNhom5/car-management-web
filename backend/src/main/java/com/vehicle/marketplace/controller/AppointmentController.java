@@ -8,6 +8,8 @@ import com.vehicle.marketplace.model.response.AppointmentResponse;
 import com.vehicle.marketplace.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,9 +27,10 @@ public class AppointmentController {
     AppointmentService appointmentService;
 
     @GetMapping
-    ApiResponse<List<AppointmentResponse>> getAll() {
-        return ApiResponse.<List<AppointmentResponse>>builder()
-                .result(appointmentService.getAll())
+    ApiResponse<Page<AppointmentResponse>> getAll(@RequestParam(defaultValue = "0") int page,
+                                                  @RequestParam(defaultValue = "5") int size) {
+        return ApiResponse.<Page<AppointmentResponse>>builder()
+                .result(appointmentService.getAll(PageRequest.of(page, size)))
                 .build();
     }
 

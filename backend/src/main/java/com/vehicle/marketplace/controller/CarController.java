@@ -11,6 +11,9 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vehicle.marketplace.Entity.CarEntity;
 import com.vehicle.marketplace.model.response.ApiResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,10 +47,19 @@ public class CarController {
 //        return ApiResponse.<List<CarEntity>>builder().result(cars).build();
 //    }
 
+//    @GetMapping
+//    ApiResponse<List<CarEntity>> findAllCars() {
+//        List<CarEntity> cars = carService.findAllCars();
+//        return ApiResponse.<List<CarEntity>>builder().result(cars).build();
+//    }
+
     @GetMapping
-    ApiResponse<List<CarEntity>> findAllCars() {
-        List<CarEntity> cars = carService.findAllCars();
-        return ApiResponse.<List<CarEntity>>builder().result(cars).build();
+    ApiResponse<Page<CarEntity>> findAllCars(@RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "5") int size) {
+        return ApiResponse.<Page<CarEntity>>
+                builder()
+                .result(carService.findAllCars(PageRequest.of(page, size)))
+                .build();
     }
 
     @GetMapping("/compare/{id1}/{id2}")

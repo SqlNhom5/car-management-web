@@ -13,6 +13,8 @@ import com.vehicle.marketplace.repository.RoleRepository;
 import com.vehicle.marketplace.repository.UserRepository;
 import com.vehicle.marketplace.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -135,6 +137,11 @@ public class CustomerServiceImpl implements CustomerService {
 
         // Lưu CustomerEntity
         customerRepository.save(customer);
+    }
+
+    @Override
+    public Page<CustomerDTO> findCustomers(Pageable pageable) {
+        return customerRepository.findAll(pageable).map(this::convertToDTO);
     }
 }
 

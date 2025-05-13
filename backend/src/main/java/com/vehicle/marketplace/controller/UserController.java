@@ -31,26 +31,26 @@ import java.util.List;
 public class UserController {
     IUserService userService;
 
-//    @GetMapping
-//    ApiResponse<Page<UserResponse>> getUsers(
-//            @RequestParam(defaultValue = "0") int page,
-//            @RequestParam(defaultValue = "2") int size
-//    ) {
-//        var authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//        log.info("Username : {}", authentication.getName());
-//        authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
-//
-//        return ApiResponse.<Page<UserResponse>>
-//                builder().result(userService.getUsers(PageRequest.of(page, size)))
-//                .build();
-//    }
-
     @GetMapping
-    ApiResponse<List<UserEntity>> findAllUsers() {
-        List<UserEntity> users = userService.findAll();
-        return ApiResponse.<List<UserEntity>>builder().result(users).build();
+    ApiResponse<Page<UserResponse>> getUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "2") int size
+    ) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        log.info("Username : {}", authentication.getName());
+        authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
+
+        return ApiResponse.<Page<UserResponse>>
+                builder().result(userService.getUsers(PageRequest.of(page, size)))
+                .build();
     }
+
+//    @GetMapping
+//    ApiResponse<List<UserEntity>> findAllUsers() {
+//        List<UserEntity> users = userService.findAll();
+//        return ApiResponse.<List<UserEntity>>builder().result(users).build();
+//    }
 
     @PostMapping
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest userCreationRequest) {
