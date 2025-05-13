@@ -1,3 +1,4 @@
+// App.js
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
@@ -16,6 +17,7 @@ import FavoriteList from './components/client/FavoriteList';
 import AppointmentForm from './components/client/AppointmentForm';
 import AppointmentManagement from './components/appointments/AppointmentManagement';
 import CarDetail from './components/client/CarDetail';
+import DealershipInfo from './components/client/DealershipInfo';
 import Register from './pages/Register';
 import { getToken } from './contexts/localStorageService';
 
@@ -84,6 +86,7 @@ function App() {
               <Route index element={<Navigate to="/client/cars" replace />} />
               <Route path="cars" element={<CarList />} />
               <Route path="cars/:carId" element={<CarDetail />} />
+              <Route path="dealership" element={<DealershipInfo />} /> {/* Thêm route mới */}
 
               {/* Yêu cầu token cho Favorites */}
               <Route

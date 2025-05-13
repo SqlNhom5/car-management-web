@@ -10,7 +10,8 @@ const CarList = () => {
   const [filteredCars, setFilteredCars] = useState(cars);
   const [priceRange, setPriceRange] = useState(maxPrice);
   const [selectedBrand, setSelectedBrand] = useState('Tất cả');
-  const [selectedYear, setSelectedYear] = useState('Tất cả');
+  const [selectedSeats, setSelectedSeats] = useState('Tất cả');
+  const [selectedModel, setSelectedModel] = useState('Tất cả');
 
   useEffect(() => {
     let result = [...cars];
@@ -23,24 +24,33 @@ const CarList = () => {
       result = result.filter(car => car.brand === selectedBrand);
     }
 
-    // Lọc theo năm sản xuất
-    if (selectedYear !== 'Tất cả') {
-      result = result.filter(car => car.manufactureYear === Number(selectedYear));
+    // Lọc theo số chỗ
+    if (selectedSeats !== 'Tất cả') {
+      result = result.filter(car => car.numberOfSeats === Number(selectedSeats));
+    }
+
+    // Lọc theo model
+    if (selectedModel !== 'Tất cả') {
+      result = result.filter(car => car.model === selectedModel);
     }
 
     setFilteredCars(result);
-  }, [cars, priceRange, selectedBrand, selectedYear]);
+  }, [cars, priceRange, selectedBrand, selectedSeats, selectedModel]);
 
   // Tạo danh sách hãng xe duy nhất từ dữ liệu
-  const brands = ['Tất cả', ...new Set(cars.map(car => car.brand))];
-  // Tạo danh sách năm sản xuất duy nhất từ dữ liệu
-  const years = ['Tất cả', ...new Set(cars.map(car => car.manufactureYear))].sort((a, b) => b - a);
+  const brands = [...new Set(cars.map(car => car.brand))].sort();
+  const brandOptions = ['Tất cả', ...brands.filter(brand => brand !== 'Tất cả')];
+  // Tạo danh sách số chỗ duy nhất từ dữ liệu
+  const seats = ['Tất cả', ...new Set(cars.map(car => car.numberOfSeats))].sort((a, b) => a - b);
+  // Tạo danh sách model duy nhất từ dữ liệu (tương tự như hãng xe)
+  const models = [...new Set(cars.map(car => car.model))].sort();
+  const modelOptions = ['Tất cả', ...models.filter(model => model !== 'Tất cả')];
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Danh sách xe</h1>
       <div className="flex gap-6">
-        {/* Bộ lọc */}
+        {/* Bộ lọc (sidebar bên trái) */}
         <div className="w-64 bg-white rounded-lg p-4 h-fit">
           <h2 className="text-lg font-bold mb-4">Bộ lọc</h2>
 
@@ -71,26 +81,40 @@ const CarList = () => {
             <div>
               <p className="mb-2">Hãng xe:</p>
               <select
-                className="w-full border p-2 rounded"
+                className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={selectedBrand}
                 onChange={(e) => setSelectedBrand(e.target.value)}
               >
-                {brands.map(brand => (
+                {brandOptions.map(brand => (
                   <option key={brand} value={brand}>{brand}</option>
                 ))}
               </select>
             </div>
 
-            {/* Lọc theo năm sản xuất */}
+            {/* Lọc theo số chỗ */}
             <div>
-              <p className="mb-2">Năm sản xuất:</p>
+              <p className="mb-2">Số chỗ:</p>
               <select
-                className="w-full border p-2 rounded"
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
+                className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={selectedSeats}
+                onChange={(e) => setSelectedSeats(e.target.value)}
               >
-                {years.map(year => (
-                  <option key={year} value={year}>{year}</option>
+                {seats.map(seat => (
+                  <option key={seat} value={seat}>{seat}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Lọc theo model (thêm vào dưới cùng) */}
+            <div>
+              <p className="mb-2">Loại xe:</p>
+              <select
+                className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
+              >
+                {modelOptions.map(model => (
+                  <option key={model} value={model}>{model}</option>
                 ))}
               </select>
             </div>
@@ -104,7 +128,7 @@ const CarList = () => {
               Không tìm thấy xe phù hợp với tiêu chí tìm kiếm
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredCars.map(car => (
                 <CarCard key={car.carId} car={car} />
               ))}

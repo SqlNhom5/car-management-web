@@ -5,7 +5,7 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
   const [formData, setFormData] = useState({
     carName: car?.carName || '',
     brand: car?.brand || '',
-    model: car?.model || '',
+    model: car?.model || '', // Sẽ là "Mới" hoặc "Cũ"
     manufactureYear: car?.manufactureYear || '',
     licensePlate: car?.licensePlate || '',
     price: car?.price || '',
@@ -180,6 +180,7 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
               <option value="">Chọn hãng xe</option>
               <option value="Toyota">Toyota</option>
               <option value="Honda">Honda</option>
+              <option value="Vinfast">Vinfast</option>
               <option value="Ford">Ford</option>
               <option value="BMW">BMW</option>
               <option value="Mercedes">Mercedes</option>
@@ -187,17 +188,19 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Model</label>
-            <input
-              type="text"
+            <label className="block text-sm font-medium text-gray-700">Tình Trạng</label>
+            <select
               name="model"
               value={formData.model}
               onChange={handleInputChange}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+            >
+              <option value="">Tình trạng</option>
+              <option value="Mới">Mới</option>
+              <option value="Cũ">Cũ</option>
+            </select>
           </div>
 
-          
           <div>
             <label className="block text-sm font-medium text-gray-700">Số chỗ</label>
             <input
@@ -208,7 +211,7 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
               required
             />
-          </div> 
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700">Giá Bán</label>
@@ -255,21 +258,19 @@ const CarForm = ({ car, onCancel, onSubmit }) => {
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-
-          
         </div>
 
-        {/* Thông số kỹ thuật - Đặt riêng với chiều cao ngắn hơn */}
+        {/* Mô tả - Đặt riêng với chiều cao ngắn hơn */}
         <div>
-            <label className="block text-sm font-medium text-gray-700">Mô tả</label>
-            <input
-              type="text"
-              name="note"
-              value={formData.note}
-              onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+          <label className="block text-sm font-medium text-gray-700">Mô tả</label>
+          <input
+            type="text"
+            name="note"
+            value={formData.note}
+            onChange={handleInputChange}
+            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
 
         {/* Nút hành động */}
         <div className="flex justify-end space-x-3 pt-2">

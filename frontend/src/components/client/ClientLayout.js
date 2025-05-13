@@ -7,15 +7,15 @@ import { getToken } from '../../contexts/localStorageService';
 const ClientLayout = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const token = getToken(); 
+  const token = getToken();
+
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
   const handleLogin = () => {
-    // Ví dụ: chuyển hướng đến trang đăng nhập
-    window.location.href = '/login'; // Thay bằng đường dẫn thực tế
+    navigate('/login'); // Sử dụng navigate thay vì window.location.href để đồng bộ với React Router
   };
 
   return (
@@ -24,13 +24,13 @@ const ClientLayout = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-8">
-              <Link to="/client" className="text-xl font-bold">Car Dealership</Link>
+              <Link to="/client" className="text-xl font-bold">Auto Luxury</Link>
               <div className="flex space-x-4">
                 <Link to="/client/cars" className="hover:text-blue-200">Danh sách xe</Link>
                 <Link to="/client/favorites" className="hover:text-blue-200">
                   <Heart className="w-4 h-4 inline mr-1" /> Yêu thích
                 </Link>
-                
+                <Link to="/client/dealership" className="hover:text-blue-200">Thông tin đại lý</Link> {/* Thêm link mới */}
               </div>
             </div>
             <button
