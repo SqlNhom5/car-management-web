@@ -9,6 +9,8 @@ import com.vehicle.marketplace.service.impl.FavoriteCarService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,10 +44,13 @@ public class FavoriteCarController {
     }
 
     @GetMapping
-    public ApiResponse<List<CarResponse>> getFavorites() {
+    public ApiResponse<Page<CarResponse>> getFavorites(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
         String username = getCurrentUsername();
-        List<CarResponse> favorites = favoriteCarService.getFavorites(username);
-        return ApiResponse.<List<CarResponse>>builder()
+        Page<CarResponse> favorites = favoriteCarService.getFavorites(username, PageRequest.of(page, size));
+        return ApiResponse.<Page<CarResponse>>builder()
                 .result(favorites)
                 .build();
     }

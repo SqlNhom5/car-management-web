@@ -19,6 +19,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -64,16 +67,16 @@ public class FavoriteCarService implements IFavoriteCarService {
         favoriteCarRepository.deleteByCustomerIdAndCarCarId(customer.getId(), carId);
     }
 
-    public List<CarResponse> getFavorites(String username) {
+    public Page<CarResponse> getFavorites(String username, Pageable pageable) {
         CustomerEntity customer = getCustomerFromUsername(username);
         if (customer == null) {
-            return Collections.emptyList();
+            return new PageImpl<>(Collections.emptyList(), pageable, 0);
         }
-
-        return favoriteCarRepository.findByCustomerId(customer.getId())
+        Page<FavoriteCarEntity> favoriteCarsPage = favoriteCarRepository.findByCustomerId(customer.getId(), pageable);
+        List<CarResponse> carResponses = favoriteCarsPage.getContent()
                 .stream()
                 .map(FavoriteCarEntity::getCar)
-                .filter(Objects::nonNull) // Xử lý null
+                .filter(Objects::nonNull)
                 .map(car -> {
                     try {
                         return carMapper.toCarResponse(car);
@@ -82,8 +85,10 @@ public class FavoriteCarService implements IFavoriteCarService {
                         return null;
                     }
                 })
-                .filter(Objects::nonNull) // Loại bỏ null sau khi map
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+
+        return new PageImpl<>(carResponses, pageable, favoriteCarsPage.getTotalElements());
     }
 
     private CustomerEntity getCustomerFromUsername(String username) {
