@@ -55,7 +55,7 @@ public class CarController {
 
     @GetMapping
     ApiResponse<Page<CarEntity>> findAllCars(@RequestParam(defaultValue = "0") int page,
-                                             @RequestParam(defaultValue = "5") int size) {
+                                             @RequestParam(defaultValue = "6") int size) {
         return ApiResponse.<Page<CarEntity>>
                 builder()
                 .result(carService.findAllCars(PageRequest.of(page, size)))

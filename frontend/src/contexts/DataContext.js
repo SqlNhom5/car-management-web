@@ -9,40 +9,51 @@ import { getToken, setToken, removeToken } from "./localStorageService";
 const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
-  // Khởi tạo state từ localStorage hoặc dữ liệu mặc định
-  const [cars, setCars] = useState([]);
-  // lay du lieu tu API ve cars
-  useEffect(() => {
-    const fetchCars = async () => {
-      try {
-        const token = getToken();
-        const response = await fetch('http://localhost:8080/api/cars', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json(); // Parse JSON từ response
-        setCars(data.result); // Cập nhật state với dữ liệu từ API
-      } catch (error) {
-        console.error('Failed to fetch customers:', error);
+  const [carsData, setCarsData] = useState({
+    content: [],
+    totalPages: 0,
+    totalElements: 0,
+    currentPage: 0
+  });
+
+  const fetchCars = async (page = 0, size = 10) => {  // Set fixed size to 10
+    try {
+      const token = getToken();
+      const response = await fetch(`http://localhost:8080/api/cars?page=${page}&size=${size}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
-  
-    fetchCars();
-  }, []);  
+      
+      const data = await response.json();
+      if (data && data.result) {
+        setCarsData({
+          content: data.result.content || [],
+          totalPages: data.result.totalPages || 0,
+          totalElements: data.result.totalElements || 0,
+          currentPage: data.result.number || 0
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch cars:', error);
+      setCarsData({
+        content: [],
+        totalPages: 0,
+        totalElements: 0,
+        currentPage: 0
+      });
+    }
+  };
 
-
-
-
-
+  // Initialize customers as empty array
   const [customers, setCustomers] = useState([]);
-  // lay du lieu tu API ve customers
-  // lay du lieu tu API ve customers
+
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
@@ -58,10 +69,12 @@ export const DataProvider = ({ children }) => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const data = await response.json(); // Parse JSON từ response
-        setCustomers(data); // Cập nhật state với dữ liệu từ API
+        const data = await response.json();
+        // Ensure we're setting an array
+        setCustomers(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Failed to fetch customers:', error);
+        setCustomers([]); // Reset to empty array on error
       }
     };
   
@@ -70,33 +83,39 @@ export const DataProvider = ({ children }) => {
   
 
   const [favorites, setFavorites] = useState([]);
+
   useEffect(() => {
     const fetchFavorite = async () => {
       try {
         const token = getToken();
+        if (!token) return;  // Return early if no token
+
         const response = await fetch('http://localhost:8080/api/favorite', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : '',
+            'Authorization': `Bearer ${token}`,
           },
         });
+        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const data = await response.json(); // Parse JSON từ response
-        setFavorites(data.result); // Cập nhật state với dữ liệu từ API
-        console.log("fetch: ",data.result);
+        const data = await response.json();
+        // Ensure we always set an array
+        setFavorites(Array.isArray(data.result) ? data.result : []);
       } catch (error) {
         console.error('Failed to fetch favorites:', error);
+        setFavorites([]); // Reset to empty array on error
       }
     };
-  
+
     fetchFavorite();
   }, []); 
    
 
+  // Initialize appointments as empty array
   const [appointments, setAppointments] = useState([]);
   useEffect(() => {
     const fetchAppointments  = async () => {
@@ -113,11 +132,12 @@ export const DataProvider = ({ children }) => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const data = await response.json(); // Parse JSON từ response
-        setAppointments(data.result); // Cập nhật state với dữ liệu từ API
-        console.log("fetchAPpoint: ",data.result);
+        const data = await response.json();
+        // Ensure we're setting an array
+        setAppointments(data.result && Array.isArray(data.result) ? data.result : []);
       } catch (error) {
-        console.error('Failed to fetch favorites:', error);
+        console.error('Failed to fetch appointments:', error);
+        setAppointments([]); // Reset to empty array on error
       }
     };
   
@@ -129,8 +149,8 @@ export const DataProvider = ({ children }) => {
 
   // Lưu cars vào localStorage khi có thay đổi
   useEffect(() => {
-    localStorage.setItem('cars', JSON.stringify(cars));
-  }, [cars]);
+    localStorage.setItem('cars', JSON.stringify(carsData.content));
+  }, [carsData.content]);
 
   useEffect(() => {
     localStorage.setItem('favorites', JSON.stringify(favorites));
@@ -147,52 +167,64 @@ export const DataProvider = ({ children }) => {
   const addCar = async (formData, imageFile) => {
     try {
       const token = getToken();
+      if (!token) throw new Error('Vui lòng đăng nhập lại');
+
+      // Format data correctly
       const carData = {
-        ...formData,
-        price: Number(formData.price) || 0,
-        count: Number(formData.count) || 0,
-        manufactureYear: Number(formData.manufactureYear) || 0,
-        warrantyPeriod: Number(formData.warrantyPeriod) || 0,
+        carName: formData.carName,
+        brand: formData.brand,
+        model: formData.model,
+        price: Number(formData.price),
+        count: Number(formData.count),
+        numberOfSeats: Number(formData.numberOfSeats),
+        gear: formData.gear,
+        fuel: formData.fuel,
+        note: formData.note
       };
 
-      if (!imageFile || !(imageFile instanceof File)) {
-        throw new Error('Vui lòng chọn một file ảnh hợp lệ');
-      }
-
       const formDataToSend = new FormData();
-      formDataToSend.append('car', new Blob([JSON.stringify(carData)], { type: 'application/json' }));
-      console.log('Appending car data to FormData:', carData);
+      formDataToSend.append('car', new Blob([JSON.stringify(carData)], { 
+        type: 'application/json'
+      }));
       formDataToSend.append('image', imageFile);
 
       const response = await fetch('http://localhost:8080/api/cars', {
         method: 'POST',
         headers: {
-          Authorization: token ? `Bearer ${token}` : '',
+          'Authorization': `Bearer ${token}`,
         },
         body: formDataToSend,
       });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-      }
 
       const data = await response.json();
-      if (data.code === 1000 && data.result) {
-        setCars(prev => [...prev, data.result]); // Cập nhật state cars ngay
-        return data.result;
-      } else {
-        throw new Error(data.message || 'Failed to add car');
+
+      if (!response.ok) {
+        throw new Error(data.message || `Lỗi: ${response.status}`);
       }
+
+      if (data.code !== 1000 || !data.result) {
+        throw new Error(data.message || 'Thêm xe không thành công');
+      }
+
+      // Update local state
+      setCarsData(prev => ({
+        ...prev,
+        content: [...prev.content, data.result],
+        totalElements: prev.totalElements + 1
+      }));
+
+      return data.result;
     } catch (error) {
-      console.error('Lỗi khi thêm xe:', error);
-      throw error;
+      console.error('Add car error:', error);
+      throw new Error(`Lỗi khi thêm xe: ${error.message}`);
     }
   };
 
   const updateCar = async (updatedCar, imageFile) => {
     try {
       const token = getToken();
+      if (!token) throw new Error('Unauthorized');
+
       const carData = {
         ...updatedCar,
         price: Number(updatedCar.price) || 0,
@@ -201,38 +233,23 @@ export const DataProvider = ({ children }) => {
         warrantyPeriod: Number(updatedCar.warrantyPeriod) || 0,
       };
 
-      console.log('updateCar input:', { carData, imageFile });
-
       const formData = new FormData();
       formData.append('car', new Blob([JSON.stringify(carData)], { type: 'application/json' }));
+      
       if (imageFile) {
         if (!(imageFile instanceof File)) {
           throw new Error('File ảnh không hợp lệ');
         }
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-        if (!allowedTypes.includes(imageFile.type)) {
-          throw new Error('Chỉ hỗ trợ file ảnh JPEG, PNG hoặc GIF');
-        }
-        console.log('Appending image to FormData:', imageFile.name, imageFile.type, imageFile.size);
         formData.append('image', imageFile);
-      } else {
-        console.log('No imageFile provided, sending only car data');
-      }
-
-      console.log('Sending updateCar FormData:');
-      for (let [key, value] of formData.entries()) {
-        console.log(`  ${key}:`, value);
       }
 
       const response = await fetch(`http://localhost:8080/api/cars/${updatedCar.carId}`, {
         method: 'PUT',
         headers: {
-          Authorization: token ? `Bearer ${token}` : '',
+          Authorization: `Bearer ${token}`,
         },
         body: formData,
       });
-
-      console.log('updateCar response status:', response.status);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -240,18 +257,13 @@ export const DataProvider = ({ children }) => {
       }
 
       const data = await response.json();
-      console.log('updateCar response data:', data);
-
-      if (data.code === 1000 && data.result) {
-        setCars(prev =>
-          prev.map(c => (c.carId === data.result.carId ? data.result : c))
-        );
-        return data.result;
-      } else {
-        throw new Error(data.message || 'Failed to update car');
+      if (!data || data.code !== 1000) {
+        throw new Error(data?.message || 'Failed to update car');
       }
+
+      return data.result;
     } catch (error) {
-      console.error('Lỗi khi cập nhật xe:', error);
+      console.error('Update car error:', error);
       throw error;
     }
   };
@@ -259,43 +271,25 @@ export const DataProvider = ({ children }) => {
   const deleteCar = async (carId) => {
     try {
       const token = getToken();
-      if (!token) throw new Error('Missing authentication token');
-      // 1. Gọi API DELETE
+      if (!token) throw new Error('Unauthorized');
+
       const response = await fetch(`http://localhost:8080/api/cars/${carId}`, {
-        
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-  
-      // 2. Kiểm tra response
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        const errorMessage = errorData?.message || `HTTP ${response.status}`;
-        throw new Error(`Delete failed: ${errorMessage}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
-  
-      
-      // 4. Kiểm tra cấu trúc response (tùy API của bạn)
-      if (response.status === 200) {
-        // 5. Cập nhật state nếu API thành công
-        setCars(prevCars => prevCars.filter(car => car.carId !== carId));
-        return true; // Trả về true nếu xóa thành công
-      } else {
-        throw new Error('Unknown API error');
-      }
-  
+
+      return true;
     } catch (error) {
-      console.error('Delete car error:', {
-        carId,
-        error: error.message,
-        time: new Date().toISOString()
-      });
-      
-      // 6. Có thể thêm xử lý UI thông báo lỗi ở đây
-      throw error; // Ném lỗi để component có thể bắt và hiển thị
+      console.error('Delete car error:', error);
+      throw error;
     }
   };
 
@@ -347,13 +341,16 @@ export const DataProvider = ({ children }) => {
     setSales(prevSales => [...prevSales, formattedSale]);
 
     // Cập nhật số lượng xe
-    const updatedCars = cars.map(car => {
+    const updatedCars = carsData.content.map(car => {
       if (car.name === newSale.car) {
         return { ...car, quantity: car.quantity - 1 };
       }
       return car;
     });
-    setCars(updatedCars);
+    setCarsData(prev => ({ 
+      ...prev, 
+      content: updatedCars 
+    }));
 
     // Cập nhật số lượng mua của khách hàng
     const updatedCustomers = customers.map(customer => {
@@ -455,162 +452,152 @@ export const DataProvider = ({ children }) => {
     } catch (error) {
       console.error('Lỗi khi xóa khách hàng:', error);
       // Xử lý lỗi (hiển thị thông báo cho người dùng, v.v.)
+      throw error;
     }
   };
 
-
-  const deleteSale = (saleId) => {
-    setSales(prevSales => prevSales.filter(sale => sale.id !== saleId));
-  };
-
-  const deleteEmployee = (employeeId) => {
-    setEmployees(prevEmployees => prevEmployees.filter(emp => emp.id !== employeeId));
-  };
-
   const toggleFavorite = async (carId) => {
-    console.log('Toggling favorite for carId:', carId); // Để debug
     try {
       const token = getToken();
-      if (!token) throw new Error('No token found');
+      if (!token) {
+        alert('Vui lòng đăng nhập để thêm vào yêu thích');
+        return;
+      }
 
-      const isFavorite = favorites.some((fav) => fav.carId === carId);
-      console.log('Is favorite:', isFavorite); // Để debug
+      const isFavorite = Array.isArray(favorites) && favorites.some(fav => fav.carId === carId);
 
       if (isFavorite) {
-        // Xóa khỏi yêu thích
+        // Remove from favorites
         const response = await fetch(`http://localhost:8080/api/favorite/${carId}`, {
           method: 'DELETE',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
           },
         });
-        if (!response.ok) {
-          throw new Error(`Failed to remove favorite: HTTP error! status: ${response.status}`);
+        if (response.ok) {
+          setFavorites(prev => prev.filter(fav => fav.carId !== carId));
         }
-        // Cập nhật state: Xóa car khỏi favorites
-        setFavorites((prev) => prev.filter((fav) => fav.carId !==carId));
       } else {
-        // Thêm vào yêu thích
+        // Add to favorites
         const response = await fetch('http://localhost:8080/api/favorite', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
           },
-          body: JSON.stringify({ carId: carId }),
+          body: JSON.stringify({ carId }),
         });
-        if (!response.ok) {
-          throw new Error(`Failed to add favorite: HTTP error! status: ${response.status}`);
+        if (response.ok) {
+          const data = await response.json();
+          const carToAdd = carsData.content.find(c => c.carId === carId);
+          if (carToAdd) {
+            setFavorites(prev => [...prev, { carId, car: carToAdd }]);
+          }
         }
-        // Giả sử API trả về object car vừa thêm
-        const data = await response.json();
-        // Cập nhật state: Thêm car vào favorites
-        // Nếu API trả về car đầy đủ, dùng data; nếu không, dùng car từ tham số
-        setFavorites((prev) => {
-          const carToAdd = data.car || cars.find((c) => c.carId === carId) || { carId };
-          return [...prev, carToAdd];
-        });
       }
     } catch (error) {
       console.error('Failed to toggle favorite:', error);
     }
   };
 
+  // Fetch cars
+  useEffect(() => {
+    fetchCars(0, 6);  // Fetch initial data with 6 items per page
+  }, []); // Empty dependency array means this runs once when component mounts
 
-  const addAppointment = (newAppointment) => {
-    console.log('Adding new appointment:', newAppointment); // Để debug
-    setAppointments(prevAppointments => {
-      const updatedAppointments = [...prevAppointments, newAppointment];
-      // Lưu vào localStorage ngay lập tức
-      localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
-      return updatedAppointments;
-    });
-  };
-
-  const addAppointmentAndCustomer = async (formData, carId) => {
-    try {
-      // Ghép date và time thành appointmentDate
-      const token = getToken();
-      const appointmentDate = `${formData.date}T${formData.time}:00`;
-  
-      // Tạo object newAppointment theo cấu trúc API yêu cầu
-      const newAppointment = {
-        carId: carId,
-        fullName: formData.name || '', // Ánh xạ 'name' thành 'fullName'
-        phone: formData.phone || '', // Giữ nguyên
-        mail: formData.email || '', // Ánh xạ 'email' thành 'mail'
-        appointmentDate: appointmentDate || new Date().toISOString(), // Sử dụng date và time đã ghép
-        notes: formData.note || '', // Ánh xạ 'note' thành 'notes'
-        status: 'Chờ xác nhận',
-        createdAt: new Date().toISOString(),
-      };
-  
-      // Gửi yêu cầu POST tới API
-      const response = await fetch('http://localhost:8080/api/appointments/customer', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
-        },
-        body: JSON.stringify(newAppointment),
-      });
-  
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to add appointment');
+  // Fetch customers
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const token = getToken();
+        if (!token) return;
+        
+        const response = await fetch('http://localhost:8080/api/customers', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const data = await response.json();
+        setCustomers(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Failed to fetch customers:', error);
+        setCustomers([]);
       }
-  
-  
-      return result; // Trả về kết quả từ API
-    } catch (error) {
-      // Thông báo rằng đã đặt lịch hẹn với xe
-      alert(`Bạn đã đặt lịch hẹn với xe này rồi!`);
-      console.error('Error:', error);
-    }
-  };
+    };
 
-  const updateAppointmentStatus = async (appointmentId, newStatus) => {
-    try {
-      const token = getToken();
-      if (!token) throw new Error('No token found');
-  
-      // Gọi API để cập nhật trạng thái
-      const response = await fetch(`http://localhost:8080/api/appointments/${appointmentId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `Failed to update appointment status: HTTP error! status: ${response.status}`);
+    fetchCustomers();
+  }, []); // Empty dependency array for initial load
+
+  // Fetch favorites
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      try {
+        const token = getToken();
+        if (!token) return;
+        
+        const response = await fetch('http://localhost:8080/api/favorite', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const data = await response.json();
+        setFavorites(Array.isArray(data.result) ? data.result : []);
+      } catch (error) {
+        console.error('Failed to fetch favorites:', error);
+        setFavorites([]);
       }
-  
-      // Cập nhật state appointments, chỉ thay đổi status
-      setAppointments((prevAppointments) =>
-        prevAppointments.map((appointment) =>
-          appointment.appointmentId === appointmentId
-            ? { ...appointment, status: newStatus }
-            : appointment
-        )
-      );
-    } catch (error) {
-      console.error('Failed to update appointment status:', error);
-    }
-  };
+    };
 
+    fetchFavorites();
+  }, []); // Empty dependency array for initial load
+
+  // Fetch appointments
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const token = getToken();
+        if (!token) return;
+        
+        const response = await fetch('http://localhost:8080/api/appointments', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const data = await response.json();
+        setAppointments(data.result && Array.isArray(data.result) ? data.result : []);
+      } catch (error) {
+        console.error('Failed to fetch appointments:', error);
+        setAppointments([]);
+      }
+    };
+
+    fetchAppointments();
+  }, []); // Empty dependency array for initial load
+
+  // Update context value
   return (
     <DataContext.Provider value={{
-      cars, setCars, addCar, updateCar, deleteCar,
+      cars: carsData.content,
+      totalPages: carsData.totalPages,
+      currentPage: carsData.currentPage,
+      fetchCars,
       customers, setCustomers, addCustomer, updateCustomer, deleteCustomer,
-      sales, setSales, addSale, updateSale, deleteSale,
-      employees, setEmployees, addEmployee, updateEmployee, deleteEmployee,
-      favorites, toggleFavorite,
-      appointments, setAppointments, addAppointment, updateAppointmentStatus,
-      addAppointmentAndCustomer
+      favorites, setFavorites, toggleFavorite,
+      appointments, setAppointments,
+      sales, setSales, addSale, updateSale,
+      employees, setEmployees, addEmployee, updateEmployee
     }}>
       {children}
     </DataContext.Provider>

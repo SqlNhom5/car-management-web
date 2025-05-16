@@ -2,7 +2,6 @@
 CREATE DATABASE CarManagement CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE CarManagement;
 
--- Bảng Role (quản lý vai trò của người dùng)
 CREATE TABLE role (
     name VARCHAR(255) PRIMARY KEY,
     description TEXT

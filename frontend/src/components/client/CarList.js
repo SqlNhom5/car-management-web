@@ -3,15 +3,22 @@ import { useData } from '../../contexts/DataContext';
 import { formatPrice } from '../../utils/formatters';
 import { useNavigate } from 'react-router-dom';
 import { Heart } from 'lucide-react';
+import Pagination from '../shared/Pagination';
 
 const CarList = () => {
-  const { cars } = useData();
+  const { cars, totalPages, currentPage, fetchCars } = useData();
   const maxPrice = Math.max(...cars.map(car => car.price));
   const [filteredCars, setFilteredCars] = useState(cars);
   const [priceRange, setPriceRange] = useState(maxPrice);
   const [selectedBrand, setSelectedBrand] = useState('Tất cả');
   const [selectedSeats, setSelectedSeats] = useState('Tất cả');
   const [selectedModel, setSelectedModel] = useState('Tất cả');
+  const [searchTerm, setSearchTerm] = useState('');
+  const itemsPerPage = 6;
+
+  useEffect(() => {
+    fetchCars(currentPage, 6); // Explicitly set size to 6
+  }, [currentPage]);
 
   useEffect(() => {
     let result = [...cars];
@@ -34,8 +41,19 @@ const CarList = () => {
       result = result.filter(car => car.model === selectedModel);
     }
 
+    // Lọc theo tìm kiếm
+    if (searchTerm) {
+      result = result.filter(car => 
+        car.carName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
     setFilteredCars(result);
-  }, [cars, priceRange, selectedBrand, selectedSeats, selectedModel]);
+  }, [cars, priceRange, selectedBrand, selectedSeats, selectedModel, searchTerm]);
+
+  const handlePageChange = (newPage) => {
+    fetchCars(newPage - 1); // API uses 0-based indexing
+  };
 
   // Tạo danh sách hãng xe duy nhất từ dữ liệu
   const brands = [...new Set(cars.map(car => car.brand))].sort();
@@ -136,6 +154,11 @@ const CarList = () => {
           )}
         </div>
       </div>
+      <Pagination 
+        currentPage={currentPage + 1} // Convert to 1-based for display
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 };
@@ -143,7 +166,9 @@ const CarList = () => {
 const CarCard = ({ car }) => {
   const navigate = useNavigate();
   const { favorites, toggleFavorite } = useData();
-  const isFavorite = favorites.includes(car.carId);
+  
+  // Add safe check for favorites array
+  const isFavorite = Array.isArray(favorites) && favorites.some(fav => fav.carId === car.carId);
 
   const handleBooking = () => {
     if (car.count > 0) {
@@ -165,10 +190,9 @@ const CarCard = ({ car }) => {
           className="absolute top-2 right-2 p-2 rounded-full bg-white shadow hover:bg-gray-100"
         >
           <Heart
-            className={`w-5 h-5 ${favorites.some((fav) => fav.carId === car.carId)
-                ? 'fill-red-500 text-red-500'
-                : 'fill-gray-500 text-gray-500'
-              }`}
+            className={`w-5 h-5 ${
+              isFavorite ? 'fill-red-500 text-red-500' : 'fill-none text-gray-500'
+            }`}
           />
         </button>
       </div>

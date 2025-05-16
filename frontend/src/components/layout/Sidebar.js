@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, Car, Users, ShoppingBag, UserCircle, Calendar, LogOut } from 'lucide-react';
+import { ChevronLeft, Car, Users, ShoppingBag, UserCircle, Calendar, LogOut, LayoutDashboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import NavItem from './NavItem';
@@ -14,6 +14,7 @@ const Sidebar = () => {
   };
 
   const navItems = [
+    { id: 'dashboard', to: '/dashboard', title: 'Tổng Quan', icon: <LayoutDashboard className="w-6 h-6" /> },
     { id: 'cars', to: '/cars', title: 'Quản Lý Xe', icon: <Car className="w-6 h-6" /> },
     { id: 'customers', to: '/customers', title: 'Quản Lý Khách Hàng', icon: <Users className="w-6 h-6" /> },
     { id: 'appointments', to: '/appointments', title: 'Quản Lý Lịch Hẹn', icon: <Calendar className="w-6 h-6" /> },
@@ -25,7 +26,7 @@ const Sidebar = () => {
         <div className="flex items-center space-x-3">
           <UserCircle className="w-8 h-8" />
           <div>
-            <p className="font-medium">Nguyễn Văn A</p>
+            <p className="font-medium">Quản trị viên</p>
             <p className="text-sm text-blue-300">Admin</p>
           </div>
         </div>

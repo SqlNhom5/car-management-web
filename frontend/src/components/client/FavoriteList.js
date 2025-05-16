@@ -1,15 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 import { formatPrice } from '../../utils/formatters';
+import Pagination from '../shared/Pagination';
 
 const FavoriteList = () => {
   const { cars, favorites, toggleFavorite } = useData();
-  const favoriteCars = cars.filter((car) =>
-    favorites.some((favorite) => favorite.carId === car.carId)
-  );  const navigate = useNavigate();
-  console.log('Favorite Cars:', favoriteCars);
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  const favoriteCars = cars.filter(car => 
+    favorites.some(fav => fav.carId === car.carId)
+  );
+
+  // Calculate pagination
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentFavorites = favoriteCars.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(favoriteCars.length / itemsPerPage);
+
   const carContent = (car) => (
     <div key={car.carId} className="bg-white rounded-lg overflow-hidden">
       <div className="relative">
@@ -58,21 +69,21 @@ const FavoriteList = () => {
     </div>
   );
 
-  if (favoriteCars.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <h1 className="text-2xl font-bold mb-4">Xe Yêu Thích</h1>
-        <p className="text-gray-500">Bạn chưa có xe yêu thích nào</p>
-      </div>
-    );
-  }
-
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">Xe Yêu Thích</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {favoriteCars.map(car => carContent(car))}
+    <div className="container mx-auto px-4 py-8">
+      <h2 className="text-2xl font-bold mb-6">Xe Yêu Thích</h2>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {currentFavorites.map(car => carContent(car))}
       </div>
+
+      {totalPages > 1 && (
+        <Pagination 
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </div>
   );
 };

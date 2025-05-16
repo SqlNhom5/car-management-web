@@ -18,14 +18,14 @@ const AppointmentManagement = () => {
     updateAppointmentStatus(appointmentId, newStatus);
   };
 
-  const filteredAppointments = appointments.filter(appointment => {
+  const filteredAppointments = Array.isArray(appointments) ? appointments.filter(appointment => {
     const matchesSearch = 
       appointment.customerName.toLowerCase().includes(searchTerm.toLowerCase()) // ||
       // appointment.phone.includes(searchTerm) ||
       // appointment.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'Tất cả' || appointment.status === statusFilter;
     return matchesSearch && matchesStatus;
-  });
+  }) : [];
 
   return (
     <div className="p-4">
