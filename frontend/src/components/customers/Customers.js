@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import Modal from '../shared/Modal';
 import CustomerForm from './CustomerForm';
@@ -6,6 +6,7 @@ import DeleteConfirmation from '../shared/DeleteConfirmation';
 import CustomerTable from './CustomerTable';
 import { useData } from '../../contexts/DataContext';
 import { formatPhoneNumber } from '../../utils/formatters';
+import Pagination from '../cars/Pagination'; // Giả sử dùng chung component Pagination
 
 const Customers = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -13,7 +14,12 @@ const Customers = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const { customers, addCustomer, updateCustomer, deleteCustomer } = useData();
+  const { customers, addCustomer, updateCustomer, deleteCustomer, customersCurrentPage, setCustomersCurrentPage, customersTotalPages, fetchCustomersWithFilters } = useData();
+
+  // Fetch dữ liệu với bộ lọc
+  useEffect(() => {
+    fetchCustomersWithFilters({ searchTerm }, customersCurrentPage);
+  }, [searchTerm, customersCurrentPage, fetchCustomersWithFilters]);
 
   const filteredCustomers = customers.filter(customer => 
     customer.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -72,8 +78,18 @@ const Customers = () => {
           setSelectedCustomer(customer);
           setIsDeleteModalOpen(true);
         }}
-        
       />
+
+      {/* Phân trang với khoảng cách */}
+      {customers.length > 0 && (
+        <div className="mt-6">
+          <Pagination
+            currentPage={customersCurrentPage}
+            totalPages={customersTotalPages}
+            onPageChange={setCustomersCurrentPage}
+          />
+        </div>
+      )}
 
       <Modal 
         isOpen={isAddModalOpen} 

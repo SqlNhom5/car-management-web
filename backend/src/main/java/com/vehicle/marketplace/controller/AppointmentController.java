@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,10 +28,9 @@ public class AppointmentController {
     AppointmentService appointmentService;
 
     @GetMapping
-    ApiResponse<Page<AppointmentResponse>> getAll(@RequestParam(defaultValue = "0") int page,
-                                                  @RequestParam(defaultValue = "5") int size) {
+    ApiResponse<Page<AppointmentResponse>> getAll(Pageable pageable) {
         return ApiResponse.<Page<AppointmentResponse>>builder()
-                .result(appointmentService.getAll(PageRequest.of(page, size)))
+                .result(appointmentService.getAll(pageable))
                 .build();
     }
 

@@ -2,30 +2,55 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Mail, Phone } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 import { formatDate } from '../../utils/formatters';
+import Pagination from '../cars/Pagination';
 
 const AppointmentManagement = () => {
-  const { appointments, updateAppointmentStatus } = useData();
-  console.log('Appointments:', appointments); // Log appointments to console
+  const {
+    appointments,
+    updateAppointmentStatus,
+    appointmentsCurrentPage,
+    setAppointmentsCurrentPage,
+    appointmentsTotalPages,
+    appointmentsLoading,
+    appointmentsError
+  } = useData();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('Tất cả');
 
-  // Thêm useEffect để log dữ liệu khi appointments thay đổi
   useEffect(() => {
     console.log('Current appointments:', appointments);
   }, [appointments]);
 
-  const handleStatusChange = (appointmentId, newStatus) => {
-    updateAppointmentStatus(appointmentId, newStatus);
+  const handleStatusChange = async (appointmentId, newStatus) => {
+    try {
+      await updateAppointmentStatus(appointmentId, newStatus);
+    } catch (error) {
+      console.error('Failed to update appointment status:', error);
+    }
   };
 
-  const filteredAppointments = appointments.filter(appointment => {
-    const matchesSearch = 
-      appointment.customerName.toLowerCase().includes(searchTerm.toLowerCase()) // ||
-      // appointment.phone.includes(searchTerm) ||
-      // appointment.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'Tất cả' || appointment.status === statusFilter;
+  const filteredAppointments = appointments.filter((appointment) => {
+    const matchesSearch =
+      (appointment.customerName || '').toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === 'Tất cả' || appointment.status === statusFilter;
+
     return matchesSearch && matchesStatus;
   });
+
+  if (appointmentsLoading) {
+    return <div className="text-center py-8 text-gray-500">Đang tải dữ liệu...</div>;
+  }
+
+  if (appointmentsError) {
+    return <div className="text-center py-8 text-red-500">Lỗi: {appointmentsError}</div>;
+  }
+
+  if (appointments.length === 0) {
+    return <div className="text-center py-8 text-gray-500">Không có lịch hẹn nào</div>;
+  }
 
   return (
     <div className="p-4">
@@ -45,33 +70,20 @@ const AppointmentManagement = () => {
           <option value="Tất cả">Tất cả trạng thái</option>
           <option value="Pending">Chờ xác nhận</option>
           <option value="Confirmed">Đã xác nhận</option>
-          {/* <option value="Đã hoàn thành">Đã hoàn thành</option> */}
           <option value="Cancelled">Đã hủy</option>
         </select>
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-x-auto">
         <table className="min-w-full">
-          <thead>
-            <tr className="bg-gray-50">
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Thông tin khách hàng
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Liên hệ
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Thời gian hẹn
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Ghi chú
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Trạng thái
-              </th>
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Thao tác
-              </th>
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thông tin khách hàng</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Liên hệ</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thời gian hẹn</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ghi chú</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -127,7 +139,6 @@ const AppointmentManagement = () => {
                   >
                     <option value="Pending">Chờ xác nhận</option>
                     <option value="Confirmed">Xác nhận</option>
-                    {/* <option value="Đã hoàn thành">Hoàn thành</option> */}
                     <option value="Cancelled">Hủy</option>
                   </select>
                 </td>
@@ -136,6 +147,16 @@ const AppointmentManagement = () => {
           </tbody>
         </table>
       </div>
+
+      {filteredAppointments.length > 0 && (
+        <div className="mt-6">
+          <Pagination
+            currentPage={appointmentsCurrentPage}
+            totalPages={appointmentsTotalPages}
+            onPageChange={setAppointmentsCurrentPage}
+          />
+        </div>
+      )}
     </div>
   );
 };

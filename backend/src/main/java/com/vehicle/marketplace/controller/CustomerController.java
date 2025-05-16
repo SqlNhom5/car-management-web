@@ -7,6 +7,7 @@ import com.vehicle.marketplace.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -25,11 +26,10 @@ public class CustomerController {
 //    }
     @GetMapping
     public ApiResponse<Page<CustomerDTO>> findCustomers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size
+            Pageable pageable
     ){
         return ApiResponse.<Page<CustomerDTO>>builder()
-                .result(customerService.findCustomers(PageRequest.of(page, size)))
+                .result(customerService.findCustomers(pageable))
                 .build();
     }
 

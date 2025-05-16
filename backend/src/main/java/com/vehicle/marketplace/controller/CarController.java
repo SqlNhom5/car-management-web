@@ -54,11 +54,10 @@ public class CarController {
 //    }
 
     @GetMapping
-    ApiResponse<Page<CarEntity>> findAllCars(@RequestParam(defaultValue = "0") int page,
-                                             @RequestParam(defaultValue = "5") int size) {
+    ApiResponse<Page<CarEntity>> findAllCars(Pageable pageable) {
         return ApiResponse.<Page<CarEntity>>
                 builder()
-                .result(carService.findAllCars(PageRequest.of(page, size)))
+                .result(carService.findAllCars(pageable))
                 .build();
     }
 

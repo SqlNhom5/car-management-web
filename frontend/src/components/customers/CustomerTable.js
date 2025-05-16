@@ -4,7 +4,7 @@ import { Edit2, Trash2 } from 'lucide-react';
 const CustomerTable = ({ customers, onEdit, onDelete }) => {
   console.log("CustomerTable customers:", customers); // Log customers to check data
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
+    <div className="bg-white rounded-lg shadow p-4">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>

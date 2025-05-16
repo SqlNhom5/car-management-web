@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { formatPrice, formatPhoneNumber } from '../utils/formatters';
 import { carData } from '../data/carData';
 import { customerData } from '../data/customerData';
@@ -9,18 +9,22 @@ import { getToken, setToken, removeToken } from "./localStorageService";
 const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
-  // Khởi tạo state cho xe
+  // Pagination state for cars
   const [cars, setCars] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
+  const [carsCurrentPage, setCarsCurrentPage] = useState(0);
+  const [carsTotalPages, setCarsTotalPages] = useState(1);
+  const [carsLoading, setCarsLoading] = useState(false);
+  const [carsError, setCarsError] = useState(null);
   const pageSize = 5;
 
-  // Lấy danh sách xe từ API
+  // Fetch cars with pagination (for admin)
   useEffect(() => {
     const fetchCars = async () => {
       try {
+        setCarsLoading(true);
+        setCarsError(null);
         const token = getToken();
-        const response = await fetch(`http://localhost:8080/api/cars?size=${pageSize}&page=${currentPage}`, {
+        const response = await fetch(`http://localhost:8080/api/cars?size=${pageSize}&page=${carsCurrentPage}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -32,20 +36,191 @@ export const DataProvider = ({ children }) => {
         }
         
         const data = await response.json();
-        setCars(data.result.content);
-        setTotalPages(data.result.totalPages);
+        setCars(data.result.content || []);
+        setCarsTotalPages(data.result.totalPages || 1);
       } catch (error) {
         console.error('Failed to fetch cars:', error);
+        setCars([]);
+        setCarsTotalPages(1);
+        setCarsError(error.message);
+      } finally {
+        setCarsLoading(false);
       }
     };
   
     fetchCars();
-  }, [currentPage]);
+  }, [carsCurrentPage]);
 
-  // Lưu cars vào localStorage khi có thay đổi
+  // Fetch cars with filters (for client)
+  const fetchCarsWithFilters = useCallback(async (filters, page = 0) => {
+    try {
+      setCarsLoading(true);
+      setCarsError(null);
+      const token = getToken();
+      const queryParams = new URLSearchParams({
+        size: 6,
+        page,
+        ...(filters.priceMax && { priceMax: filters.priceMax }),
+        ...(filters.brand && filters.brand !== 'Tất cả' && { brand: filters.brand }),
+        ...(filters.seats && filters.seats !== 'Tất cả' && { seats: filters.seats }),
+        ...(filters.model && filters.model !== 'Tất cả' && { model: filters.model }),
+      });
+      const response = await fetch(`http://localhost:8080/api/cars?${queryParams}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setCars(data.result.content || []);
+      setCarsTotalPages(data.result.totalPages || 1);
+      setCarsCurrentPage(page);
+    } catch (error) {
+      console.error('Failed to fetch filtered cars:', error);
+      setCars([]);
+      setCarsTotalPages(1);
+      setCarsError(error.message);
+    } finally {
+      setCarsLoading(false);
+    }
+  }, []);
+
+  // Pagination state for customers
+  const [customers, setCustomers] = useState([]);
+  const [customersCurrentPage, setCustomersCurrentPage] = useState(0);
+  const [customersTotalPages, setCustomersTotalPages] = useState(1);
+
+  // Fetch customers with filters
+  const fetchCustomersWithFilters = useCallback(async (filters, page = 0) => {
+    try {
+      const token = getToken();
+      const queryParams = new URLSearchParams({
+        size: pageSize,
+        page,
+        ...(filters.searchTerm && { search: filters.searchTerm }),
+      });
+      const response = await fetch(`http://localhost:8080/api/customers?${queryParams}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setCustomers(data.result.content || []);
+      setCustomersTotalPages(data.result.totalPages || 1);
+      setCustomersCurrentPage(page);
+    } catch (error) {
+      console.error('Failed to fetch customers:', error);
+      setCustomers([]);
+      setCustomersTotalPages(1);
+    }
+  }, [pageSize]);
+
+  // Fetch customers with pagination (replaced by fetchCustomersWithFilters)
+  useEffect(() => {
+    fetchCustomersWithFilters({}, customersCurrentPage);
+  }, [customersCurrentPage, fetchCustomersWithFilters]);
+
+  // Pagination state for favorites
+  const [favorites, setFavorites] = useState([]);
+  const [favoritesCurrentPage, setFavoritesCurrentPage] = useState(0);
+  const [favoritesTotalPages, setFavoritesTotalPages] = useState(1);
+  const [favoritesLoading, setFavoritesLoading] = useState(false);
+  const [favoritesError, setFavoritesError] = useState(null);
+
+  // Fetch favorite cars with pagination (returns full car details)
+  useEffect(() => {
+    const fetchFavorite = async () => {
+      try {
+        setFavoritesLoading(true);
+        setFavoritesError(null);
+        const token = getToken();
+        const response = await fetch(`http://localhost:8080/api/favorite?size=${pageSize}&page=${favoritesCurrentPage}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : '',
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setFavorites(data.result.content || []);
+        setFavoritesTotalPages(data.result.totalPages || 1);
+      } catch (error) {
+        console.error('Failed to fetch favorites:', error);
+        setFavoritesError(error.message);
+      } finally {
+        setFavoritesLoading(false);
+      }
+    };
+  
+    fetchFavorite();
+  }, [favoritesCurrentPage]);
+
+  // Pagination state for appointments
+  const [appointments, setAppointments] = useState([]);
+  const [appointmentsCurrentPage, setAppointmentsCurrentPage] = useState(0);
+  const [appointmentsTotalPages, setAppointmentsTotalPages] = useState(1);
+
+  // Fetch appointments with pagination
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const token = getToken();
+        const response = await fetch(`http://localhost:8080/api/appointments?size=${pageSize}&page=${appointmentsCurrentPage}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : '',
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setAppointments(data.result.content || []);
+        setAppointmentsTotalPages(data.result.totalPages || 1);
+      } catch (error) {
+        console.error('Failed to fetch appointments:', error);
+      }
+    };
+  
+    fetchAppointments();
+  }, [appointmentsCurrentPage]);
+
+  const [sales, setSales] = useState(salesData);
+  const [employees, setEmployees] = useState(employeeData);
+
+  // Save to localStorage
   useEffect(() => {
     localStorage.setItem('cars', JSON.stringify(cars));
   }, [cars]);
+
+  useEffect(() => {
+    localStorage.setItem('customers', JSON.stringify(customers));
+  }, [customers]);
+
+  useEffect(() => {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  useEffect(() => {
+    localStorage.setItem('appointments', JSON.stringify(appointments));
+  }, [appointments]);
 
   const addCar = async (formData, imageFile) => {
     try {
@@ -81,16 +256,16 @@ export const DataProvider = ({ children }) => {
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
-      // Làm mới danh sách xe
-      const fetchResponse = await fetch(`http://localhost:8080/api/cars?size=${pageSize}&page=${currentPage}`, {
+      // Refresh car list
+      const fetchResponse = await fetch(`http://localhost:8080/api/cars?size=${pageSize}&page=${carsCurrentPage}`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
       });
       const data = await fetchResponse.json();
-      setCars(data.result.content);
-      setTotalPages(data.result.totalPages);
+      setCars(data.result.content || []);
+      setCarsTotalPages(data.result.totalPages || 1);
     } catch (error) {
       console.error('Lỗi khi thêm xe:', error);
       throw error;
@@ -133,16 +308,16 @@ export const DataProvider = ({ children }) => {
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
-      // Làm mới danh sách xe
-      const fetchResponse = await fetch(`http://localhost:8080/api/cars?size=${pageSize}&page=${currentPage}`, {
+      // Refresh car list
+      const fetchResponse = await fetch(`http://localhost:8080/api/cars?size=${pageSize}&page=${carsCurrentPage}`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
       });
       const data = await fetchResponse.json();
-      setCars(data.result.content);
-      setTotalPages(data.result.totalPages);
+      setCars(data.result.content || []);
+      setCarsTotalPages(data.result.totalPages || 1);
     } catch (error) {
       console.error('Lỗi khi cập nhật xe:', error);
       throw error;
@@ -167,117 +342,21 @@ export const DataProvider = ({ children }) => {
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
-      // Làm mới danh sách xe
-      const fetchResponse = await fetch(`http://localhost:8080/api/cars?size=${pageSize}&page=${currentPage}`, {
+      // Refresh car list
+      const fetchResponse = await fetch(`http://localhost:8080/api/cars?size=${pageSize}&page=${carsCurrentPage}`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
       });
       const data = await fetchResponse.json();
-      setCars(data.result.content);
-      setTotalPages(data.result.totalPages);
+      setCars(data.result.content || []);
+      setCarsTotalPages(data.result.totalPages || 1);
     } catch (error) {
       console.error('Lỗi khi xóa xe:', error);
       throw error;
     }
   };
-
-  // Các state và logic khác (không sửa đổi)
-  const [customers, setCustomers] = useState([]);
-  useEffect(() => {
-    const fetchCustomers = async () => {
-      try {
-        const token = getToken();
-        const response = await fetch('http://localhost:8080/api/customers', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : '',
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        setCustomers(data);
-      } catch (error) {
-        console.error('Failed to fetch customers:', error);
-      }
-    };
-  
-    fetchCustomers();
-  }, []);
-
-  const [favorites, setFavorites] = useState([]);
-  useEffect(() => {
-    const fetchFavorite = async () => {
-      try {
-        const token = getToken();
-        const response = await fetch('http://localhost:8080/api/favorite', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : '',
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        setFavorites(data.result);
-        console.log("fetch: ", data.result);
-      } catch (error) {
-        console.error('Failed to fetch favorites:', error);
-      }
-    };
-  
-    fetchFavorite();
-  }, []);
-
-  const [appointments, setAppointments] = useState([]);
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const token = getToken();
-        const response = await fetch('http://localhost:8080/api/appointments', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : '',
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        setAppointments(data.result);
-        console.log("fetchAPpoint: ", data.result);
-      } catch (error) {
-        console.error('Failed to fetch appointments:', error);
-      }
-    };
-  
-    fetchAppointments();
-  }, []);
-
-  const [sales, setSales] = useState(salesData);
-  const [employees, setEmployees] = useState(employeeData);
-
-  useEffect(() => {
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-  }, [favorites]);
-
-  useEffect(() => {
-    localStorage.setItem('appointments', JSON.stringify(appointments));
-  }, [appointments]);
-
-  useEffect(() => {
-    localStorage.setItem('customers', JSON.stringify(customers));
-  }, [customers]);
 
   const addCustomer = async (newCustomer) => {
     try {
@@ -300,10 +379,58 @@ export const DataProvider = ({ children }) => {
       }
   
       const createdCustomer = await response.json();
-      setCustomers(prevCustomers => [...prevCustomers, createdCustomer]);
+      // Refresh customer list
+      fetchCustomersWithFilters({}, customersCurrentPage); // Use fetchCustomersWithFilters
       return createdCustomer;
     } catch (error) {
       console.error('Lỗi khi thêm khách hàng:', error);
+      throw error;
+    }
+  };
+
+  const updateCustomer = async (updatedCustomer) => {
+    try {
+      const token = getToken();
+      const response = await fetch(`http://localhost:8080/api/customers/${updatedCustomer.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
+        },
+        body: JSON.stringify(updatedCustomer),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Cập nhật không thành công');
+      }
+  
+      // Refresh customer list
+      fetchCustomersWithFilters({}, customersCurrentPage); // Use fetchCustomersWithFilters
+    } catch (error) {
+      console.error('Lỗi khi cập nhật khách hàng:', error);
+      throw error;
+    }
+  };
+
+  const deleteCustomer = async (customerId) => {
+    try {
+      const token = getToken();
+      const response = await fetch(`http://localhost:8080/api/customers/${customerId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Không thể xóa khách hàng');
+      }
+  
+      // Refresh customer list
+      fetchCustomersWithFilters({}, customersCurrentPage); // Use fetchCustomersWithFilters
+    } catch (error) {
+      console.error('Lỗi khi xóa khách hàng:', error);
       throw error;
     }
   };
@@ -334,6 +461,16 @@ export const DataProvider = ({ children }) => {
     setCustomers(updatedCustomers);
   };
 
+  const updateSale = (updatedSale) => {
+    setSales(sales.map(sale =>
+      sale.id === updatedSale.id ? { ...sale, ...updatedSale } : sale
+    ));
+  };
+
+  const deleteSale = (saleId) => {
+    setSales(prevSales => prevSales.filter(sale => sale.id !== saleId));
+  };
+
   const addEmployee = (newEmployee) => {
     const formattedEmployee = {
       id: Date.now(),
@@ -344,80 +481,10 @@ export const DataProvider = ({ children }) => {
     setEmployees(prevEmployees => [...prevEmployees, formattedEmployee]);
   };
 
-  const updateCustomer = async (updatedCustomer) => {
-    try {
-      setCustomers(prevCustomers => 
-        prevCustomers.map(customer =>
-          customer.id === updatedCustomer.id 
-            ? { ...customer, ...updatedCustomer } 
-            : customer
-        )
-      );
-      const token = getToken();
-      const response = await fetch(`http://localhost:8080/api/customers/${updatedCustomer.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
-        },
-        body: JSON.stringify(updatedCustomer),
-      });
-  
-      if (!response.ok) {
-        throw new Error('Cập nhật không thành công');
-      }
-  
-      const serverUpdatedCustomer = await response.json();
-      setCustomers(prevCustomers => 
-        prevCustomers.map(customer =>
-          customer.id === serverUpdatedCustomer.id 
-            ? serverUpdatedCustomer 
-            : customer
-        )
-      );
-    } catch (error) {
-      console.error('Lỗi khi cập nhật khách hàng:', error);
-      setCustomers(customers);
-    }
-  };
-
-  const updateSale = (updatedSale) => {
-    setSales(sales.map(sale =>
-      sale.id === updatedSale.id ? { ...sale, ...updatedSale } : sale
-    ));
-  };
-
   const updateEmployee = (updatedEmployee) => {
     setEmployees(prevEmployees => prevEmployees.map(emp => 
       emp.id === updatedEmployee.id ? { ...emp, ...updatedEmployee } : emp
     ));
-  };
-
-  const deleteCustomer = async (customerId) => {
-    try {
-      const token = getToken();
-      const response = await fetch(`http://localhost:8080/api/customers/${customerId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
-        },
-        },
-      );
-  
-      if (!response.ok) {
-        throw new Error('Không thể xóa khách hàng');
-      }
-  
-      setCustomers(prevCustomers => prevCustomers.filter(customer => customer.id !== customerId));
-      console.log('Xóa khách hàng thành công');
-    } catch (error) {
-      console.error('Lỗi khi xóa khách hàng:', error);
-    }
-  };
-
-  const deleteSale = (saleId) => {
-    setSales(prevSales => prevSales.filter(sale => sale.id !== saleId));
   };
 
   const deleteEmployee = (employeeId) => {
@@ -441,7 +508,16 @@ export const DataProvider = ({ children }) => {
         if (!response.ok) {
           throw new Error(`Failed to remove favorite: HTTP error! status: ${response.status}`);
         }
-        setFavorites((prev) => prev.filter((fav) => fav.carId !== carId));
+        // Refresh favorites list
+        const fetchResponse = await fetch(`http://localhost:8080/api/favorite?size=${pageSize}&page=${favoritesCurrentPage}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        const data = await fetchResponse.json();
+        setFavorites(data.result.content || []);
+        setFavoritesTotalPages(data.result.totalPages || 1);
       } else {
         const response = await fetch('http://localhost:8080/api/favorite', {
           method: 'POST',
@@ -454,23 +530,52 @@ export const DataProvider = ({ children }) => {
         if (!response.ok) {
           throw new Error(`Failed to add favorite: HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
-        setFavorites((prev) => {
-          const carToAdd = data.car || cars.find((c) => c.carId === carId) || { carId };
-          return [...prev, carToAdd];
+        // Refresh favorites list
+        const fetchResponse = await fetch(`http://localhost:8080/api/favorite?size=${pageSize}&page=${favoritesCurrentPage}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
         });
+        const data = await fetchResponse.json();
+        setFavorites(data.result.content || []);
+        setFavoritesTotalPages(data.result.totalPages || 1);
       }
     } catch (error) {
       console.error('Failed to toggle favorite:', error);
     }
   };
 
-  const addAppointment = (newAppointment) => {
-    setAppointments(prevAppointments => {
-      const updatedAppointments = [...prevAppointments, newAppointment];
-      localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
-      return updatedAppointments;
-    });
+  const addAppointment = async (newAppointment) => {
+    try {
+      const token = getToken();
+      const response = await fetch('http://localhost:8080/api/appointments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
+        },
+        body: JSON.stringify(newAppointment),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Không thể thêm lịch hẹn');
+      }
+  
+      // Refresh appointments list
+      const fetchResponse = await fetch(`http://localhost:8080/api/appointments?size=${pageSize}&page=${appointmentsCurrentPage}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await fetchResponse.json();
+      setAppointments(data.result.content || []);
+      setAppointmentsTotalPages(data.result.totalPages || 1);
+    } catch (error) {
+      console.error('Lỗi khi thêm lịch hẹn:', error);
+      throw error;
+    }
   };
 
   const addAppointmentAndCustomer = async (formData, carId) => {
@@ -501,10 +606,21 @@ export const DataProvider = ({ children }) => {
       if (!response.ok) {
         throw new Error(result.message || 'Failed to add appointment');
       }
+  
+      // Refresh appointments list
+      const fetchResponse = await fetch(`http://localhost:8080/api/appointments?size=${pageSize}&page=${appointmentsCurrentPage}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await fetchResponse.json();
+      setAppointments(data.result.content || []);
+      setAppointmentsTotalPages(data.result.totalPages || 1);
       return result;
     } catch (error) {
-      alert(`Bạn đã đặt lịch hẹn với xe này rồi!`);
       console.error('Error:', error);
+      throw error;
     }
   };
 
@@ -526,13 +642,16 @@ export const DataProvider = ({ children }) => {
         throw new Error(errorData.message || `Failed to update appointment status: HTTP error! status: ${response.status}`);
       }
   
-      setAppointments((prevAppointments) =>
-        prevAppointments.map((appointment) =>
-          appointment.appointmentId === appointmentId
-            ? { ...appointment, status: newStatus }
-            : appointment
-        )
-      );
+      // Refresh appointments list
+      const fetchResponse = await fetch(`http://localhost:8080/api/appointments?size=${pageSize}&page=${appointmentsCurrentPage}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await fetchResponse.json();
+      setAppointments(data.result.content || []);
+      setAppointmentsTotalPages(data.result.totalPages || 1);
     } catch (error) {
       console.error('Failed to update appointment status:', error);
     }
@@ -547,7 +666,12 @@ export const DataProvider = ({ children }) => {
       favorites, toggleFavorite,
       appointments, setAppointments, addAppointment, updateAppointmentStatus,
       addAppointmentAndCustomer,
-      currentPage, setCurrentPage, totalPages
+      carsCurrentPage, setCarsCurrentPage, carsTotalPages, carsLoading, carsError,
+      customersCurrentPage, setCustomersCurrentPage, customersTotalPages,
+      favoritesCurrentPage, setFavoritesCurrentPage, favoritesTotalPages, favoritesLoading, favoritesError,
+      appointmentsCurrentPage, setAppointmentsCurrentPage, appointmentsTotalPages,
+      fetchCarsWithFilters,
+      fetchCustomersWithFilters // Thêm hàm này vào value
     }}>
       {children}
     </DataContext.Provider>
