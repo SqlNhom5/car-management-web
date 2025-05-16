@@ -6,6 +6,7 @@ import CarForm from './CarForm';
 import DeleteConfirmation from '../shared/DeleteConfirmation';
 import CarTable from './CarTable';
 import CarFilter from './CarFilter';
+import Pagination from './Pagination';
 
 const Cars = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -14,7 +15,10 @@ const Cars = () => {
   const [selectedCar, setSelectedCar] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBrand, setSelectedBrand] = useState('Tất Cả Hãng Xe');
-  const { cars, addCar, updateCar, deleteCar } = useData();
+  const { cars, addCar, updateCar, deleteCar, currentPage, setCurrentPage, totalPages } = useData();
+
+  // Debug: Log context values to verify
+  console.log('DataContext values:', { cars, currentPage, setCurrentPage, totalPages });
 
   const filteredCars = cars.filter(car => {
     const matchesSearch = car.carName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -67,6 +71,12 @@ const Cars = () => {
           setSelectedCar(car);
           setIsDeleteModalOpen(true);
         }}
+      />
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
       />
 
       <Modal 
