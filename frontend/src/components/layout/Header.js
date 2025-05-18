@@ -6,8 +6,8 @@ const Header = () => {
 
   const getTitleFromPath = (pathname) => {
     switch (pathname) {
-      // case '/dashboard':
-      //   return 'Tổng Quan';
+      case '/dashboard':
+        return 'Tổng Quan';
       case '/cars':
         return 'Quản Lý Xe';
       case '/customers':

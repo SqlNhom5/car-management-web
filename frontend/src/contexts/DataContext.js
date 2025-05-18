@@ -9,7 +9,6 @@ import { getToken, setToken, removeToken } from "./localStorageService";
 const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
-  // Pagination state for cars
   const [cars, setCars] = useState([]);
   const [carsCurrentPage, setCarsCurrentPage] = useState(0);
   const [carsTotalPages, setCarsTotalPages] = useState(1);
@@ -17,46 +16,59 @@ export const DataProvider = ({ children }) => {
   const [carsError, setCarsError] = useState(null);
   const pageSize = 5;
 
-  // Fetch cars with pagination (for admin)
-  useEffect(() => {
-    const fetchCars = async () => {
-      try {
-        setCarsLoading(true);
-        setCarsError(null);
-        const token = getToken();
-        const response = await fetch(`http://localhost:8080/api/cars?size=${pageSize}&page=${carsCurrentPage}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : '',
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        setCars(data.result.content || []);
-        setCarsTotalPages(data.result.totalPages || 1);
-      } catch (error) {
-        console.error('Failed to fetch cars:', error);
-        setCars([]);
-        setCarsTotalPages(1);
-        setCarsError(error.message);
-      } finally {
-        setCarsLoading(false);
+  const fetchCars = async () => {
+    try {
+      setCarsLoading(true);
+      setCarsError(null);
+      const token = getToken();
+      if (!token) {
+        setCarsError('Không tìm thấy token xác thực. Vui lòng đăng nhập.');
+        window.location.href = '/login';
+        return;
       }
-    };
-  
+      const response = await fetch(`http://localhost:8080/api/cars?size=${pageSize}&page=${carsCurrentPage}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (response.status === 401) {
+        removeToken();
+        setCarsError('Phiên đã hết hạn. Vui lòng đăng nhập lại.');
+        window.location.href = '/login';
+        return;
+      }
+      if (!response.ok) {
+        throw new Error(`Lỗi HTTP! trạng thái: ${response.status}`);
+      }
+      const data = await response.json();
+      setCars(data.result.content || []);
+      setCarsTotalPages(data.result.totalPages || 1);
+    } catch (error) {
+      console.error('Failed to fetch cars:', error);
+      setCars([]);
+      setCarsTotalPages(1);
+      setCarsError(error.message);
+    } finally {
+      setCarsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchCars();
   }, [carsCurrentPage]);
 
-  // Fetch cars with filters (for client)
   const fetchCarsWithFilters = useCallback(async (filters, page = 0) => {
     try {
       setCarsLoading(true);
       setCarsError(null);
       const token = getToken();
+      if (!token) {
+        setCarsError('Không tìm thấy token xác thực. Vui lòng đăng nhập.');
+        window.location.href = '/login';
+        return;
+      }
       const queryParams = new URLSearchParams({
         size: 6,
         page,
@@ -69,13 +81,18 @@ export const DataProvider = ({ children }) => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
+          'Authorization': `Bearer ${token}`,
         },
       });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (response.status === 401) {
+        removeToken();
+        setCarsError('Phiên đã hết hạn. Vui lòng đăng nhập lại.');
+        window.location.href = '/login';
+        return;
       }
-      
+      if (!response.ok) {
+        throw new Error(`Lỗi HTTP! trạng thái: ${response.status}`);
+      }
       const data = await response.json();
       setCars(data.result.content || []);
       setCarsTotalPages(data.result.totalPages || 1);
@@ -90,15 +107,19 @@ export const DataProvider = ({ children }) => {
     }
   }, []);
 
-  // Pagination state for customers
   const [customers, setCustomers] = useState([]);
   const [customersCurrentPage, setCustomersCurrentPage] = useState(0);
   const [customersTotalPages, setCustomersTotalPages] = useState(1);
 
-  // Fetch customers with filters
   const fetchCustomersWithFilters = useCallback(async (filters, page = 0) => {
     try {
       const token = getToken();
+      if (!token) {
+        setCustomers([]);
+        setCustomersTotalPages(1);
+        window.location.href = '/login';
+        return;
+      }
       const queryParams = new URLSearchParams({
         size: pageSize,
         page,
@@ -108,13 +129,19 @@ export const DataProvider = ({ children }) => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
+          'Authorization': `Bearer ${token}`,
         },
       });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (response.status === 401) {
+        removeToken();
+        setCustomers([]);
+        setCustomersTotalPages(1);
+        window.location.href = '/login';
+        return;
       }
-      
+      if (!response.ok) {
+        throw new Error(`Lỗi HTTP! trạng thái: ${response.status}`);
+      }
       const data = await response.json();
       setCustomers(data.result.content || []);
       setCustomersTotalPages(data.result.totalPages || 1);
@@ -126,86 +153,102 @@ export const DataProvider = ({ children }) => {
     }
   }, [pageSize]);
 
-  // Fetch customers with pagination (replaced by fetchCustomersWithFilters)
   useEffect(() => {
     fetchCustomersWithFilters({}, customersCurrentPage);
   }, [customersCurrentPage, fetchCustomersWithFilters]);
 
-  // Pagination state for favorites
   const [favorites, setFavorites] = useState([]);
   const [favoritesCurrentPage, setFavoritesCurrentPage] = useState(0);
   const [favoritesTotalPages, setFavoritesTotalPages] = useState(1);
   const [favoritesLoading, setFavoritesLoading] = useState(false);
   const [favoritesError, setFavoritesError] = useState(null);
 
-  // Fetch favorite cars with pagination (returns full car details)
-  useEffect(() => {
-    const fetchFavorite = async () => {
-      try {
-        setFavoritesLoading(true);
-        setFavoritesError(null);
-        const token = getToken();
-        const response = await fetch(`http://localhost:8080/api/favorite?size=${pageSize}&page=${favoritesCurrentPage}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : '',
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        setFavorites(data.result.content || []);
-        setFavoritesTotalPages(data.result.totalPages || 1);
-      } catch (error) {
-        console.error('Failed to fetch favorites:', error);
-        setFavoritesError(error.message);
-      } finally {
-        setFavoritesLoading(false);
+  const fetchFavorite = async () => {
+    try {
+      setFavoritesLoading(true);
+      setFavoritesError(null);
+      const token = getToken();
+      if (!token) {
+        setFavoritesError('Không tìm thấy token xác thực. Vui lòng đăng nhập.');
+        window.location.href = '/login';
+        return;
       }
-    };
-  
+      const response = await fetch(`http://localhost:8080/api/favorite?size=${pageSize}&page=${favoritesCurrentPage}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (response.status === 401) {
+        removeToken();
+        setFavoritesError('Phiên đã hết hạn. Vui lòng đăng nhập lại.');
+        window.location.href = '/login';
+        return;
+      }
+      if (!response.ok) {
+        throw new Error(`Lỗi HTTP! trạng thái: ${response.status}`);
+      }
+      const data = await response.json();
+      setFavorites(data.result.content || []);
+      setFavoritesTotalPages(data.result.totalPages || 1);
+    } catch (error) {
+      console.error('Failed to fetch favorites:', error);
+      setFavoritesError(error.message);
+    } finally {
+      setFavoritesLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchFavorite();
   }, [favoritesCurrentPage]);
 
-  // Pagination state for appointments
   const [appointments, setAppointments] = useState([]);
   const [appointmentsCurrentPage, setAppointmentsCurrentPage] = useState(0);
   const [appointmentsTotalPages, setAppointmentsTotalPages] = useState(1);
 
-  // Fetch appointments with pagination
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const token = getToken();
-        const response = await fetch(`http://localhost:8080/api/appointments?size=${pageSize}&page=${appointmentsCurrentPage}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : '',
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        setAppointments(data.result.content || []);
-        setAppointmentsTotalPages(data.result.totalPages || 1);
-      } catch (error) {
-        console.error('Failed to fetch appointments:', error);
+  const fetchAppointments = async () => {
+    try {
+      const token = getToken();
+      if (!token) {
+        setAppointments([]);
+        setAppointmentsTotalPages(1);
+        window.location.href = '/login';
+        return;
       }
-    };
-  
+      const response = await fetch(`http://localhost:8080/api/appointments?size=${pageSize}&page=${appointmentsCurrentPage}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (response.status === 401) {
+        removeToken();
+        setAppointments([]);
+        setAppointmentsTotalPages(1);
+        window.location.href = '/login';
+        return;
+      }
+      if (!response.ok) {
+        throw new Error(`Lỗi HTTP! trạng thái: ${response.status}`);
+      }
+      const data = await response.json();
+      setAppointments(data.result.content || []);
+      setAppointmentsTotalPages(data.result.totalPages || 1);
+    } catch (error) {
+      console.error('Failed to fetch appointments:', error);
+    }
+  };
+
+  useEffect(() => {
     fetchAppointments();
   }, [appointmentsCurrentPage]);
 
   const [sales, setSales] = useState(salesData);
   const [employees, setEmployees] = useState(employeeData);
 
-  // Save to localStorage
   useEffect(() => {
     localStorage.setItem('cars', JSON.stringify(cars));
   }, [cars]);
@@ -226,7 +269,6 @@ export const DataProvider = ({ children }) => {
     try {
       const token = getToken();
       if (!token) throw new Error('Missing authentication token');
-      
       const carData = {
         ...formData,
         price: Number(formData.price) || 0,
@@ -234,15 +276,12 @@ export const DataProvider = ({ children }) => {
         manufactureYear: Number(formData.manufactureYear) || 0,
         warrantyPeriod: Number(formData.warrantyPeriod) || 0,
       };
-
       if (!imageFile || !(imageFile instanceof File)) {
         throw new Error('Vui lòng chọn một file ảnh hợp lệ');
       }
-
       const formDataToSend = new FormData();
       formDataToSend.append('car', new Blob([JSON.stringify(carData)], { type: 'application/json' }));
       formDataToSend.append('image', imageFile);
-
       const response = await fetch('http://localhost:8080/api/cars', {
         method: 'POST',
         headers: {
@@ -250,22 +289,15 @@ export const DataProvider = ({ children }) => {
         },
         body: formDataToSend,
       });
-      
+      if (response.status === 401) {
+        removeToken();
+        throw new Error('Phiên đã hết hạn. Vui lòng đăng nhập lại.');
+      }
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(errorData.message || `Lỗi HTTP! trạng thái: ${response.status}`);
       }
-
-      // Refresh car list
-      const fetchResponse = await fetch(`http://localhost:8080/api/cars?size=${pageSize}&page=${carsCurrentPage}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await fetchResponse.json();
-      setCars(data.result.content || []);
-      setCarsTotalPages(data.result.totalPages || 1);
+      await fetchCars();
     } catch (error) {
       console.error('Lỗi khi thêm xe:', error);
       throw error;
@@ -276,7 +308,6 @@ export const DataProvider = ({ children }) => {
     try {
       const token = getToken();
       if (!token) throw new Error('Missing authentication token');
-      
       const carData = {
         ...updatedCar,
         price: Number(updatedCar.price) || 0,
@@ -284,7 +315,6 @@ export const DataProvider = ({ children }) => {
         manufactureYear: Number(updatedCar.manufactureYear) || 0,
         warrantyPeriod: Number(updatedCar.warrantyPeriod) || 0,
       };
-
       const formData = new FormData();
       formData.append('car', new Blob([JSON.stringify(carData)], { type: 'application/json' }));
       if (imageFile && imageFile instanceof File) {
@@ -294,7 +324,6 @@ export const DataProvider = ({ children }) => {
         }
         formData.append('image', imageFile);
       }
-
       const response = await fetch(`http://localhost:8080/api/cars/${updatedCar.carId}`, {
         method: 'PUT',
         headers: {
@@ -302,22 +331,15 @@ export const DataProvider = ({ children }) => {
         },
         body: formData,
       });
-
+      if (response.status === 401) {
+        removeToken();
+        throw new Error('Phiên đã hết hạn. Vui lòng đăng nhập lại.');
+      }
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(errorData.message || `Lỗi HTTP! trạng thái: ${response.status}`);
       }
-
-      // Refresh car list
-      const fetchResponse = await fetch(`http://localhost:8080/api/cars?size=${pageSize}&page=${carsCurrentPage}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await fetchResponse.json();
-      setCars(data.result.content || []);
-      setCarsTotalPages(data.result.totalPages || 1);
+      await fetchCars();
     } catch (error) {
       console.error('Lỗi khi cập nhật xe:', error);
       throw error;
@@ -328,7 +350,6 @@ export const DataProvider = ({ children }) => {
     try {
       const token = getToken();
       if (!token) throw new Error('Missing authentication token');
-      
       const response = await fetch(`http://localhost:8080/api/cars/${carId}`, {
         method: 'DELETE',
         headers: {
@@ -336,22 +357,15 @@ export const DataProvider = ({ children }) => {
           'Content-Type': 'application/json',
         },
       });
-
+      if (response.status === 401) {
+        removeToken();
+        throw new Error('Phiên đã hết hạn. Vui lòng đăng nhập lại.');
+      }
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(errorData.message || `Lỗi HTTP! trạng thái: ${response.status}`);
       }
-
-      // Refresh car list
-      const fetchResponse = await fetch(`http://localhost:8080/api/cars?size=${pageSize}&page=${carsCurrentPage}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await fetchResponse.json();
-      setCars(data.result.content || []);
-      setCarsTotalPages(data.result.totalPages || 1);
+      await fetchCars();
     } catch (error) {
       console.error('Lỗi khi xóa xe:', error);
       throw error;
@@ -369,18 +383,19 @@ export const DataProvider = ({ children }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(formattedCustomer),
       });
-  
+      if (response.status === 401) {
+        removeToken();
+        throw new Error('Phiên đã hết hạn. Vui lòng đăng nhập lại.');
+      }
       if (!response.ok) {
         throw new Error('Không thể thêm khách hàng');
       }
-  
       const createdCustomer = await response.json();
-      // Refresh customer list
-      fetchCustomersWithFilters({}, customersCurrentPage); // Use fetchCustomersWithFilters
+      await fetchCustomersWithFilters({}, customersCurrentPage);
       return createdCustomer;
     } catch (error) {
       console.error('Lỗi khi thêm khách hàng:', error);
@@ -395,17 +410,18 @@ export const DataProvider = ({ children }) => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(updatedCustomer),
       });
-  
+      if (response.status === 401) {
+        removeToken();
+        throw new Error('Phiên đã hết hạn. Vui lòng đăng nhập lại.');
+      }
       if (!response.ok) {
         throw new Error('Cập nhật không thành công');
       }
-  
-      // Refresh customer list
-      fetchCustomersWithFilters({}, customersCurrentPage); // Use fetchCustomersWithFilters
+      await fetchCustomersWithFilters({}, customersCurrentPage);
     } catch (error) {
       console.error('Lỗi khi cập nhật khách hàng:', error);
       throw error;
@@ -419,16 +435,17 @@ export const DataProvider = ({ children }) => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
+          'Authorization': `Bearer ${token}`,
         },
       });
-  
+      if (response.status === 401) {
+        removeToken();
+        throw new Error('Phiên đã hết hạn. Vui lòng đăng nhập lại.');
+      }
       if (!response.ok) {
         throw new Error('Không thể xóa khách hàng');
       }
-  
-      // Refresh customer list
-      fetchCustomersWithFilters({}, customersCurrentPage); // Use fetchCustomersWithFilters
+      await fetchCustomersWithFilters({}, customersCurrentPage);
     } catch (error) {
       console.error('Lỗi khi xóa khách hàng:', error);
       throw error;
@@ -443,7 +460,6 @@ export const DataProvider = ({ children }) => {
       value: formatPrice(Number(newSale.value))
     };
     setSales(prevSales => [...prevSales, formattedSale]);
-
     const updatedCars = cars.map(car => {
       if (car.name === newSale.car) {
         return { ...car, quantity: car.quantity - 1 };
@@ -451,7 +467,6 @@ export const DataProvider = ({ children }) => {
       return car;
     });
     setCars(updatedCars);
-
     const updatedCustomers = customers.map(customer => {
       if (customer.name === newSale.customer) {
         return { ...customer, purchased: customer.purchased + 1 };
@@ -495,7 +510,6 @@ export const DataProvider = ({ children }) => {
     try {
       const token = getToken();
       if (!token) throw new Error('No token found');
-
       const isFavorite = favorites.some((fav) => fav.carId === carId);
       if (isFavorite) {
         const response = await fetch(`http://localhost:8080/api/favorite/${carId}`, {
@@ -505,19 +519,14 @@ export const DataProvider = ({ children }) => {
             'Authorization': `Bearer ${token}`,
           },
         });
+        if (response.status === 401) {
+          removeToken();
+          throw new Error('Phiên đã hết hạn. Vui lòng đăng nhập lại.');
+        }
         if (!response.ok) {
           throw new Error(`Failed to remove favorite: HTTP error! status: ${response.status}`);
         }
-        // Refresh favorites list
-        const fetchResponse = await fetch(`http://localhost:8080/api/favorite?size=${pageSize}&page=${favoritesCurrentPage}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-        const data = await fetchResponse.json();
-        setFavorites(data.result.content || []);
-        setFavoritesTotalPages(data.result.totalPages || 1);
+        await fetchFavorite();
       } else {
         const response = await fetch('http://localhost:8080/api/favorite', {
           method: 'POST',
@@ -527,19 +536,14 @@ export const DataProvider = ({ children }) => {
           },
           body: JSON.stringify({ carId: carId }),
         });
+        if (response.status === 401) {
+          removeToken();
+          throw new Error('Phiên đã hết hạn. Vui lòng đăng nhập lại.');
+        }
         if (!response.ok) {
           throw new Error(`Failed to add favorite: HTTP error! status: ${response.status}`);
         }
-        // Refresh favorites list
-        const fetchResponse = await fetch(`http://localhost:8080/api/favorite?size=${pageSize}&page=${favoritesCurrentPage}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-        const data = await fetchResponse.json();
-        setFavorites(data.result.content || []);
-        setFavoritesTotalPages(data.result.totalPages || 1);
+        await fetchFavorite();
       }
     } catch (error) {
       console.error('Failed to toggle favorite:', error);
@@ -553,25 +557,18 @@ export const DataProvider = ({ children }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(newAppointment),
       });
-  
+      if (response.status === 401) {
+        removeToken();
+        throw new Error('Phiên đã hết hạn. Vui lòng đăng nhập lại.');
+      }
       if (!response.ok) {
         throw new Error('Không thể thêm lịch hẹn');
       }
-  
-      // Refresh appointments list
-      const fetchResponse = await fetch(`http://localhost:8080/api/appointments?size=${pageSize}&page=${appointmentsCurrentPage}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await fetchResponse.json();
-      setAppointments(data.result.content || []);
-      setAppointmentsTotalPages(data.result.totalPages || 1);
+      await fetchAppointments();
     } catch (error) {
       console.error('Lỗi khi thêm lịch hẹn:', error);
       throw error;
@@ -592,31 +589,23 @@ export const DataProvider = ({ children }) => {
         status: 'Chờ xác nhận',
         createdAt: new Date().toISOString(),
       };
-  
       const response = await fetch('http://localhost:8080/api/appointments/customer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(newAppointment),
       });
-  
+      if (response.status === 401) {
+        removeToken();
+        throw new Error('Phiên đã hết hạn. Vui lòng đăng nhập lại.');
+      }
       const result = await response.json();
       if (!response.ok) {
         throw new Error(result.message || 'Failed to add appointment');
       }
-  
-      // Refresh appointments list
-      const fetchResponse = await fetch(`http://localhost:8080/api/appointments?size=${pageSize}&page=${appointmentsCurrentPage}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await fetchResponse.json();
-      setAppointments(data.result.content || []);
-      setAppointmentsTotalPages(data.result.totalPages || 1);
+      await fetchAppointments();
       return result;
     } catch (error) {
       console.error('Error:', error);
@@ -628,7 +617,6 @@ export const DataProvider = ({ children }) => {
     try {
       const token = getToken();
       if (!token) throw new Error('No token found');
-  
       const response = await fetch(`http://localhost:8080/api/appointments/${appointmentId}`, {
         method: 'PUT',
         headers: {
@@ -637,21 +625,15 @@ export const DataProvider = ({ children }) => {
         },
         body: JSON.stringify({ status: newStatus }),
       });
+      if (response.status === 401) {
+        removeToken();
+        throw new Error('Phiên đã hết hạn. Vui lòng đăng nhập lại.');
+      }
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || `Failed to update appointment status: HTTP error! status: ${response.status}`);
       }
-  
-      // Refresh appointments list
-      const fetchResponse = await fetch(`http://localhost:8080/api/appointments?size=${pageSize}&page=${appointmentsCurrentPage}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await fetchResponse.json();
-      setAppointments(data.result.content || []);
-      setAppointmentsTotalPages(data.result.totalPages || 1);
+      await fetchAppointments();
     } catch (error) {
       console.error('Failed to update appointment status:', error);
     }
@@ -671,7 +653,7 @@ export const DataProvider = ({ children }) => {
       favoritesCurrentPage, setFavoritesCurrentPage, favoritesTotalPages, favoritesLoading, favoritesError,
       appointmentsCurrentPage, setAppointmentsCurrentPage, appointmentsTotalPages,
       fetchCarsWithFilters,
-      fetchCustomersWithFilters // Thêm hàm này vào value
+      fetchCustomersWithFilters
     }}>
       {children}
     </DataContext.Provider>

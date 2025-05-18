@@ -14,6 +14,21 @@ const Sidebar = () => {
   };
 
   const navItems = [
+    {
+      id: 'dashboard',
+      to: '/dashboard',
+      title: 'Tổng Quan',
+      icon: (
+        <div className="w-6 h-6 flex items-center justify-center">
+          <div className="w-4 h-4 grid grid-cols-2 gap-0.5">
+            <div className="bg-white"></div>
+            <div className="bg-white"></div>
+            <div className="bg-white"></div>
+            <div className="bg-white"></div>
+          </div>
+        </div>
+      ),
+    },
     { id: 'cars', to: '/cars', title: 'Quản Lý Xe', icon: <Car className="w-6 h-6" /> },
     { id: 'customers', to: '/customers', title: 'Quản Lý Khách Hàng', icon: <Users className="w-6 h-6" /> },
     { id: 'appointments', to: '/appointments', title: 'Quản Lý Lịch Hẹn', icon: <Calendar className="w-6 h-6" /> },
@@ -25,8 +40,7 @@ const Sidebar = () => {
         <div className="flex items-center space-x-3">
           <UserCircle className="w-8 h-8" />
           <div>
-            <p className="font-medium">Nguyễn Văn A</p>
-            <p className="text-sm text-blue-300">Admin</p>
+            <p className="font-medium">Quản trị viên</p>
           </div>
         </div>
         <ChevronLeft className="w-6 h-6 cursor-pointer hover:text-blue-300" />

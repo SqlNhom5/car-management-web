@@ -3,140 +3,141 @@ import { DollarSign, Package, ShoppingCart, Users } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { useData } from '../../contexts/DataContext';
 import { formatPrice } from '../../utils/formatters';
+import styled from 'styled-components';
+
+// Styled components cho CSS
+const DashboardContainer = styled.div`
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+`;
+
+const PowerBIFrame = styled.iframe`
+  width: 100%;
+  height: 541.25px;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+
+  @media (max-width: 1200px) {
+    height: 450px;
+  }
+
+  @media (max-width: 768px) {
+    height: 350px;
+  }
+
+  @media (max-width: 480px) {
+    height: 300px;
+  }
+`;
+
+// Nếu bạn muốn thêm stats hoặc chart sau này
+const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+`;
+
+const StatCard = styled.div`
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+
+  .stat-icon {
+    color: #4a90e2;
+    font-size: 24px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .stat-label {
+    font-size: 14px;
+    color: #666;
+  }
+`;
+
+const ChartContainer = styled.div`
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+
+  .recharts-wrapper {
+    width: 100% !important;
+    height: 400px !important;
+  }
+
+  .recharts-tooltip {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .recharts-tooltip p {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+  }
+
+  @media (max-width: 768px) {
+    .recharts-wrapper {
+      height: 300px !important;
+    }
+  }
+`;
 
 const Dashboard = () => {
-  const { sales, cars, customers, employees } = useData();
-
-  // Tính toán thống kê
-  const stats = {
-    totalRevenue: sales.reduce((sum, sale) => {
-      const value = typeof sale.value === 'string' 
-        ? Number(sale.value.replace(/[^0-9.-]+/g,""))
-        : sale.value;
-      return sum + value;
-    }, 0),
-    inventory: cars.reduce((sum, car) => sum + car.quantity, 0),
-    totalOrders: sales.length,
-    newCustomers: customers.filter(customer => 
-      new Date(customer.joinDate).getMonth() === new Date().getMonth()
-    ).length
-  };
-
-  // Dữ liệu cho biểu đồ doanh số
-  const salesData = Array.from({ length: 6 }, (_, i) => {
-    const month = new Date();
-    month.setMonth(month.getMonth() - (5 - i));
-    const monthSales = sales.filter(sale => 
-      new Date(sale.date).getMonth() === month.getMonth()
-    );
-    return {
-      month: `T${month.getMonth() + 1}`,
-      sales: monthSales.reduce((sum, sale) => {
-        const value = typeof sale.value === 'string' 
-          ? Number(sale.value.replace(/[^0-9.-]+/g,""))
-          : sale.value;
-        return sum + value;
-      }, 0)
-    };
-  });
-
-  // Dữ liệu cho biểu đồ tồn kho
-  const inventoryData = Object.entries(
-    cars.reduce((acc, car) => {
-      acc[car.brand] = (acc[car.brand] || 0) + car.quantity;
-      return acc;
-    }, {})
-  ).map(([name, value]) => ({ name, value }));
-
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#8884D8'];
-
   return (
-    <> </>
-//     <div className="p-4">
-//       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-//         <StatCard
-//           title="Tổng Doanh Thu"
-//           value={formatPrice(stats.totalRevenue)}
-//           change="+20.1% so với tháng trước"
-//           icon={<DollarSign className="w-6 h-6" />}
-//         />
-//         <StatCard
-//           title="Tồn Kho"
-//           value={stats.inventory}
-//           change="+12% so với tháng trước"
-//           icon={<Package className="w-6 h-6" />}
-//         />
-//         <StatCard
-//           title="Đơn Hàng"
-//           value={stats.totalOrders}
-//           change="+8.2% so với tháng trước"
-//           icon={<ShoppingCart className="w-6 h-6" />}
-//         />
-//         <StatCard
-//           title="Khách Hàng Mới"
-//           value={stats.newCustomers}
-//           change="+12.5% so với tháng trước"
-//           icon={<Users className="w-6 h-6" />}
-//         />
-//       </div>
-
-//       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-//         <div className="bg-white p-6 rounded-lg shadow">
-//           <h2 className="text-lg font-semibold mb-4">Doanh Số Theo Tháng</h2>
-//           <ResponsiveContainer width="100%" height={300}>
-//             <BarChart data={salesData}>
-//               <CartesianGrid strokeDasharray="3 3" />
-//               <XAxis dataKey="month" />
-//               <YAxis />
-//               <Tooltip 
-//                 formatter={(value) => formatPrice(value)}
-//               />
-//               <Bar dataKey="sales" fill="#3B82F6" />
-//             </BarChart>
-//           </ResponsiveContainer>
-//         </div>
-
-//         <div className="bg-white p-6 rounded-lg shadow">
-//           <h2 className="text-lg font-semibold mb-4">Tồn Kho Theo Hãng</h2>
-//           <ResponsiveContainer width="100%" height={300}>
-//             <PieChart>
-//               <Pie
-//                 data={inventoryData}
-//                 cx="50%"
-//                 cy="50%"
-//                 labelLine={false}
-//                 outerRadius={100}
-//                 fill="#8884d8"
-//                 dataKey="value"
-//                 label={({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`}
-//               >
-//                 {inventoryData.map((entry, index) => (
-//                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-//                 ))}
-//               </Pie>
-//               <Tooltip />
-//             </PieChart>
-//           </ResponsiveContainer>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// const StatCard = ({ title, value, change, icon }) => (
-//   <div className="bg-white p-6 rounded-lg shadow">
-//     <div className="flex items-center justify-between mb-4">
-//       <div className="p-2 bg-blue-100 rounded-lg">
-//         {icon}
-//       </div>
-//     </div>
-//     <h3 className="text-gray-500 text-sm">{title}</h3>
-//     <div className="flex items-center space-x-2">
-//       <p className="text-2xl font-semibold">{value}</p>
-//     </div>
-//     <p className="text-sm text-green-500 mt-2">{change}</p>
-//   </div>
- );
+    <DashboardContainer>
+      <PowerBIFrame
+        title="hqtcsdl_phulee"
+        src="https://app.powerbi.com/reportEmbed?reportId=a9348dd8-dc50-49ce-a186-5564a8b7c839&autoAuth=true&ctid=e7572e92-7aee-4713-a3c4-ba64888ad45f"
+        allowFullScreen
+      />
+      {/* Nếu bạn muốn thêm stats hoặc chart, ví dụ: */}
+      {/* <StatsGrid>
+        <StatCard>
+          <DollarSign className="stat-icon" />
+          <div>
+            <div className="stat-value">{formatPrice(123456)}</div>
+            <div className="stat-label">Doanh thu</div>
+          </div>
+        </StatCard>
+      </StatsGrid>
+      <ChartContainer>
+        <ResponsiveContainer>
+          <BarChart data={yourData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip wrapperClassName="recharts-tooltip" />
+            <Bar dataKey="value" fill="#4a90e2" />
+          </BarChart>
+        </ResponsiveContainer>
+      </ChartContainer> */}
+    </DashboardContainer>
+  );
 };
 
 export default Dashboard;

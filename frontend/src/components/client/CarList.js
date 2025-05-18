@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useData } from '../../contexts/DataContext';
 import { formatPrice } from '../../utils/formatters';
 import { useNavigate } from 'react-router-dom';
@@ -6,78 +6,62 @@ import { Heart } from 'lucide-react';
 import Pagination from '../cars/Pagination';
 
 const CarList = () => {
-  const { cars, favorites, toggleFavorite, carsCurrentPage, setCarsCurrentPage, carsTotalPages, fetchCarsWithFilters, carsLoading, carsError } = useData();
-  const [priceRange, setPriceRange] = useState(0);
+  const { cars, favorites, toggleFavorite } = useData();
+  const [priceRange, setPriceRange] = useState([0, 0]); // Khởi tạo priceRange là [0, 0]
   const [selectedBrand, setSelectedBrand] = useState('Tất cả');
   const [selectedSeats, setSelectedSeats] = useState('Tất cả');
   const [selectedModel, setSelectedModel] = useState('Tất cả');
   const [maxPrice, setMaxPrice] = useState(0);
-  const [filters, setFilters] = useState({
-    priceMax: undefined,
-    brand: 'Tất cả',
-    seats: 'Tất cả',
-    model: 'Tất cả',
-  });
+  const [currentPage, setCurrentPage] = useState(0);
+  const carsPerPage = 9;
 
-  // Debounce function for API calls
-  const debounce = (func, delay) => {
-    let timeoutId;
-    return (...args) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => func(...args), delay);
-    };
-  };
-
-  // Debounced fetch function
-  const debouncedFetchCars = useCallback(
-    debounce((filters, page) => {
-      fetchCarsWithFilters(filters, page);
-    }, 500),
-    [fetchCarsWithFilters]
-  );
-
-  // Initial fetch without filters to populate options
-  useEffect(() => {
-    fetchCarsWithFilters({}, 0);
-  }, [fetchCarsWithFilters]);
-
-  // Update filters and fetch when they change
-  useEffect(() => {
-    const newFilters = {
-      priceMax: priceRange > 0 ? priceRange : undefined,
-      brand: selectedBrand,
-      seats: selectedSeats,
-      model: selectedModel,
-    };
-    setFilters(newFilters);
-    debouncedFetchCars(newFilters, carsCurrentPage);
-  }, [priceRange, selectedBrand, selectedSeats, selectedModel, carsCurrentPage, debouncedFetchCars]);
-
-  // Update maxPrice when cars change
+  // Cập nhật maxPrice và priceRange khi danh sách xe thay đổi
   useEffect(() => {
     if (cars && cars.length > 0) {
       const newMaxPrice = Math.max(...cars.map(car => car.price), 0);
       setMaxPrice(newMaxPrice);
-      if (priceRange === 0) {
-        setPriceRange(newMaxPrice);
-      }
+      setPriceRange([0, newMaxPrice]); // Đặt priceRange thành [0, maxPrice]
     } else {
       setMaxPrice(0);
-      if (priceRange === 0) setPriceRange(0);
+      setPriceRange([0, 0]);
     }
-  }, [cars, priceRange]);
+  }, [cars]);
 
-  // Memoize filter options to prevent recalculating on every render
+  // Lọc xe dựa trên bộ lọc
+  const filteredCars = useMemo(() => {
+    return cars.filter(car => {
+      const priceInRange = car.price >= priceRange[0] && car.price <= priceRange[1];
+      const brandMatch = selectedBrand === 'Tất cả' || car.brand === selectedBrand;
+      const seatsMatch = selectedSeats === 'Tất cả' || car.numberOfSeats.toString() === selectedSeats;
+      const modelMatch = selectedModel === 'Tất cả' || car.model === selectedModel;
+      return priceInRange && brandMatch && seatsMatch && modelMatch;
+    });
+  }, [cars, priceRange, selectedBrand, selectedSeats, selectedModel]);
+
+  // Tính toán phân trang
+  const totalPages = Math.ceil(filteredCars.length / carsPerPage);
+  const paginatedCars = filteredCars.slice(
+    currentPage * carsPerPage,
+    (currentPage + 1) * carsPerPage
+  );
+
+  // Memoize các tùy chọn bộ lọc
   const brands = useMemo(() => {
-    return cars && cars.length > 0 ? ['Tất cả', ...[...new Set(cars.map(car => car.brand))].sort()] : ['Tất cả'];
+    return cars && cars.length > 0
+      ? ['Tất cả', ...[...new Set(cars.map(car => car.brand))].sort()]
+      : ['Tất cả'];
   }, [cars]);
 
   const seats = useMemo(() => {
-    return cars && cars.length > 0 ? ['Tất cả', ...[...new Set(cars.map(car => car.numberOfSeats))].sort((a, b) => a - b)] : ['Tất cả'];
+    return cars && cars.length > 0
+      ? ['Tất cả', ...[...new Set(cars.map(car => car.numberOfSeats))].sort((a, b) => a - b)]
+      : ['Tất cả'];
   }, [cars]);
 
   const models = useMemo(() => {
-    return cars && cars.length > 0 ? ['Tất cả', ...[...new Set(cars.map(car => car.model))].sort()] : ['Tất cả'];
+    return cars && cars.length > 0
+      ? ['Tất cả', ...[...new Set(cars.map(car => car.model))].sort()]
+      : ['Tất cả'];
   }, [cars]);
 
   return (
@@ -91,7 +75,7 @@ const CarList = () => {
             {/* Lọc theo giá */}
             <div>
               <p className="mb-2">
-                Khoảng giá: {priceRange > 0 ? formatPrice(priceRange) : 'Tất cả'}
+                Khoảng giá:
               </p>
               <div className="flex items-center gap-2">
                 <input
@@ -99,13 +83,13 @@ const CarList = () => {
                   min="0"
                   max={maxPrice}
                   step="1000"
-                  value={priceRange}
+                  value={priceRange[1]}
                   onChange={(e) => {
-                    setPriceRange(Number(e.target.value));
-                    setCarsCurrentPage(0);
+                    setPriceRange([0, Number(e.target.value)]);
+                    setCurrentPage(0);
                   }}
                   className="w-full"
-                  disabled={maxPrice === 0 || carsLoading}
+                  disabled={maxPrice === 0}
                 />
               </div>
               <div className="flex justify-between text-sm text-gray-500">
@@ -121,9 +105,9 @@ const CarList = () => {
                 value={selectedBrand}
                 onChange={(e) => {
                   setSelectedBrand(e.target.value);
-                  setCarsCurrentPage(0);
+                  setCurrentPage(0);
                 }}
-                disabled={brands.length <= 1 || carsLoading}
+                disabled={brands.length <= 1}
               >
                 {brands.map(brand => (
                   <option key={brand} value={brand}>{brand}</option>
@@ -138,9 +122,9 @@ const CarList = () => {
                 value={selectedSeats}
                 onChange={(e) => {
                   setSelectedSeats(e.target.value);
-                  setCarsCurrentPage(0);
+                  setCurrentPage(0);
                 }}
-                disabled={seats.length <= 1 || carsLoading}
+                disabled={seats.length <= 1}
               >
                 {seats.map(seat => (
                   <option key={seat} value={seat}>{seat}</option>
@@ -155,9 +139,9 @@ const CarList = () => {
                 value={selectedModel}
                 onChange={(e) => {
                   setSelectedModel(e.target.value);
-                  setCarsCurrentPage(0);
+                  setCurrentPage(0);
                 }}
-                disabled={models.length <= 1 || carsLoading}
+                disabled={models.length <= 1}
               >
                 {models.map(model => (
                   <option key={model} value={model}>{model}</option>
@@ -168,29 +152,21 @@ const CarList = () => {
         </div>
         {/* Danh sách xe */}
         <div className="flex-1">
-          {carsLoading ? (
-            <div className="text-center py-8 text-gray-500">
-              Đang tải danh sách xe...
-            </div>
-          ) : carsError ? (
-            <div className="text-center py-8 text-red-500">
-              Lỗi khi tải danh sách xe: {carsError}
-            </div>
-          ) : cars.length === 0 ? (
+          {filteredCars.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               Không tìm thấy xe phù hợp với tiêu chí tìm kiếm
             </div>
           ) : (
             <div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {cars.map(car => (
+                {paginatedCars.map(car => (
                   <CarCard key={car.carId} car={car} />
                 ))}
               </div>
               <Pagination
-                currentPage={carsCurrentPage}
-                totalPages={carsTotalPages}
-                onPageChange={setCarsCurrentPage}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
               />
             </div>
           )}
@@ -200,6 +176,7 @@ const CarList = () => {
   );
 };
 
+// Component CarCard không thay đổi
 const CarCard = ({ car }) => {
   const navigate = useNavigate();
   const { favorites, toggleFavorite } = useData();
