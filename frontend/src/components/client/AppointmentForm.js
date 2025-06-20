@@ -37,7 +37,7 @@ const AppointmentForm = () => {
       }
 
       addAppointmentAndCustomer(formData, carId );
-      alert('Đặt lịch hẹn thành công!');
+      
       navigate('/client/cars');
     } catch (error) {
       console.error('Error:', error);

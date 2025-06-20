@@ -603,8 +603,10 @@ export const DataProvider = ({ children }) => {
       }
       const result = await response.json();
       if (!response.ok) {
-        throw new Error(result.message || 'Failed to add appointment');
+        alert('Bạn đã có lịch hẹn với xe này rồi !');
+        return;
       }
+      alert('Đặt lịch hẹn thành công!');
       await fetchAppointments();
       return result;
     } catch (error) {

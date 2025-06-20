@@ -73,7 +73,7 @@ public class FavoriteCarService implements IFavoriteCarService {
             return new PageImpl<>(Collections.emptyList(), pageable, 0);
         }
         Page<FavoriteCarEntity> favoriteCarsPage = favoriteCarRepository.findByCustomerId(customer.getId(), pageable);
-        List<CarResponse> carResponses = favoriteCarsPage.getContent()
+         List<CarResponse> carResponses = favoriteCarsPage.getContent()
                 .stream()
                 .map(FavoriteCarEntity::getCar)
                 .filter(Objects::nonNull)
