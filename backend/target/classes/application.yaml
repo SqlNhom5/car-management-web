@@ -33,3 +33,11 @@ jwt:
   expiration: 86400000
   valid-duration: 3600 # in second
   refresh-duration : 36000
+
+mailServer:
+  host: smtp.gmail.com
+  port: 587
+  email: truongmessi2k4@gmail.com
+  password: gzuk msgc rnia ahnq
+  protocol: smtp
+  isSSL: false
