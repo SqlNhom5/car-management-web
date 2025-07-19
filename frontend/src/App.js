@@ -19,6 +19,9 @@ import AppointmentManagement from './components/appointments/AppointmentManageme
 import CarDetail from './components/client/CarDetail';
 import DealershipInfo from './components/client/DealershipInfo';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import OtpVerification from './pages/OtpVerification';
+import ResetPassword from './pages/ResetPassword';
 import { getToken } from './contexts/localStorageService';
 
 // ProtectedRoute cho Admin: Yêu cầu vai trò admin
@@ -26,7 +29,7 @@ const ProtectedAdminRoute = ({ children }) => {
   const getUserRole = () => {
     const token = getToken();
     if (!token) return null;
-
+ 
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       return payload.sub === 'admin' || payload.scope === 'ROLE_ADMIN' ? 'admin' : null;
@@ -64,6 +67,9 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/otp-verification" element={<OtpVerification />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             {/* Admin Routes */}
             <Route
               path="/"

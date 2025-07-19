@@ -33,4 +33,7 @@ public class UserEntity {
             inverseJoinColumns = @JoinColumn(name = "role_name")
     )
     Set<RoleEntity> roles;
+
+    @OneToOne(mappedBy = "user")
+    ForgotPassword forgotPassword;
 }

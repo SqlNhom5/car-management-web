@@ -6,7 +6,6 @@ import com.vehicle.marketplace.service.ClientService;
 import com.vehicle.marketplace.service.MailService;
 import com.vehicle.marketplace.utils.Const;
 import com.vehicle.marketplace.utils.DataUtil;
-import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

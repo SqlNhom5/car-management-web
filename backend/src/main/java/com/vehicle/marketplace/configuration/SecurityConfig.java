@@ -23,7 +23,7 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINTS = {
             "/auth/token", "/auth/logout", "/api/users", "/auth/introspect","/auth/refresh",
-            "/uploads", "/api/cars","/api/customers/register"
+            "/uploads", "/api/cars","/api/customers/register","/forgotPassword/**"
     };
 
 

@@ -84,13 +84,18 @@ const Login = () => {
                         {isSubmitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
                     </button>
                 </form>
-                <div className="register-link">
-                    <p>
+                <div className="register-link" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
+                    <div>
                         Chưa có tài khoản?{' '}
                         <Link to="/register" className="text-blue-600 hover:underline">
                             Đăng ký
                         </Link>
-                    </p>
+                    </div>
+                    <div>
+                        <Link to="/forgot-password" className="text-blue-600 hover:underline">
+                            Quên mật khẩu?
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>
